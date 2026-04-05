@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "코람코자산운용",
+      "ticker": "비상장",
+      "date": "20260406",
+      "file": "코람코자산운용_20260406.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
       "company": "Vertiv Holdings",
       "ticker": "VRT",
       "date": "20260405",
