@@ -1,5 +1,20 @@
 {
   "name": "stock-intel-dashboard",
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
-  "reports": []
+  "reports": [
+    {
+      "company": "Vertiv Holdings",
+      "ticker": "VRT",
+      "date": "20260405",
+      "file": "Vertiv_20260405.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Hewlett Packard Enterprise",
+      "ticker": "HPE",
+      "date": "20260405",
+      "file": "HPE_20260405.html",
+      "verdict": "LEAN BUY"
+    }
+  ]
 }
