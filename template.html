@@ -538,6 +538,12 @@
     <div class="verdict-votes" id="verdict-votes"></div>
   </div>
 
+  <!-- 1-Year Price Trend -->
+  <div class="chart-card" style="margin-bottom:28px">
+    <h3>1-Year Price Trend</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+
   <!-- Price Target -->
   <div class="price-section">
     <h3>Price Target & Strategy</h3>
@@ -686,6 +692,78 @@ document.getElementById('signal-grid').innerHTML = ts.signals.map(s => `
     </div>
   </div>
 `).join('');
+
+// ===== 1-YEAR PRICE CHART =====
+if (D.priceHistory && D.priceHistory.length > 0) {
+  const ph = D.priceHistory;
+  const priceCtx = document.getElementById('priceChart').getContext('2d');
+  const gradient = priceCtx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, 'rgba(88, 166, 255, 0.25)');
+  gradient.addColorStop(1, 'rgba(88, 166, 255, 0.0)');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: ph.map(p => p.date),
+      datasets: [
+        {
+          label: 'Price',
+          data: ph.map(p => p.close),
+          borderColor: '#58A6FF',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHitRadius: 8
+        },
+        ...(D.priceMA120 ? [{
+          label: '120-day MA',
+          data: D.priceMA120,
+          borderColor: 'rgba(210,153,34,0.6)',
+          borderWidth: 1.5,
+          borderDash: [6, 3],
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#8B949E', font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'line', padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#161B22',
+          borderColor: '#30363D',
+          borderWidth: 1,
+          titleColor: '#E6EDF3',
+          bodyColor: '#8B949E',
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + fmt(ctx.parsed.y, D.currency);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10, family: 'Pretendard Variable' }, maxTicksLimit: 12 }
+        },
+        y: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10 }, callback: v => fmt(v, D.currency) }
+        }
+      }
+    }
+  });
+}
 
 // ===== RADAR CHART =====
 const radarCtx = document.getElementById('radarChart').getContext('2d');

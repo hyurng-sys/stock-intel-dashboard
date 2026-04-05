@@ -538,6 +538,12 @@
     <div class="verdict-votes" id="verdict-votes"></div>
   </div>
 
+  <!-- 1-Year Price Trend -->
+  <div class="chart-card" style="margin-bottom:28px">
+    <h3>1-Year Price Trend</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+
   <!-- Price Target -->
   <div class="price-section">
     <h3>Price Target & Strategy</h3>
@@ -605,7 +611,7 @@
 
 <script>
 // ===== DATA INJECTION POINT =====
-const D = {"date": "2026-04-05", "company": "Vertiv Holdings", "ticker": "VRT", "market": "NYSE", "verdict": "BUY", "guruVotes": {"buy": 4, "hold": 1, "sell": 1}, "currentPrice": 261.7, "currency": "USD", "priceTarget": {"buyPrice": 240, "target1": {"price": 284, "pct": 9, "basis": "애널리스트 평균 목표가"}, "target2": {"price": 325, "pct": 24, "basis": "애널리스트 최고 목표가 / DCF"}, "target3": {"price": 400, "pct": 53, "basis": "AI 프리미엄 FY2026 EPS $6.0 × PER 67x"}, "stopLoss": {"price": 216, "pct": -17, "basis": "200일 이동평균선 부근"}, "trailingStop": -15}, "timingSignals": {"total": 2, "max": 6, "verdict": "대기 (분할 매수 검토)", "signals": [{"name": "RSI < 40", "met": false, "value": "RSI 63~66 (중립)"}, {"name": "MACD 골든크로스", "met": false, "value": "혼조 (모멘텀 둔화)"}, {"name": "120일선 부근", "met": false, "value": "120일선 대비 +20% 위"}, {"name": "PER 할인", "met": false, "value": "Trailing 56~77x (5년 평균 수준)"}, {"name": "S&P 500 편입", "met": true, "value": "2026.03.23 편입 완료"}, {"name": "구루 4명+ BUY", "met": true, "value": "4명 BUY"}]}, "fundamentals": {"revenue": {"value": "$10.23B", "growth": "+27.7% YoY", "verdict": "우수"}, "operatingMargin": {"value": "20.1%", "trend": "개선 (+410bps)", "verdict": "우수"}, "roe": {"value": "33.8%", "trend": "", "verdict": "우수"}, "fcf": {"value": "$1.9B", "growth": "+67% YoY", "verdict": "우수"}, "debtRatio": {"value": "0.73x", "trend": "대폭 개선", "verdict": "양호"}}, "valuation": {"per": {"current": 56, "avg5y": 56.5, "peer": 33.0, "verdict": "고평가"}, "pbr": {"current": 19.14, "avg5y": null, "peer": null, "verdict": "고평가"}, "evEbitda": {"current": 30, "avg5y": null, "peer": 18.4, "verdict": "고평가"}, "peg": {"value": 0.9, "avg5y": null, "peer": null, "verdict": "양호"}}, "aiRelevance": {"allianceRating": "★★★ (추정)", "axes": {"AIDC": {"score": "◎", "note": "쿨링+전력 풀스택. 800 VDC"}, "AICC": {"score": "✕", "note": "직접 연관 없음"}, "SovereignAI": {"score": "△", "note": "글로벌 기업, 간접 기여"}, "AX": {"score": "✕", "note": "직접 연관 없음"}}}, "risks": [{"type": "기업", "desc": "PER 56~77x 밸류에이션 부담", "impact": "높음", "probability": "중간"}, {"type": "경쟁", "desc": "Schneider/Eaton 공격 투자", "impact": "중간", "probability": "중간"}, {"type": "규제", "desc": "트럼프 관세 — 하루 -10.53% 급락 사례", "impact": "높음", "probability": "중간"}, {"type": "매크로", "desc": "AI CAPEX 사이클 둔화 시 수주 급감", "impact": "높음", "probability": "낮음"}, {"type": "수급", "desc": "S&P 500 편입 효과 소멸", "impact": "중간", "probability": "낮음"}], "gurus": [{"name": "워런 버핏", "style": "가치투자", "verdict": "HOLD", "confidence": "중간", "target": 200, "reasons": ["ROE 33.8%, FCF $1.9B 우수하나 PER 56~77x 과도", "경제적 해자 인정, 가격 부담"]}, {"name": "벤저민 그레이엄", "style": "안전마진", "verdict": "SELL", "confidence": "높음", "target": 33, "reasons": ["PER 56x, PBR 19x — 모든 안전마진 기준 미충족", "그레이엄 넘버 $32.6 대비 현재가 8배 괴리"]}, {"name": "피터 린치", "style": "성장투자", "verdict": "BUY", "confidence": "높음", "target": 325, "reasons": ["PEG 0.90 < 1.0 매력적. 매출 +27.7% 폭발 성장", "$15B 수주잔고 = 2년+ 성장 가시성"]}, {"name": "캐시 우드", "style": "혁신투자", "verdict": "BUY", "confidence": "높음", "target": 400, "reasons": ["AI DC TAM $500B+. 파괴적 기술 전환 핵심", "800 VDC + 리퀴드쿨링 기술 리더십"]}, {"name": "기술적 분석가", "style": "차트분석", "verdict": "BUY", "confidence": "중간", "target": 282, "reasons": ["모든 MA 위 정배열. S&P 500 편입", "RSI 66 과열 경계이나 70 미만"]}, {"name": "AI사업 내부자", "style": "U+ 관점", "verdict": "BUY", "confidence": "높음", "target": 300, "reasons": ["파주 AIDC 핵심 공급사 후보", "NVIDIA 800 VDC = LG U+ DSX 인증 시너지"]}], "axisRadar": {"fundamentals": 3.0, "valuation": 1.0, "technicals": 2.5, "aiRelevance": 2.5, "risk": 1.5}, "disclaimer": "본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다."};
+const D = {"date": "2026-04-05", "company": "Vertiv Holdings", "ticker": "VRT", "market": "NYSE", "verdict": "BUY", "guruVotes": {"buy": 4, "hold": 1, "sell": 1}, "currentPrice": 261.7, "currency": "USD", "priceHistory": [{"date": "2025-04-07", "close": 69.61}, {"date": "2025-04-14", "close": 73.21}, {"date": "2025-04-21", "close": 86.95}, {"date": "2025-04-28", "close": 95.0}, {"date": "2025-05-05", "close": 94.06}, {"date": "2025-05-12", "close": 106.04}, {"date": "2025-05-19", "close": 104.14}, {"date": "2025-05-26", "close": 107.93}, {"date": "2025-06-02", "close": 115.36}, {"date": "2025-06-09", "close": 110.97}, {"date": "2025-06-16", "close": 118.54}, {"date": "2025-06-23", "close": 127.16}, {"date": "2025-06-30", "close": 127.84}, {"date": "2025-07-07", "close": 123.3}, {"date": "2025-07-14", "close": 129.06}, {"date": "2025-07-21", "close": 137.47}, {"date": "2025-07-28", "close": 141.59}, {"date": "2025-08-04", "close": 139.93}, {"date": "2025-08-11", "close": 133.07}, {"date": "2025-08-18", "close": 125.97}, {"date": "2025-08-25", "close": 127.55}, {"date": "2025-09-01", "close": 124.0}, {"date": "2025-09-08", "close": 134.84}, {"date": "2025-09-15", "close": 143.6}, {"date": "2025-09-22", "close": 138.62}, {"date": "2025-09-29", "close": 160.2}, {"date": "2025-10-06", "close": 169.01}, {"date": "2025-10-13", "close": 174.0}, {"date": "2025-10-20", "close": 186.06}, {"date": "2025-10-27", "close": 192.86}, {"date": "2025-11-03", "close": 179.8}, {"date": "2025-11-10", "close": 170.97}, {"date": "2025-11-17", "close": 159.83}, {"date": "2025-11-24", "close": 179.73}, {"date": "2025-12-01", "close": 189.02}, {"date": "2025-12-08", "close": 161.27}, {"date": "2025-12-15", "close": 159.82}, {"date": "2025-12-22", "close": 167.58}, {"date": "2025-12-29", "close": 175.61}, {"date": "2026-01-05", "close": 163.58}, {"date": "2026-01-12", "close": 176.93}, {"date": "2026-01-19", "close": 182.49}, {"date": "2026-01-26", "close": 186.18}, {"date": "2026-02-02", "close": 195.58}, {"date": "2026-02-09", "close": 234.53}, {"date": "2026-02-16", "close": 243.75}, {"date": "2026-02-23", "close": 254.89}, {"date": "2026-03-02", "close": 241.78}, {"date": "2026-03-09", "close": 258.88}, {"date": "2026-03-16", "close": 255.88}, {"date": "2026-03-23", "close": 251.07}, {"date": "2026-03-30", "close": 261.29}, {"date": "2026-04-02", "close": 261.29}], "priceMA120": [104.35, 101.6, 99.94, 98.13, 96.08, 94.33, 91.85, 91.31, 90.96, 91.13, 92.46, 94.34, 96.86, 98.96, 101.34, 105.06, 109.9, 114.03, 117.55, 119.85, 121.76, 123.52, 125.22, 127.54, 129.35, 131.98, 135.4, 138.66, 142.12, 145.95, 149.27, 151.74, 153.05, 155.3, 158.18, 159.84, 161.83, 164.19, 167.22, 168.92, 170.88, 173.46, 174.98, 176.55, 180.11, 183.5, 187.15, 190.8, 195.97, 201.62, 205.81, 210.07, 215.95], "priceTarget": {"buyPrice": 240, "target1": {"price": 284, "pct": 9, "basis": "애널리스트 평균 목표가"}, "target2": {"price": 325, "pct": 24, "basis": "애널리스트 최고 목표가 / DCF"}, "target3": {"price": 400, "pct": 53, "basis": "AI 프리미엄 FY2026 EPS $6.0 × PER 67x"}, "stopLoss": {"price": 216, "pct": -17, "basis": "200일 이동평균선 부근"}, "trailingStop": -15}, "timingSignals": {"total": 2, "max": 6, "verdict": "대기 (분할 매수 검토)", "signals": [{"name": "RSI < 40", "met": false, "value": "RSI 63~66 (중립)"}, {"name": "MACD 골든크로스", "met": false, "value": "혼조 (모멘텀 둔화)"}, {"name": "120일선 부근", "met": false, "value": "120일선 대비 +20% 위"}, {"name": "PER 할인", "met": false, "value": "Trailing 56~77x (5년 평균 수준)"}, {"name": "S&P 500 편입", "met": true, "value": "2026.03.23 편입 완료"}, {"name": "구루 4명+ BUY", "met": true, "value": "4명 BUY"}]}, "fundamentals": {"revenue": {"value": "$10.23B", "growth": "+27.7% YoY", "verdict": "우수"}, "operatingMargin": {"value": "20.1%", "trend": "개선 (+410bps)", "verdict": "우수"}, "roe": {"value": "33.8%", "trend": "", "verdict": "우수"}, "fcf": {"value": "$1.9B", "growth": "+67% YoY", "verdict": "우수"}, "debtRatio": {"value": "0.73x", "trend": "대폭 개선", "verdict": "양호"}}, "valuation": {"per": {"current": 56, "avg5y": 56.5, "peer": 33.0, "verdict": "고평가"}, "pbr": {"current": 19.14, "avg5y": null, "peer": null, "verdict": "고평가"}, "evEbitda": {"current": 30, "avg5y": null, "peer": 18.4, "verdict": "고평가"}, "peg": {"value": 0.9, "avg5y": null, "peer": null, "verdict": "양호"}}, "aiRelevance": {"allianceRating": "★★★ (추정)", "axes": {"AIDC": {"score": "◎", "note": "쿨링+전력 풀스택. 800 VDC"}, "AICC": {"score": "✕", "note": "직접 연관 없음"}, "SovereignAI": {"score": "△", "note": "글로벌 기업, 간접 기여"}, "AX": {"score": "✕", "note": "직접 연관 없음"}}}, "risks": [{"type": "기업", "desc": "PER 56~77x 밸류에이션 부담", "impact": "높음", "probability": "중간"}, {"type": "경쟁", "desc": "Schneider/Eaton 공격 투자", "impact": "중간", "probability": "중간"}, {"type": "규제", "desc": "트럼프 관세 — 하루 -10.53% 급락 사례", "impact": "높음", "probability": "중간"}, {"type": "매크로", "desc": "AI CAPEX 사이클 둔화 시 수주 급감", "impact": "높음", "probability": "낮음"}, {"type": "수급", "desc": "S&P 500 편입 효과 소멸", "impact": "중간", "probability": "낮음"}], "gurus": [{"name": "워런 버핏", "style": "가치투자", "verdict": "HOLD", "confidence": "중간", "target": 200, "reasons": ["ROE 33.8%, FCF $1.9B 우수하나 PER 56~77x 과도", "경제적 해자 인정, 가격 부담"]}, {"name": "벤저민 그레이엄", "style": "안전마진", "verdict": "SELL", "confidence": "높음", "target": 33, "reasons": ["PER 56x, PBR 19x — 모든 안전마진 기준 미충족", "그레이엄 넘버 $32.6 대비 현재가 8배 괴리"]}, {"name": "피터 린치", "style": "성장투자", "verdict": "BUY", "confidence": "높음", "target": 325, "reasons": ["PEG 0.90 < 1.0 매력적. 매출 +27.7% 폭발 성장", "$15B 수주잔고 = 2년+ 성장 가시성"]}, {"name": "캐시 우드", "style": "혁신투자", "verdict": "BUY", "confidence": "높음", "target": 400, "reasons": ["AI DC TAM $500B+. 파괴적 기술 전환 핵심", "800 VDC + 리퀴드쿨링 기술 리더십"]}, {"name": "기술적 분석가", "style": "차트분석", "verdict": "BUY", "confidence": "중간", "target": 282, "reasons": ["모든 MA 위 정배열. S&P 500 편입", "RSI 66 과열 경계이나 70 미만"]}, {"name": "AI사업 내부자", "style": "U+ 관점", "verdict": "BUY", "confidence": "높음", "target": 300, "reasons": ["파주 AIDC 핵심 공급사 후보", "NVIDIA 800 VDC = DSX 인증 시너지"]}], "axisRadar": {"fundamentals": 3.0, "valuation": 1.0, "technicals": 2.5, "aiRelevance": 2.5, "risk": 1.5}, "disclaimer": "본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다."};
 
 // ===== HELPERS =====
 const fmt = (n, cur) => {
@@ -686,6 +692,78 @@ document.getElementById('signal-grid').innerHTML = ts.signals.map(s => `
     </div>
   </div>
 `).join('');
+
+// ===== 1-YEAR PRICE CHART =====
+if (D.priceHistory && D.priceHistory.length > 0) {
+  const ph = D.priceHistory;
+  const priceCtx = document.getElementById('priceChart').getContext('2d');
+  const gradient = priceCtx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, 'rgba(88, 166, 255, 0.25)');
+  gradient.addColorStop(1, 'rgba(88, 166, 255, 0.0)');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: ph.map(p => p.date),
+      datasets: [
+        {
+          label: 'Price',
+          data: ph.map(p => p.close),
+          borderColor: '#58A6FF',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHitRadius: 8
+        },
+        ...(D.priceMA120 ? [{
+          label: '120-day MA',
+          data: D.priceMA120,
+          borderColor: 'rgba(210,153,34,0.6)',
+          borderWidth: 1.5,
+          borderDash: [6, 3],
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#8B949E', font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'line', padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#161B22',
+          borderColor: '#30363D',
+          borderWidth: 1,
+          titleColor: '#E6EDF3',
+          bodyColor: '#8B949E',
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + fmt(ctx.parsed.y, D.currency);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10, family: 'Pretendard Variable' }, maxTicksLimit: 12 }
+        },
+        y: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10 }, callback: v => fmt(v, D.currency) }
+        }
+      }
+    }
+  });
+}
 
 // ===== RADAR CHART =====
 const radarCtx = document.getElementById('radarChart').getContext('2d');
