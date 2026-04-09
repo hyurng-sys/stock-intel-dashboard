@@ -3,6 +3,41 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Synopsys",
+      "ticker": "SNPS",
+      "date": "20260409",
+      "file": "Synopsys_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "CoreWeave",
+      "ticker": "CRWV",
+      "date": "20260409",
+      "file": "CoreWeave_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Coherent Corp",
+      "ticker": "COHR",
+      "date": "20260409",
+      "file": "Coherent_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Lumentum",
+      "ticker": "LITE",
+      "date": "20260409",
+      "file": "Lumentum_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Nebius Group",
+      "ticker": "NBIS",
+      "date": "20260409",
+      "file": "Nebius_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "Constellation Energy",
       "ticker": "CEG",
       "date": "20260409",
