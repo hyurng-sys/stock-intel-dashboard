@@ -3,6 +3,41 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "NVIDIA",
+      "ticker": "NVDA",
+      "date": "20260409",
+      "file": "NVIDIA_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Vertiv Holdings",
+      "ticker": "VRT",
+      "date": "20260409",
+      "file": "Vertiv_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Eaton Corporation",
+      "ticker": "ETN",
+      "date": "20260409",
+      "file": "Eaton_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "HD현대일렉트릭",
+      "ticker": "267260",
+      "date": "20260409",
+      "file": "HD현대일렉트릭_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Equinix",
+      "ticker": "EQIX",
+      "date": "20260409",
+      "file": "Equinix_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "코람코자산운용",
       "ticker": "비상장",
       "date": "20260406",
