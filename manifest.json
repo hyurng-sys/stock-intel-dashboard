@@ -3,6 +3,41 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Accenture",
+      "ticker": "ACN",
+      "date": "20260409",
+      "file": "Accenture_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Alphabet",
+      "ticker": "GOOGL",
+      "date": "20260409",
+      "file": "Alphabet_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Amazon",
+      "ticker": "AMZN",
+      "date": "20260409",
+      "file": "Amazon_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "SK Telecom",
+      "ticker": "SKM",
+      "date": "20260409",
+      "file": "SK_Telecom_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Snowflake",
+      "ticker": "SNOW",
+      "date": "20260409",
+      "file": "Snowflake_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "Synopsys",
       "ticker": "SNPS",
       "date": "20260409",
