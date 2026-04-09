@@ -3,6 +3,41 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Constellation Energy",
+      "ticker": "CEG",
+      "date": "20260409",
+      "file": "Constellation_Energy_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Arista Networks",
+      "ticker": "ANET",
+      "date": "20260409",
+      "file": "Arista_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Marvell Technology",
+      "ticker": "MRVL",
+      "date": "20260409",
+      "file": "Marvell_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Modine Manufacturing",
+      "ticker": "MOD",
+      "date": "20260409",
+      "file": "Modine_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Ciena Corporation",
+      "ticker": "CIEN",
+      "date": "20260409",
+      "file": "Ciena_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "NVIDIA",
       "ticker": "NVDA",
       "date": "20260409",
