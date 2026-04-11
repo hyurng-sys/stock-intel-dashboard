@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "웰컴저축은행",
+      "ticker": "비상장",
+      "date": "20260411",
+      "file": "웰컴저축은행_20260411.html",
+      "verdict": "IPO 모니터링"
+    },
+    {
       "company": "현대건설",
       "ticker": "000720",
       "date": "20260411",
