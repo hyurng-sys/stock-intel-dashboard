@@ -3,6 +3,13 @@
     "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
     "reports": [
         {
+            "company": "EMP벨스타",
+            "ticker": "비상장",
+            "date": "20260411",
+            "file": "EMP벨스타_20260411.html",
+            "verdict": "IPO MONITOR"
+        },
+        {
             "company": "엘리스그룹",
             "ticker": "비상장",
             "date": "20260411",

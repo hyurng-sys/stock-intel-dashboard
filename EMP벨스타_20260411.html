@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — EMP벨스타 | IPO Monitor | 2026-04-11</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ipo), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ipo);
+    background: rgba(188, 140, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(188, 140, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+
+  .ipo-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    background: rgba(188, 140, 255, 0.08);
+    border: 1px solid rgba(188, 140, 255, 0.3);
+  }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .overview-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 24px; font-weight: 800; color: var(--uplus-magenta); }
+  .overview-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.4); }
+  .tbl td:first-child { font-weight: 600; color: var(--text-primary); }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .pipeline-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 12px;
+    padding: 18px;
+    border-left: 3px solid var(--uplus-magenta);
+  }
+  .pipeline-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .pipeline-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .pipeline-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-top: 8px; }
+  .pipeline-status.active { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .pipeline-status.dev { background: rgba(88,166,255,0.12); color: var(--uplus-magenta); }
+  .pipeline-status.plan { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .pipeline-status.delay { background: rgba(244,112,103,0.12); color: var(--sell); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .chart-wrap { display: flex; justify-content: center; align-items: center; height: 260px; }
+  .chart-wrap canvas { max-height: 260px; }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 { font-size: 13px; font-weight: 600; color: var(--axis-ai); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .ai-axes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ai-axis-card { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; text-align: center; }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid; }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  .meeting-context {
+    background: linear-gradient(135deg, rgba(188,140,255,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(188,140,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .meeting-context h3 { font-size: 13px; font-weight: 600; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .meeting-info { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .meeting-info strong { color: var(--text-primary); }
+
+  .valuation-bar {
+    position: relative;
+    height: 50px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    margin: 24px 0 50px;
+    overflow: visible;
+  }
+  .val-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 62px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .val-marker-label {
+    position: absolute;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .val-range {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 8px;
+    opacity: 0.15;
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .partner-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    border-top: 2px solid var(--uplus-magenta);
+  }
+  .partner-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .partner-type { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .partner-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  .timeline-grid {
+    display: grid;
+    gap: 12px;
+  }
+  .timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px;
+    background: rgba(48,54,61,0.3);
+    border-radius: 10px;
+  }
+  .timeline-date {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ipo);
+    min-width: 90px;
+    white-space: nowrap;
+  }
+  .timeline-content { font-size: 13px; color: var(--text-secondary); }
+  .timeline-content strong { color: var(--text-primary); }
+
+  .uplus-fit {
+    background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.04));
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .uplus-fit h3 { font-size: 13px; font-weight: 600; color: var(--uplus-magenta); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .fit-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .fit-item {
+    background: rgba(13,17,23,0.5);
+    border-radius: 10px;
+    padding: 16px;
+    border-left: 3px solid var(--uplus-magenta);
+  }
+  .fit-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .fit-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  @media (max-width: 900px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+    .partner-grid { grid-template-columns: 1fr 1fr; }
+    .fit-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .ipo-text { font-size: 28px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .partner-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">IPO Monitor Mode</div>
+    <h1>EMP벨스타 (ENP베스타)</h1>
+    <div class="date">2026-04-11 · 미팅일: 2026-04-08 · 이준호 한국대표</div>
+  </header>
+
+  <!-- IPO Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">Comprehensive Verdict</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장 PEF — JP모건 주관 상장 추진 중 · 인천신항 DC 사업 변수 · 상장 시 재검토</div>
+  </div>
+
+  <!-- Meeting Context -->
+  <div class="meeting-context">
+    <h3>Meeting Context</h3>
+    <div class="meeting-info">
+      <strong>미팅 대상:</strong> 이준호 한국대표 (연세대 2002, NYU Stern MBA, 前 삼정KPMG)<br>
+      <strong>미팅 일시:</strong> 2026년 4월 8일 (수) 16:00<br>
+      <strong>미팅 목적:</strong> 인천신항 한국초저온 데이터센터 개발 건 — DBO/운영 파트너십 논의<br>
+      <strong>핵심 포인트:</strong> 에너지 인프라 PEF가 콜드체인 수익성 보완을 위해 20MW DC 사업 진출 모색. LNG 냉열(-162℃) 냉각 기술로 DC 전력비 30~40% 절감 목표. DC 운영 경험 없어 U+ 같은 코로케이션 운영사 파트너 필요.
+    </div>
+  </div>
+
+  <!-- Overview KPIs -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">한국초저온 기업가치</div>
+      <div class="overview-value">1조+</div>
+      <div class="overview-note">원 (2025년 기준)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">2025 투자유치 규모</div>
+      <div class="overview-value">6~7천억</div>
+      <div class="overview-note">원 (JP모건 주도)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">인천신항 프로젝트</div>
+      <div class="overview-value">5,000억</div>
+      <div class="overview-note">원 (DC 20MW 포함)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">운용 AUM</div>
+      <div class="overview-value">7조</div>
+      <div class="overview-note">원 (EMP벨스타 글로벌)</div>
+    </div>
+  </div>
+
+  <!-- Company Fact Sheet -->
+  <div class="card">
+    <h3>기업 팩트시트 — EMP벨스타 (이엠피벨스타)</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th><th>비고</th></tr>
+      <tr>
+        <td>정식 명칭</td>
+        <td>EMP벨스타 (EMP Belstar) — "ENP베스타"는 약칭/오기</td>
+        <td><span class="chip ipo">비상장</span></td>
+      </tr>
+      <tr>
+        <td>설립</td>
+        <td>2007년 뉴욕 (데니엘 윤 회장 + 이준호 한국대표)</td>
+        <td>2014년 EMP 인수 후 현 사명</td>
+      </tr>
+      <tr>
+        <td>본사/사무소</td>
+        <td>뉴욕(본사) · 서울 강남구 도산대로171 · 싱가포르</td>
+        <td>2024.08 싱가포르 지사 설립</td>
+      </tr>
+      <tr>
+        <td>운용 형태</td>
+        <td>글로벌 에너지·인프라 전문 사모펀드(PEF)</td>
+        <td>AUM 약 7조원</td>
+      </tr>
+      <tr>
+        <td>핵심 사업</td>
+        <td>콜드체인 물류 · LNG 냉열 기술 · 신재생에너지 · DC 신규 진출</td>
+        <td>한국초저온 직접 운영</td>
+      </tr>
+      <tr>
+        <td>한국초저온 지분</td>
+        <td>EMP벨스타 50.1% · SK㈜ 21% · 골드만삭스PIA 21% · 기타 7.9%</td>
+        <td>주요 투자자 기관 신뢰도 높음</td>
+      </tr>
+      <tr>
+        <td>상장 여부</td>
+        <td>비상장 — 국내/싱가포르 IPO 추진 중 (JP모건 주관사 선정)</td>
+        <td><span class="chip neutral">IPO 준비 중</span></td>
+      </tr>
+      <tr>
+        <td>LNG 냉열 기술</td>
+        <td>한국가스공사 인천 LNG 기지(-162℃) 냉열 활용 — 국내 유일 초저온 물류</td>
+        <td>전력비 30~40% 절감 (DC 냉각 적용 시)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Project Pipeline -->
+  <div class="card">
+    <h3>핵심 프로젝트 파이프라인</h3>
+    <div class="pipeline-grid">
+      <div class="pipeline-card">
+        <div class="pipeline-name">🏗️ 인천신항 콜드체인+DC 클러스터</div>
+        <div class="pipeline-detail">
+          위치: 인천경제자유구역 송도 콜드체인 전문구역<br>
+          규모: 전체 231,000㎡ (콜드체인 118,000㎡ + DC 20MW)<br>
+          총 투자: 5,000억원 (대우건설 시공 4,930억원)<br>
+          LNG 냉열 이중 냉각 → PUE 1.1~1.2 목표<br>
+          준공 목표: 2029년 (착공: 2026H2 목표)
+        </div>
+        <span class="pipeline-status delay">착공 2년+ 지연 중</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">📦 부산 콜드체인 물류센터</div>
+        <div class="pipeline-detail">
+          위치: 부산 국제산업물류도시<br>
+          규모: 2,447억원 투자<br>
+          특징: LNG 냉열 활용 초저온 물류<br>
+          파트너: 네오밸류, 한국가스기술공사<br>
+          상태: 진행 중
+        </div>
+        <span class="pipeline-status active">진행 중</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">🌏 동남아 확장</div>
+        <div class="pipeline-detail">
+          싱가포르 지사: 2024.08 설립<br>
+          베트남·인도네시아: 계획 단계<br>
+          콜드체인 수요 고성장 시장 공략<br>
+          글로벌 AUM 확대 연계
+        </div>
+        <span class="pipeline-status plan">계획 단계</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">💹 IPO / 투자 엑시트</div>
+        <div class="pipeline-detail">
+          한국초저온 기업가치: 1조원+<br>
+          2025.08: JP모건 주관사 선정<br>
+          투자유치 목표: 6,000~7,000억원<br>
+          상장 예상: 국내 또는 싱가포르 (2026H2~2027H1)<br>
+          구조: 신주+구주 혼합 (리츠 상장 병행 검토)
+        </div>
+        <span class="pipeline-status dev">추진 중</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPO Outlook -->
+  <div class="card">
+    <h3>IPO Outlook — 상장 시나리오 및 예상 밸류에이션</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th><th>상태</th></tr>
+      <tr>
+        <td>주관사</td>
+        <td>JP모건 (2025.08 선정)</td>
+        <td><span class="chip good">확정</span></td>
+      </tr>
+      <tr>
+        <td>상장 예상 시기</td>
+        <td>2026년 하반기 ~ 2027년 상반기 (인천신항 착공 본격화 이후)</td>
+        <td><span class="chip neutral">추정</span></td>
+      </tr>
+      <tr>
+        <td>상장 시장</td>
+        <td>국내 코스피/코스닥 또는 싱가포르 SGX 검토</td>
+        <td><span class="chip neutral">미확정</span></td>
+      </tr>
+      <tr>
+        <td>현재 기업가치</td>
+        <td>1조원+ (한국초저온 기준, 2022~2025년 투자유치 기반)</td>
+        <td><span class="chip ipo">비공개</span></td>
+      </tr>
+      <tr>
+        <td>예상 IPO 규모</td>
+        <td>3,000억 ~ 5,000억원 (투자유치 6~7천억원 기반 추산)</td>
+        <td><span class="chip neutral">추정</span></td>
+      </tr>
+      <tr>
+        <td>IPO 후 매수 전략</td>
+        <td>공모가 기준 EV/EBITDA 15x 이하 + DC 20MW 착공 확인 + LNG 냉열 PoC 검증 완료 시 매수 검토</td>
+        <td><span class="chip neutral">조건부 긍정</span></td>
+      </tr>
+      <tr>
+        <td>주요 상장 리스크</td>
+        <td>인천신항 착공 지연 지속 시 IPO 타이밍 재조정 가능성 높음</td>
+        <td><span class="chip bad">리스크 존재</span></td>
+      </tr>
+    </table>
+
+    <!-- Valuation Bar -->
+    <h3 style="margin-top:24px; margin-bottom:8px;">예상 밸류에이션 스펙트럼 (한국초저온 + DC 사업 합산)</h3>
+    <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">비교 기준: 글로벌 DC 리츠(EV/EBITDA 20~30x) + 콜드체인 물류사(PER 12~18x) 가중평균</div>
+    <div class="valuation-bar">
+      <div class="val-range" style="left:0%; width:30%; background:var(--sell);"></div>
+      <div class="val-range" style="left:30%; width:40%; background:var(--hold);"></div>
+      <div class="val-range" style="left:70%; width:30%; background:var(--buy);"></div>
+
+      <div class="val-marker" style="left:20%; background:var(--sell);">
+        <div class="val-marker-label" style="color:var(--sell);">비관적<br>8,000억</div>
+      </div>
+      <div class="val-marker" style="left:50%; background:var(--ipo);">
+        <div class="val-marker-label" style="color:var(--ipo);">기본<br>1.2조</div>
+      </div>
+      <div class="val-marker" style="left:80%; background:var(--buy);">
+        <div class="val-marker-label" style="color:var(--buy);">낙관적<br>2.0조</div>
+      </div>
+    </div>
+
+    <!-- Comparables -->
+    <h3 style="margin-top:8px; margin-bottom:12px;">비교 상장사</h3>
+    <div class="partner-grid">
+      <div class="partner-card">
+        <div class="partner-name">Equinix (EQIX)</div>
+        <div class="partner-type">글로벌 DC REIT · NASDAQ</div>
+        <div class="partner-detail">EV/EBITDA ~23x · 시총 $70B+<br>DC 리츠 밸류에이션 최고 준거</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">Digital Realty (DLR)</div>
+        <div class="partner-type">글로벌 DC REIT · NYSE</div>
+        <div class="partner-detail">EV/EBITDA ~18x · 배당 3~4%<br>DC 인프라 리츠 비교군</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">CJ대한통운 (000120)</div>
+        <div class="partner-type">콜드체인 물류 · KOSPI</div>
+        <div class="partner-detail">PER ~12x · 콜드체인 인프라<br>국내 물류 밸류에이션 기준</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>5축 평가 레이더</h3>
+      <div class="chart-wrap">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>투자 매력도 분포</h3>
+      <div class="chart-wrap">
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Business Relevance -->
+  <div class="ai-section">
+    <h3>AI 사업 연관성 — U+ 4대 전략축</h3>
+    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+      얼라이언스 평가: <strong style="color:var(--text-primary);">★★☆</strong> (잠재적 DBO 파트너 — DC 진출 초기, U+ 운영역량 필요)
+    </div>
+    <div class="ai-axes">
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AIDC 인프라</div>
+        <div class="ai-axis-score">◎</div>
+        <div class="ai-axis-note">인천 20MW DC 직접 개발 — DBO 파트너 필요</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AICC SaaS</div>
+        <div class="ai-axis-score">✕</div>
+        <div class="ai-axis-note">AICC 연관 없음</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">Sovereign AI</div>
+        <div class="ai-axis-score">○</div>
+        <div class="ai-axis-note">LNG 냉열 국산 AI DC — 친환경 독자 기술</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AX 사업화</div>
+        <div class="ai-axis-score">△</div>
+        <div class="ai-axis-note">DC DCIM AI 최적화 가능성</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- U+ Strategic Fit -->
+  <div class="uplus-fit">
+    <h3>U+ 전략적 시너지 — DBO 모델 적용 가능성</h3>
+    <div class="fit-grid">
+      <div class="fit-item">
+        <div class="fit-title">DBO 운영 파트너</div>
+        <div class="fit-desc">EMP벨스타 자본+부지 / U+ 설계·건설·운영 위탁. 가산 코람코 DBO 모델 동일 구조. 20MW 소규모지만 LNG 냉열 DC 신모델 확보 기회.</div>
+      </div>
+      <div class="fit-item">
+        <div class="fit-title">코로케이션 운영 위탁</div>
+        <div class="fit-desc">2029년 준공 후 U+가 DC 운영 전담. U+ 기존 고객 기반 인천 DC 수요 연결 가능. 인천 포트폴리오 확대 + AI DC 고객 유치.</div>
+      </div>
+      <div class="fit-item">
+        <div class="fit-title">LNG 냉열 기술 연계</div>
+        <div class="fit-desc">LG전자 수냉 기술 + LNG 냉열 하이브리드 냉각. 전력비 30~40% 절감 → PUE 1.1~1.2 목표. 국내 최초 LNG 냉열 AI DC 레퍼런스 확보.</div>
+      </div>
+      <div class="fit-item">
+        <div class="fit-title">쌍방 가치</div>
+        <div class="fit-desc">U+: 인천 포트폴리오+LNG냉열 신모델+DBO 확장. EMP벨스타: DC 운영 파트너+테넌트+기술 신뢰성. 공동: 친환경 AI DC 국내 첫 사례.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Risk Factors -->
+  <div class="card">
+    <h3>리스크 평가</h3>
+    <div class="risk-grid">
+      <div class="risk-card high">
+        <div class="risk-type">착공 지연</div>
+        <div class="risk-desc">2024년 목표 착공이 2026H2로 2년+ 지연. 지분 문제(한국초저온인천 내부) + 원자재가 + 건설경기 복합 요인.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 높음</div>
+      </div>
+      <div class="risk-card high">
+        <div class="risk-type">전력 공급</div>
+        <div class="risk-desc">인천 지역 DC 전력 신청이 "공급 불가" 판정 속출. 인천신항 부지는 전력 승인 완료로 희소성 있으나 추가 용량 확보 불확실.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">PEF 엑시트 리스크</div>
+        <div class="risk-desc">PEF 특성상 IPO/매각 엑시트가 목표. 장기 파트너십 안정성 불확실. U+ DBO 계약의 연속성 보장 필요.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">기술 미검증</div>
+        <div class="risk-desc">LNG 냉열 DC 냉각 기술은 글로벌 레퍼런스 거의 없음. PoC 단계 거쳐야 상용화 가능. 기술 리스크 내재.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">규모 리스크</div>
+        <div class="risk-desc">20MW는 파주 200MW 대비 소규모. U+ 전략적 우선순위에서 후순위 배치 가능. DBO 투자 대비 효과 검증 필요.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 낮음</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">비상장 투자 불가</div>
+        <div class="risk-desc">현재 비상장사로 직접 주식 투자 불가. 장외 거래 또는 IPO 후 진입만 가능. IPO 공모 참여 또는 2차 시장 매수 전략 필요.</div>
+        <div class="risk-meta">영향: 낮음 · 확률: 해당 없음</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPO Monitoring Strategy -->
+  <div class="card">
+    <h3>IPO 모니터링 — 관찰 지표 & 매수 조건</h3>
+    <table class="tbl">
+      <tr><th>체크포인트</th><th>현재 상태</th><th>IPO 매수 판단 기준</th></tr>
+      <tr>
+        <td>인천신항 착공</td>
+        <td><span class="chip neutral">2026H2 목표</span></td>
+        <td>실제 착공 확인 시 긍정 신호</td>
+      </tr>
+      <tr>
+        <td>LNG 냉열 DC PoC</td>
+        <td><span class="chip bad">미진행</span></td>
+        <td>PoC 성공 + 전력비 절감 30%+ 검증 필수</td>
+      </tr>
+      <tr>
+        <td>JP모건 IPO 일정</td>
+        <td><span class="chip neutral">2025.08 선정</span></td>
+        <td>상장 예비심사 신청 후 주시</td>
+      </tr>
+      <tr>
+        <td>DC 테넌트 확보</td>
+        <td><span class="chip bad">미확보</span></td>
+        <td>주요 테넌트(하이퍼스케일러/엔터프라이즈) LOI 확인</td>
+      </tr>
+      <tr>
+        <td>한국초저온인천 지분 정리</td>
+        <td><span class="chip bad">진행 중</span></td>
+        <td>지분 구조 확정 공시 확인</td>
+      </tr>
+      <tr>
+        <td>IPO 후 밸류에이션</td>
+        <td><span class="chip ipo">미정</span></td>
+        <td>공모가 기준 EV/EBITDA 15x 이하 + DC 매출 비중 20%+ 시 매수 검토</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Shareholder Info -->
+  <div class="card">
+    <h3>주주 구성 — 한국초저온 (핵심 자회사)</h3>
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
+      <div style="text-align:center; padding:16px; background:rgba(48,54,61,0.3); border-radius:10px;">
+        <div style="font-size:24px; font-weight:800; color:var(--ipo);">50.1%</div>
+        <div style="font-size:13px; font-weight:600; margin:4px 0;">EMP벨스타</div>
+        <div style="font-size:11px; color:var(--text-muted);">최대주주 · PEF GP</div>
+      </div>
+      <div style="text-align:center; padding:16px; background:rgba(48,54,61,0.3); border-radius:10px;">
+        <div style="font-size:24px; font-weight:800; color:var(--uplus-magenta);">21%</div>
+        <div style="font-size:13px; font-weight:600; margin:4px 0;">SK㈜</div>
+        <div style="font-size:11px; color:var(--text-muted);">전략적 투자자</div>
+      </div>
+      <div style="text-align:center; padding:16px; background:rgba(48,54,61,0.3); border-radius:10px;">
+        <div style="font-size:24px; font-weight:800; color:var(--uplus-magenta);">21%</div>
+        <div style="font-size:13px; font-weight:600; margin:4px 0;">골드만삭스PIA</div>
+        <div style="font-size:11px; color:var(--text-muted);">글로벌 FI</div>
+      </div>
+      <div style="text-align:center; padding:16px; background:rgba(48,54,61,0.3); border-radius:10px;">
+        <div style="font-size:24px; font-weight:800; color:var(--text-secondary);">7.9%</div>
+        <div style="font-size:13px; font-weight:600; margin:4px 0;">기타</div>
+        <div style="font-size:11px; color:var(--text-muted);">글로벌 국부펀드 등</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="card">
+    <h3>주요 이력 & 향후 일정</h3>
+    <div class="timeline-grid">
+      <div class="timeline-item">
+        <div class="timeline-date">2007</div>
+        <div class="timeline-content"><strong>벨스타 설립</strong> — 뉴욕 (데니엘 윤 + 이준호)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2014</div>
+        <div class="timeline-content"><strong>EMP 인수</strong> → 이엠피벨스타로 사명 변경</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2021.10</div>
+        <div class="timeline-content"><strong>부산 물류센터</strong> 건립 계약 (2,447억원)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2022.09</div>
+        <div class="timeline-content"><strong>글로벌 국부펀드</strong>와 6억달러 펀드 조성 완료</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024.05</div>
+        <div class="timeline-content"><strong>인천경제자유구역</strong> 개발 투자의향서(LOI) 제출</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024.08</div>
+        <div class="timeline-content"><strong>싱가포르 지사</strong> 설립 — 동남아 확장 시작</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025.08</div>
+        <div class="timeline-content"><strong>JP모건 주관사 선정</strong> — IPO 6,000~7,000억원 투자유치 추진</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026.02</div>
+        <div class="timeline-content"><strong>인천신항 DC 20MW</strong> 건립 사업변경 계획서 제출 (콜드체인→콜드체인+DC 복합)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026.04</div>
+        <div class="timeline-content"><strong>LG U+ 미팅</strong> — DBO/운영 파트너십 논의 (현재)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026H2~</div>
+        <div class="timeline-content"><strong>인천신항 착공</strong> 목표 + IPO 예비심사 신청 예정</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2027H1</div>
+        <div class="timeline-content"><strong>국내/싱가포르 상장</strong> 예상 (조건 충족 시)</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2029</div>
+        <div class="timeline-content"><strong>인천신항 DC 준공</strong> 목표 (콜드체인+20MW DC)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> 본 분석은 AI 에이전트가 공개 정보 및 노션 미팅준비 DB를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. EMP벨스타(ENP베스타)는 현재 비상장 사모펀드 운용사로 일반 주식 투자 대상이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다. 2026-04-11 기준 정보이며 이후 변경될 수 있습니다.
+  </div>
+
+  <footer class="footer">
+    Stock Intelligence Report — EMP벨스타 (ENP베스타) · 2026-04-11 · IPO Monitor Mode · Generated by Claude Stock Intel Agent
+  </footer>
+
+</div>
+
+<script>
+// ===== RADAR CHART =====
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['사업 모멘텀', '밸류에이션', 'IPO 가능성', 'AI 연관성', '리스크(역)'],
+    datasets: [{
+      label: 'EMP벨스타',
+      data: [2.5, 2.0, 2.0, 2.8, 1.2],
+      fill: true,
+      backgroundColor: 'rgba(188, 140, 255, 0.15)',
+      borderColor: 'rgba(188, 140, 255, 0.8)',
+      pointBackgroundColor: '#BC8CFF',
+      pointBorderColor: '#BC8CFF',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: '#BC8CFF'
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      r: {
+        min: 0,
+        max: 3,
+        ticks: { stepSize: 1, display: false },
+        grid: { color: 'rgba(48,54,61,0.8)' },
+        angleLines: { color: 'rgba(48,54,61,0.8)' },
+        pointLabels: { color: '#8B949E', font: { size: 12, family: 'Pretendard Variable', weight: '600' } }
+      }
+    },
+    plugins: {
+      legend: { display: false }
+    }
+  }
+});
+
+// ===== DONUT CHART — IPO 모니터링 매력도 분포 =====
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['AIDC 사업 가능성', 'IPO 모멘텀', '리스크 요인'],
+    datasets: [{
+      data: [45, 30, 25],
+      backgroundColor: ['#56D4DD', '#BC8CFF', '#F47067'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#B0B0C0', padding: 16, font: { size: 12, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
