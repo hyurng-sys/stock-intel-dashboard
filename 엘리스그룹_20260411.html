@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 엘리스그룹 | IPO Monitor | 2026-04-11</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ipo), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ipo);
+    background: rgba(188, 140, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(188, 140, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+
+  /* IPO Banner */
+  .ipo-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    background: rgba(188, 140, 255, 0.08);
+    border: 1px solid rgba(188, 140, 255, 0.3);
+  }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .overview-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 24px; font-weight: 800; color: var(--uplus-magenta); }
+  .overview-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.4); }
+  .tbl td:first-child { font-weight: 600; color: var(--text-primary); }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .pipeline-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 12px;
+    padding: 18px;
+    border-left: 3px solid var(--uplus-magenta);
+  }
+  .pipeline-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .pipeline-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .pipeline-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-top: 8px; }
+  .pipeline-status.active { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .pipeline-status.dev { background: rgba(88,166,255,0.12); color: var(--uplus-magenta); }
+  .pipeline-status.plan { background: rgba(210,153,34,0.12); color: var(--hold); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .chart-wrap { display: flex; justify-content: center; align-items: center; height: 260px; }
+  .chart-wrap canvas { max-height: 260px; }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 { font-size: 13px; font-weight: 600; color: var(--axis-ai); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .ai-axes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ai-axis-card { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; text-align: center; }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid; }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  .meeting-context {
+    background: linear-gradient(135deg, rgba(188,140,255,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(188,140,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .meeting-context h3 { font-size: 13px; font-weight: 600; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .meeting-info { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .meeting-info strong { color: var(--text-primary); }
+
+  .valuation-bar {
+    position: relative;
+    height: 50px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    margin: 24px 0 50px;
+    overflow: visible;
+  }
+  .val-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 62px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .val-marker-label {
+    position: absolute;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .val-range {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 8px;
+    opacity: 0.15;
+  }
+
+  .partner-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .partner-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    border-top: 2px solid var(--uplus-magenta);
+  }
+  .partner-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .partner-type { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .partner-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  @media (max-width: 900px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+    .partner-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .ipo-text { font-size: 28px; }
+    .overview-grid { grid-template-columns: 1fr; }
+    .partner-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">IPO Monitor Mode</div>
+    <h1>엘리스그룹 (Elice Group)</h1>
+    <p class="date">2026-04-11 · 비상장 (AI 풀스택 — 교육·인프라·클라우드)</p>
+  </header>
+
+  <!-- IPO Monitor Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">COMPREHENSIVE VERDICT</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장사 — 시리즈C 단계 · 공식 IPO 계획 미발표 · 상장 시 재검토</div>
+  </div>
+
+  <!-- Meeting Context -->
+  <div class="meeting-context">
+    <h3>Meeting Context</h3>
+    <div class="meeting-info">
+      <strong>미팅 상대:</strong> 김재원 대표 — 2026.04.08<br>
+      <strong>회사 포지션:</strong> 2015년 11월 창업, AI 교육(LXP) → AI 인프라(PMDC) → 클라우드(ECI) 풀스택 확장<br>
+      <strong>주요 성과:</strong> '2026 아시아태평양 고성장 기업' 선정 (FT·Statista), 3년 매출 성장률 270.56%, SKT MOU (MWC25)<br>
+      <strong>전략 메시지:</strong> "누적 매출 1000억에서 연 매출 1000억으로" — 2024 인터뷰, 국내 최초 블랙웰 탑재 PMDC 출시
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">2025 매출</div>
+      <div class="overview-value">386억</div>
+      <div class="overview-note">YoY +19.5% (추정)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">추정 기업가치</div>
+      <div class="overview-value">1,391억</div>
+      <div class="overview-note">밸류업 플랫폼 추정</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">누적 투자유치</div>
+      <div class="overview-value">335억</div>
+      <div class="overview-note">시리즈C 200억 포함</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">고객사</div>
+      <div class="overview-value">4,700+</div>
+      <div class="overview-note">클라우드 유료 기업</div>
+    </div>
+  </div>
+
+  <!-- Company Overview -->
+  <div class="card">
+    <h3>Company Overview</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th><th>비고</th></tr>
+      <tr><td>회사명</td><td>(주)엘리스그룹</td><td>2015.11 설립</td></tr>
+      <tr><td>대표이사</td><td>김재원</td><td>창업자·대표</td></tr>
+      <tr><td>주요 사업</td><td>AI 교육 플랫폼(LXP) · AI PMDC · 클라우드(ECI) · 에듀부트캠프(트랙)</td><td>AI 풀스택</td></tr>
+      <tr><td>누적 이용자</td><td>280만명 (LXP 기준)</td><td>기업·공공·대학</td></tr>
+      <tr><td>2024 매출</td><td>363억원</td><td>AI인프라 비중 20%→40% 목표</td></tr>
+      <tr><td>2025 매출</td><td>386.4억원 (추정)</td><td>3년 CAGR 270.56%</td></tr>
+      <tr><td>글로벌</td><td>미국 법인(2022) · 싱가포르 법인(2023)</td><td>APAC·미국·유럽 진출 중</td></tr>
+      <tr><td>주요 인증</td><td>CSAP (과기부 클라우드보안인증) — 국내 최초 PMDC 인증</td><td>2026.02 취득</td></tr>
+      <tr><td>상장 여부</td><td><span class="chip ipo">비상장</span></td><td>IPO 공식 계획 미발표</td></tr>
+    </table>
+  </div>
+
+  <!-- Estimated Valuation -->
+  <div class="card">
+    <h3>Estimated Valuation — IPO 상장 시 목표 밸류에이션 (추정)</h3>
+    <table class="tbl">
+      <tr><th>시나리오</th><th>추정 기업가치</th><th>산출 근거</th><th>비고</th></tr>
+      <tr><td style="color:var(--sell)">보수적</td><td style="font-weight:800">1,400~1,700억원</td><td>현재 추정가치 1,391억 + 소폭 프리미엄 (PSR 3.6~4.5x)</td><td>성장 둔화 시나리오</td></tr>
+      <tr><td style="color:var(--hold)">기본</td><td style="font-weight:800">2,500~3,500억원</td><td>PSR 6~9x 적용 (AI 인프라·에듀테크 하이브리드 프리미엄)</td><td>PMDC 성장 본격화</td></tr>
+      <tr><td style="color:var(--buy)">낙관적</td><td style="font-weight:800">4,000~6,000억원</td><td>PSR 10~15x (연매출 1,000억 달성 + 글로벌 확장 성공)</td><td>부산DC 완공·해외 매출 20%+</td></tr>
+    </table>
+    <div class="valuation-bar">
+      <div class="val-range" style="left:10%;width:75%;background:var(--ipo)"></div>
+      <div class="val-marker" style="left:12%;background:var(--sell)"><div class="val-marker-label" style="color:var(--sell)">현재 1,391억</div></div>
+      <div class="val-marker" style="left:28%;background:var(--text-secondary)"><div class="val-marker-label" style="color:var(--text-secondary)">보수적 1,700억</div></div>
+      <div class="val-marker" style="left:50%;background:var(--hold)"><div class="val-marker-label" style="color:var(--hold)">기본 3,000억</div></div>
+      <div class="val-marker" style="left:82%;background:var(--buy)"><div class="val-marker-label" style="color:var(--buy)">낙관적 5,000억</div></div>
+    </div>
+  </div>
+
+  <!-- Investment History -->
+  <div class="card">
+    <h3>Investment Rounds</h3>
+    <table class="tbl">
+      <tr><th>라운드</th><th>투자금액</th><th>주요 투자자</th><th>시점</th><th>누적</th></tr>
+      <tr><td>시드~시리즈B</td><td>135억원</td><td>알토스벤처스 등</td><td>~2022</td><td>135억원</td></tr>
+      <tr><td>시리즈C</td><td>200억원</td><td><strong>버텍스그로쓰</strong>(테마섹 자회사) + 알토스벤처스</td><td>2024.01</td><td>335억원</td></tr>
+      <tr><td>총 투자자</td><td colspan="3">FI 6개사 · SI 1개사 · 해외 투자자 2개사 (총 8개사)</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <!-- Business Pipeline -->
+  <div class="card">
+    <h3>Business Pipeline — 4대 사업축</h3>
+    <div class="pipeline-grid">
+      <div class="pipeline-card">
+        <div class="pipeline-name">AI PMDC (이동식 모듈형 데이터센터)</div>
+        <div class="pipeline-detail">
+          컨테이너형 AI DC, NVIDIA 블랙웰 B200 탑재<br>
+          수랭식 냉각, PUE 1.1~1.2, B200 2,000장 규모 클러스터<br>
+          CSAP 인증 (국내 최초) · SKT MOU (2025.03)<br>
+          부산 대규모 AI DC: 2027~2028년 완공 목표
+        </div>
+        <span class="pipeline-status active">핵심 성장축</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">엘리스LXP (AI 교육 플랫폼)</div>
+        <div class="pipeline-detail">
+          누적 이용자 280만명, 기업·공공·대학 AI 전환 교육<br>
+          맞춤형 실습 환경, AI 코칭, 성과 측정 통합<br>
+          국비 지원 부트캠프 연계 (엘리스트랙)<br>
+          2025년 APAC·미국 서비스 확장 중
+        </div>
+        <span class="pipeline-status active">기존 캐시카우</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">ECI (클라우드 가상화)</div>
+        <div class="pipeline-detail">
+          GPU 활용률 극대화 클라우드 가상화 솔루션<br>
+          고객사 4,700개 돌파 (21개월 만에 74배 성장)<br>
+          중소 연구기관·스타트업 타겟, 구독형 모델<br>
+          GPU 임차 지원사업 선정 (2025.09)
+        </div>
+        <span class="pipeline-status dev">성장 중</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">글로벌 확장</div>
+        <div class="pipeline-detail">
+          미국 법인(2022) + 싱가포르 법인(2023) 운영<br>
+          슈나이더 일렉트릭 파트너십 — APAC·미국 PMDC 공동 진출<br>
+          델 테크놀로지스 DTW 2025 파트너 선정<br>
+          목표: 해외 매출 비중 20%+ (2027)
+        </div>
+        <span class="pipeline-status plan">확장 중</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Revenue Trend (억원)</h3>
+      <div class="chart-wrap">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Revenue Mix (2026 목표)</h3>
+      <div class="chart-wrap">
+        <canvas id="mixChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Relevance -->
+  <div class="ai-section">
+    <h3>AI Business Relevance — U+ 관점</h3>
+    <div class="ai-axes">
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AIDC 인프라</div>
+        <div class="ai-axis-score">◎</div>
+        <div class="ai-axis-note">PMDC = 직접 경쟁/시너지<br>SKT MOU는 감점 요인</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AICC SaaS</div>
+        <div class="ai-axis-score">✕</div>
+        <div class="ai-axis-note">직접 연관 없음<br>컨택센터 사업 부재</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">Sovereign AI</div>
+        <div class="ai-axis-score">○</div>
+        <div class="ai-axis-note">CSAP 인증 보유<br>국가안보 AI인프라 포지셔닝</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AX 사업화</div>
+        <div class="ai-axis-score">○</div>
+        <div class="ai-axis-note">기업 AI 전환 교육 지원<br>슈퍼스쿨과 교육 시너지 가능</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding:14px;background:rgba(13,17,23,0.5);border-radius:10px;">
+      <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+        <strong style="color:var(--axis-ai)">U+ 시너지 포인트:</strong> 엘리스 PMDC는 U+의 AIDC 전략(코로케이션·PMDC 검토)과 직접 겹치는 영역. 경쟁자이기도 하지만, 소버린 AI 인프라 공동 구축이나 U+ IDC 내 PMDC 임대 모델로 협력 가능성도 있음. 슈퍼스쿨 AI 교육 사업과 LXP 플랫폼 연계도 검토 가치 있음. 다만 SKT와의 MOU는 U+ 관점에서 경쟁사 진영으로의 편입을 의미하므로, 얼라이언스 추진 시 SKT 관계 정리가 전제 조건.
+      </div>
+    </div>
+  </div>
+
+  <!-- Partners -->
+  <div class="card">
+    <h3>Key Partners & Ecosystem</h3>
+    <div class="partner-grid">
+      <div class="partner-card" style="border-top-color:var(--sell);">
+        <div class="partner-name">SK텔레콤</div>
+        <div class="partner-type">AI DC 모듈러 MOU (2025.03, MWC25)</div>
+        <div class="partner-detail">PMDC 테스트베드 공동 구축 중. <span style="color:var(--sell);font-weight:700;">U+ 관점 경쟁사 진영</span> — 얼라이언스 추진 시 관계 재조율 필요</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">LG CNS</div>
+        <div class="partner-type">파트너십 논의 중 (자체 AI Box 개발 병행)</div>
+        <div class="partner-detail">LG CNS가 엘리스 PMDC에 러브콜. 단, LG CNS가 자체 모듈형 DC 개발 중으로 파트너·경쟁 혼재 관계</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">슈나이더 일렉트릭</div>
+        <div class="partner-type">APAC·미국 PMDC 공동 진출 파트너</div>
+        <div class="partner-detail">유럽 최대 DC 설비 기업과 MOU. 글로벌 영업망 활용 PMDC 판매·설치 협력</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">KISTI</div>
+        <div class="partner-type">LLM 개발용 엣지 DC 협력</div>
+        <div class="partner-detail">한국과학기술정보연구원과 LLM 개발을 위한 엣지 데이터센터 구축 협력. 공공 AI 인프라 레퍼런스 확보</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">Dell Technologies</div>
+        <div class="partner-type">DTW 2025 파트너 선정</div>
+        <div class="partner-detail">델이 선택한 한국 스타트업으로 GPU 인프라 국산화 파트너십. 글로벌 하드웨어 공급망 연계</div>
+      </div>
+      <div class="partner-card">
+        <div class="partner-name">버텍스그로쓰 (테마섹)</div>
+        <div class="partner-type">시리즈C 리드 투자자 (싱가포르 국부펀드 자회사)</div>
+        <div class="partner-detail">APAC 네트워크 활용 싱가포르·동남아 진출 가속. 국부펀드 투자 = 신뢰도 레버리지</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk -->
+  <div class="section-title">Risk Assessment</div>
+  <div class="risk-grid">
+    <div class="risk-card high">
+      <div class="risk-type">투자 접근성</div>
+      <div class="risk-desc">비상장사로 직접 주식 투자 불가. 장외 거래 또는 IPO 후 진입만 가능.</div>
+      <div class="risk-meta">영향: 높음 · 단기 해결 불가</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-type">SKT 경쟁사 연대</div>
+      <div class="risk-desc">SKT와 PMDC MOU 체결. U+ 관점에서 경쟁 진영 포지셔닝 리스크. 얼라이언스 시 배타적 조항 확인 필수.</div>
+      <div class="risk-meta">영향: 높음 · 협상으로 해결 가능</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">수익성 불투명</div>
+      <div class="risk-desc">매출 성장에도 불구 영업이익·순이익 데이터 미공개. 고성장 투자 단계로 적자 가능성 상존.</div>
+      <div class="risk-meta">영향: 중간 · IPO 전 공시로 확인 필요</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">PMDC 경쟁 심화</div>
+      <div class="risk-desc">LG CNS 자체 AI Box 개발, 통신 3사 모두 PMDC 검토 중. 하드웨어 마진 압박 및 차별화 약화 위험.</div>
+      <div class="risk-meta">영향: 중간 · 선점 우위 보유 중</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">글로벌 확장 리스크</div>
+      <div class="risk-desc">미국·싱가포르 법인 운영 중이나 해외 매출 비중 미공개. 글로벌 PMDC 경쟁(Vertiv·Eaton 등) 치열.</div>
+      <div class="risk-meta">영향: 중간 · 슈나이더 파트너십으로 부분 완화</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-type">GPU 공급망 리스크</div>
+      <div class="risk-desc">NVIDIA 블랙웰 의존도 높음. 관세·수출 통제 강화 시 GPU 조달 비용 상승 가능.</div>
+      <div class="risk-meta">영향: 낮음~중간 · 단기 재고 확보로 완화</div>
+    </div>
+  </div>
+
+  <!-- IPO Outlook -->
+  <div class="card">
+    <h3>IPO Outlook — 상장 시나리오</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th><th>판단</th></tr>
+      <tr><td>IPO 공식 발표</td><td>없음 (2026.04 기준)</td><td><span class="chip neutral">미확인</span></td></tr>
+      <tr><td>상장 적합성</td><td>3년 270% 성장률, 글로벌 투자자(테마섹), 코스닥 기술특례 요건 충족 가능성</td><td><span class="chip good">높음</span></td></tr>
+      <tr><td>예상 시장</td><td>코스닥 (기술특례 상장 또는 일반 상장)</td><td>—</td></tr>
+      <tr><td>예상 시기</td><td>2026~2027년 (부산DC 착공 + 연매출 500억 달성 이후)</td><td><span class="chip neutral">추정</span></td></tr>
+      <tr><td>비교 기업</td><td>뤼이드(AI에듀테크 비상장), 코어위브(AI 인프라 상장), 네오사피엔스</td><td>—</td></tr>
+      <tr><td>IPO 후 매수 전략</td><td>공모가 기준 PSR 8x 이하 + AI인프라 매출 40%+ 확인 시 매수 검토</td><td><span class="chip good">조건부 긍정</span></td></tr>
+    </table>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료입니다. 투자 자문이 아니며, 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다. 비상장사의 재무 정보는 추정치를 포함하며, 실제 수치와 다를 수 있습니다.
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Stock Intelligence Report — 엘리스그룹 (Elice Group) · 2026-04-11 · IPO Monitor Mode · Generated by Claude Stock Intel Agent
+  </footer>
+
+</div>
+
+<script>
+// Revenue Trend Chart
+new Chart(document.getElementById('revenueChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['2022', '2023', '2024', '2025', '2026E'],
+    datasets: [{
+      label: '매출 (억원)',
+      data: [104, 323, 363, 386, 520],
+      backgroundColor: ['rgba(88,166,255,0.4)', 'rgba(88,166,255,0.5)', 'rgba(88,166,255,0.6)', 'rgba(88,166,255,0.8)', 'rgba(188,140,255,0.5)'],
+      borderColor: ['#58A6FF', '#58A6FF', '#58A6FF', '#58A6FF', '#BC8CFF'],
+      borderWidth: 2,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1C2128',
+        titleColor: '#E6EDF3',
+        bodyColor: '#8B949E',
+        callbacks: { label: ctx => ctx.parsed.y + '억원' }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+        ticks: { color: '#6E7681', font: { size: 11 } }
+      },
+      y: {
+        grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+        ticks: { color: '#6E7681', font: { size: 11 }, callback: v => v + '억' }
+      }
+    }
+  }
+});
+
+// Revenue Mix Chart (2026 목표)
+new Chart(document.getElementById('mixChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['AI PMDC', 'AI 교육(LXP)', '클라우드(ECI)', '부트캠프·기타'],
+    datasets: [{
+      data: [50, 25, 15, 10],
+      backgroundColor: ['#58A6FF', '#BC8CFF', '#56D4DD', '#8B949E'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#8B949E', font: { size: 11 }, padding: 14 }
+      },
+      tooltip: {
+        backgroundColor: '#1C2128',
+        titleColor: '#E6EDF3',
+        bodyColor: '#8B949E',
+        callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
