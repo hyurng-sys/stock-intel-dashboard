@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "현대건설",
+      "ticker": "000720",
+      "date": "20260411",
+      "file": "현대건설_20260411.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "Accenture",
       "ticker": "ACN",
       "date": "20260409",
