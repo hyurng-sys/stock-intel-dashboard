@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 브룩필드코리아 | IPO Monitor | 2026-04-11</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ipo), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ipo);
+    background: rgba(188, 140, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(188, 140, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+
+  .ipo-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    background: rgba(188, 140, 255, 0.08);
+    border: 1px solid rgba(188, 140, 255, 0.3);
+  }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .overview-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 22px; font-weight: 800; color: var(--uplus-magenta); }
+  .overview-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.4); }
+  .tbl td:first-child { font-weight: 600; color: var(--text-primary); }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .chart-wrap { display: flex; justify-content: center; align-items: center; height: 260px; }
+  .chart-wrap canvas { max-height: 260px; }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 { font-size: 13px; font-weight: 600; color: var(--axis-ai); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .ai-axes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ai-axis-card { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; text-align: center; }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid; }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  .meeting-context {
+    background: linear-gradient(135deg, rgba(188,140,255,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(188,140,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .meeting-context h3 { font-size: 13px; font-weight: 600; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .meeting-info { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .meeting-info strong { color: var(--text-primary); }
+
+  .parent-section {
+    background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(57,139,253,0.06));
+    border: 1px solid rgba(88,166,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .parent-section h3 { font-size: 13px; font-weight: 600; color: var(--uplus-magenta); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+
+  .metric-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .metric-box { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px 18px; flex: 1; min-width: 120px; }
+  .metric-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .metric-value { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+  .metric-note { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+  .invest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .invest-card { background: rgba(48,54,61,0.3); border-radius: 10px; padding: 14px; border-top: 2px solid var(--uplus-magenta); }
+  .invest-name { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .invest-type { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
+  .invest-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .invest-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-top: 8px; }
+  .invest-status.active { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .invest-status.review { background: rgba(88,166,255,0.12); color: var(--uplus-magenta); }
+  .invest-status.exit { background: rgba(210,153,34,0.12); color: var(--hold); }
+
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ipo-timeline { display: flex; flex-direction: column; gap: 12px; }
+  .timeline-item { display: flex; gap: 16px; align-items: flex-start; }
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .timeline-dot.done { background: var(--buy); }
+  .timeline-dot.current { background: var(--ipo); box-shadow: 0 0 8px rgba(188,140,255,0.6); }
+  .timeline-dot.future { background: var(--text-muted); }
+  .timeline-content { flex: 1; }
+  .timeline-date { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .timeline-event { font-size: 13px; color: var(--text-secondary); }
+
+  @media (max-width: 900px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .ai-axes { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .invest-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .invest-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">IPO Monitoring Mode</div>
+    <h1>브룩필드코리아 (브룩필드자산운용코리아)</h1>
+    <div class="date">2026-04-11 · 비상장 · 글로벌 대체자산운용사</div>
+  </div>
+
+  <!-- IPO Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">판정</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">브룩필드코리아 자체 상장 계획 없음 · 모회사 BAM (NYSE) 기준 참조 분석 제공 · IPO 시 재검토</div>
+  </div>
+
+  <!-- 미팅 컨텍스트 -->
+  <div class="meeting-context">
+    <h3>미팅 컨텍스트</h3>
+    <div class="meeting-info">
+      <strong>미팅 일자:</strong> 2026-04-09<br>
+      <strong>미팅 상대:</strong> 박용훈 대표 (브룩필드코리아)<br>
+      <strong>브룩필드코리아 공식 대표:</strong> 박준우 Managing Partner (동북아 인프라 총괄, 2021년 합류)<br>
+      <strong>사업 맥락:</strong> 글로벌 1.2조 달러 AUM 운용사의 한국 법인. 인프라·PE·부동산·재생에너지 투자 전문. SK 울산 AI 데이터센터(2조원 지분) 투자 검토 중. U+ 입장에서 AIDC 공동 인프라 파트너십 또는 데이터센터 자산 매각/매입 시 핵심 카운터파트.<br>
+      <strong>전략 포인트:</strong> 브룩필드는 글로벌 데이터센터 인프라 투자의 최대 플레이어 중 하나. 국내 AI DC 투자 확대 시 U+의 파주/구미 AIDC 프로젝트와 연계 가능성 검토 필요.
+    </div>
+  </div>
+
+  <!-- 개요 지표 -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">한국 AUM</div>
+      <div class="overview-value">$13B+</div>
+      <div class="overview-note">운용 자산 (한국)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">설립</div>
+      <div class="overview-value">2019</div>
+      <div class="overview-note">국내 법인 설립</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">모회사 AUM</div>
+      <div class="overview-value">$1.18T</div>
+      <div class="overview-note">BAM 전체 (2025FY)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">BAM 주가</div>
+      <div class="overview-value">$44.90</div>
+      <div class="overview-note">NYSE BAM (2026.4.10)</div>
+    </div>
+  </div>
+
+  <!-- 모회사 BAM 분석 -->
+  <div class="parent-section">
+    <h3>모회사 Brookfield Asset Management (NYSE: BAM) 분석</h3>
+    <div class="metric-row">
+      <div class="metric-box">
+        <div class="metric-label">시가총액</div>
+        <div class="metric-value">$72.3B</div>
+        <div class="metric-note">2026.4.10 기준</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">52주 범위</div>
+        <div class="metric-value">$42.20</div>
+        <div class="metric-note">~ $64.10 최고</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">PER (TTM)</div>
+        <div class="metric-value">~29x</div>
+        <div class="metric-note">대형 AM 평균 38x 대비</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">배당수익률</div>
+        <div class="metric-value">4.04%</div>
+        <div class="metric-note">$1.82/주 (15% 인상)</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">2025 매출</div>
+        <div class="metric-value">$4.82B</div>
+        <div class="metric-note">+21% YoY</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-label">2025 순이익</div>
+        <div class="metric-value">$2.49B</div>
+        <div class="metric-note">+14.6% YoY</div>
+      </div>
+    </div>
+
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>지표</th>
+          <th>현재값</th>
+          <th>판정</th>
+          <th>비고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>FRE (Fee-Related Earnings)</td>
+          <td>$754M/분기</td>
+          <td><span class="chip good">우수</span></td>
+          <td>+17% YoY (Q3 2025)</td>
+        </tr>
+        <tr>
+          <td>Distributable Earnings</td>
+          <td>$2.7B (FY2025)</td>
+          <td><span class="chip good">우수</span></td>
+          <td>+14% YoY</td>
+        </tr>
+        <tr>
+          <td>2025 자금조달</td>
+          <td>$112B (연간 최고)</td>
+          <td><span class="chip good">탁월</span></td>
+          <td>Q4만 $35B 조달</td>
+        </tr>
+        <tr>
+          <td>Fee-Bearing AUM</td>
+          <td>$602.7B</td>
+          <td><span class="chip good">우수</span></td>
+          <td>+22% YoY 성장</td>
+        </tr>
+        <tr>
+          <td>애널리스트 컨센서스</td>
+          <td>평균 목표가 $60.73</td>
+          <td><span class="chip good">매력적</span></td>
+          <td>현재가 대비 +35% 업사이드</td>
+        </tr>
+        <tr>
+          <td>2026 전망</td>
+          <td>자금조달·이익 모두 최고치 갱신 예상</td>
+          <td><span class="chip good">긍정</span></td>
+          <td>Oaktree 통합 효과 +$200M FRE</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 한국 투자 포트폴리오 -->
+  <div class="card">
+    <h3>한국 주요 투자 포트폴리오 (2024~2026)</h3>
+    <div class="invest-grid">
+      <div class="invest-card">
+        <div class="invest-name">SK 울산 AI 데이터센터</div>
+        <div class="invest-type">인프라 · AI DC</div>
+        <div class="invest-detail">SK그룹 울산 AI DC 소수지분 인수전 참여 검토. 매각 지분 최대 49%, 거래 규모 약 2조원. KKR, EQT 등과 경쟁 중.</div>
+        <span class="invest-status review">검토 중</span>
+      </div>
+      <div class="invest-card">
+        <div class="invest-name">SK Materials Air Plus</div>
+        <div class="invest-type">사모펀드 · 산업가스</div>
+        <div class="invest-detail">SK그룹 산업가스 시설 인수 완료. 박준우 대표가 주도한 한국 PE 확장 첫 딜.</div>
+        <span class="invest-status active">보유 중</span>
+      </div>
+      <div class="invest-card">
+        <div class="invest-name">대림 데이터센터 공동투자</div>
+        <div class="invest-type">인프라 · 부동산</div>
+        <div class="invest-detail">대림그룹과 공동으로 데이터센터 투자 집행. AI 시대 한국 데이터센터 수요 선점 전략.</div>
+        <span class="invest-status active">투자 중</span>
+      </div>
+      <div class="invest-card">
+        <div class="invest-name">IFC 서울</div>
+        <div class="invest-type">부동산 · 오피스</div>
+        <div class="invest-detail">IFC 서울 4조원 매각 완료(2023) 후 리파이낸싱 마무리. 조 단위 차익 실현.</div>
+        <span class="invest-status exit">EXIT 완료</span>
+      </div>
+      <div class="invest-card">
+        <div class="invest-name">콘래드 서울</div>
+        <div class="invest-type">부동산 · 호텔</div>
+        <div class="invest-detail">콘래드서울 매각 완료. IFC 리파이낸싱과 함께 대규모 회수 성공.</div>
+        <span class="invest-status exit">EXIT 완료</span>
+      </div>
+      <div class="invest-card">
+        <div class="invest-name">재생에너지 · 전력 인프라</div>
+        <div class="invest-type">인프라 · 에너지</div>
+        <div class="invest-detail">전환의 시대 인프라 전략 일환. AI 데이터센터 전력 수요 급증으로 전력 인프라 투자 확대 중.</div>
+        <span class="invest-status review">검토 확대</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI사업 연관성 -->
+  <div class="ai-section">
+    <h3>U+ AI 전략축 연관성</h3>
+    <div class="ai-axes">
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AIDC 인프라</div>
+        <div class="ai-axis-score">◎</div>
+        <div class="ai-axis-note">SK 울산 AI DC 투자 검토 · 대림 DC 공동투자 · 글로벌 DC 인프라 핵심 LP/GP</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AICC SaaS</div>
+        <div class="ai-axis-score">✕</div>
+        <div class="ai-axis-note">AI컨택센터 SaaS와 직접 연관 없음</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">Sovereign AI</div>
+        <div class="ai-axis-score">△</div>
+        <div class="ai-axis-note">국내 AI 인프라 투자 → 소버린 AI 인프라 레이어 간접 기여</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AX 사업화</div>
+        <div class="ai-axis-score">✕</div>
+        <div class="ai-axis-note">AX 도입·컨설팅 사업과 무관</div>
+      </div>
+    </div>
+    <div style="margin-top:16px; font-size:13px; color:var(--text-secondary); line-height:1.7;">
+      <strong style="color:var(--axis-ai)">U+ 관점 핵심 시사점:</strong> 브룩필드코리아는 U+의 AIDC 사업과 가장 직접적으로 연결되는 글로벌 인프라 투자자다. 파주/구미 AIDC 프로젝트에서 브룩필드를 재무적투자자(FI)로 유치하거나, 역으로 브룩필드 포트폴리오 데이터센터에 U+가 IDC 서비스·통신 인프라를 공급하는 B2B 파트너십 구도 모두 현실적이다. SK 울산 AI DC 투자전 결과에 따라 브룩필드의 국내 AI DC 포지셔닝이 결정되므로 해당 딜 모니터링 필수.
+    </div>
+  </div>
+
+  <!-- 차트: BAM 모회사 재무 추이 + AI DC 투자 포트폴리오 -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>BAM 모회사 — 연간 FRE 성장 추이 (억 달러)</h3>
+      <div class="chart-wrap">
+        <canvas id="freChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>한국 AI DC 투자 생태계 — 브룩필드 포지션</h3>
+      <div class="chart-wrap">
+        <canvas id="posChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPO 가능성 분석 -->
+  <div class="card">
+    <h3>상장 가능성 & 비교 밸류에이션</h3>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>내용</th>
+          <th>판정</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>브룩필드코리아 단독 상장</td>
+          <td>한국 자산운용사 라이선스 보유 법인. 단독 IPO 계획 없음. 모회사 BAM 산하로 운영.</td>
+          <td><span class="chip ipo">해당없음</span></td>
+        </tr>
+        <tr>
+          <td>모회사 BAM (NYSE) 투자 가능</td>
+          <td>BAM 현재가 $44.90, 목표가 $60.73 (애널리스트 컨센서스 +35% 업사이드)</td>
+          <td><span class="chip good">매력적</span></td>
+        </tr>
+        <tr>
+          <td>비교 기업 — 맥쿼리자산운용</td>
+          <td>MQG (ASX 상장) AUM $820B, P/E 22x. 브룩필드 대비 보수적 밸류에이션</td>
+          <td><span class="chip neutral">참고</span></td>
+        </tr>
+        <tr>
+          <td>비교 기업 — 블랙스톤 (BX)</td>
+          <td>AUM $1T+, P/E 50x 이상. 프리미엄 밸류에이션. BAM 상대적 저평가 시사.</td>
+          <td><span class="chip neutral">참고</span></td>
+        </tr>
+        <tr>
+          <td>한국 자산운용 시장 상장 유사 사례</td>
+          <td>코람코자산운용, 한투리츠운용 등 비상장 다수. 리츠 형태 간접 상장 사례 증가.</td>
+          <td><span class="chip ipo">간접 참고</span></td>
+        </tr>
+        <tr>
+          <td>브룩필드 한국 리츠/펀드 상장 가능성</td>
+          <td>인프라 자산 패키징 → 공모 인프라 펀드 또는 리츠 상장 검토 가능성 있음 (5년 내)</td>
+          <td><span class="chip ipo">모니터링</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 리스크 -->
+  <div class="section-title" style="margin-top:8px;">리스크 평가</div>
+  <div class="risk-grid">
+    <div class="risk-card mid">
+      <div class="risk-type">매크로 리스크</div>
+      <div class="risk-desc">미국 트럼프 관세 전쟁으로 글로벌 인프라 투자 심리 위축. 금리 고착화 시 대체자산 밸류에이션 압박.</div>
+      <div class="risk-meta">영향도: 중간 · 확률: 중간</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-type">경쟁 리스크</div>
+      <div class="risk-desc">SK 울산 AI DC 투자전에서 KKR, EQT와 경쟁. KKR이 적극적으로 CEO 레벨 접촉 중. 브룩필드 후순위 가능성.</div>
+      <div class="risk-meta">영향도: 낮음 · 확률: 중간</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-type">규제 리스크</div>
+      <div class="risk-desc">금융당국 규제 변화, CSAP 인증 요건 변화로 인한 데이터센터 투자 수익성 변동 가능.</div>
+      <div class="risk-meta">영향도: 낮음 · 확률: 낮음</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-type">파트너십 리스크</div>
+      <div class="risk-desc">글로벌 본사 전략과 한국 법인 우선순위 차이. 본사 자금 배분에 따라 한국 투자 속도 조절 가능.</div>
+      <div class="risk-meta">영향도: 낮음 · 확률: 낮음</div>
+    </div>
+  </div>
+
+  <!-- 미팅 전략 제언 -->
+  <div class="card">
+    <h3>미팅 전략 제언 (U+ 임원용)</h3>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>어젠다</th>
+          <th>포인트</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>파주/구미 AIDC FI 유치</td>
+          <td>U+가 건설 중인 AIDC 프로젝트에 브룩필드를 재무적투자자로 유치하는 구조 제안. 브룩필드의 글로벌 인프라 LP 네트워크 활용.</td>
+        </tr>
+        <tr>
+          <td>SK 울산 AI DC 모니터링</td>
+          <td>브룩필드의 SK 울산 AI DC 투자 의향 파악. 투자 완료 시 U+의 통신·IDC 서비스 공급 계약 연계 가능.</td>
+        </tr>
+        <tr>
+          <td>전력 인프라 공동투자</td>
+          <td>AI DC 전력 수요 급증으로 전력 인프라 투자 검토 중인 브룩필드와 U+의 에너지 사업 연계 탐색.</td>
+        </tr>
+        <tr>
+          <td>리츠/공모펀드 구조화</td>
+          <td>U+ AIDC 자산을 리츠 또는 인프라펀드로 패키징 → 브룩필드가 GP 또는 앵커 LP 역할. 자산유동화+투자 유치 동시 달성.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 면책 -->
+  <div class="disclaimer">
+    <strong>면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 브룩필드코리아는 비상장 법인으로 재무 정보가 제한적입니다. 모든 수치는 공개 자료 기반 추정이며, 실제 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <div class="footer">
+    Stock Intelligence Report · 브룩필드코리아 · 2026-04-11 · IPO Monitoring Mode · Powered by Claude Code
+  </div>
+
+</div>
+
+<script>
+// FRE 성장 차트
+new Chart(document.getElementById('freChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['2023', '2024', '2025', '2026E'],
+    datasets: [{
+      label: 'Fee-Related Earnings (억$)',
+      data: [17, 22, 29, 35],
+      backgroundColor: ['rgba(88,166,255,0.5)','rgba(88,166,255,0.6)','rgba(88,166,255,0.8)','rgba(188,140,255,0.6)'],
+      borderColor: ['#58A6FF','#58A6FF','#58A6FF','#BC8CFF'],
+      borderWidth: 2,
+      borderRadius: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#161B22',
+        borderColor: '#30363D',
+        borderWidth: 1,
+        titleColor: '#E6EDF3',
+        bodyColor: '#8B949E',
+        callbacks: { label: ctx => '$' + ctx.parsed.y + '억 FRE' }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+        ticks: { color: '#6E7681', font: { size: 11 } }
+      },
+      y: {
+        grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+        ticks: { color: '#6E7681', font: { size: 11 }, callback: v => '$' + v + 'B' }
+      }
+    }
+  }
+});
+
+// 한국 AI DC 포지션 차트
+new Chart(document.getElementById('posChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['AIDC 인프라 투자', 'PE 사모펀드', '부동산·호텔', '재생에너지'],
+    datasets: [{
+      data: [45, 25, 20, 10],
+      backgroundColor: ['#58A6FF', '#BC8CFF', '#56D4DD', '#3FB950'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#8B949E', font: { size: 11 }, padding: 14 }
+      },
+      tooltip: {
+        backgroundColor: '#1C2128',
+        titleColor: '#E6EDF3',
+        bodyColor: '#8B949E',
+        callbacks: { label: ctx => ctx.label + ': ' + ctx.parsed + '%' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

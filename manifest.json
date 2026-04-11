@@ -3,6 +3,13 @@
     "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
     "reports": [
         {
+            "company": "브룩필드코리아",
+            "ticker": "비상장",
+            "date": "20260411",
+            "file": "브룩필드코리아_20260411.html",
+            "verdict": "IPO MONITOR"
+        },
+        {
             "company": "EMP벨스타",
             "ticker": "비상장",
             "date": "20260411",
