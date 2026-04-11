@@ -1,202 +1,209 @@
 {
-    "name": "stock-intel-dashboard",
-    "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
-    "reports": [
-        {
-            "company": "브룩필드코리아",
-            "ticker": "비상장",
-            "date": "20260411",
-            "file": "브룩필드코리아_20260411.html",
-            "verdict": "IPO MONITOR"
-        },
-        {
-            "company": "EMP벨스타",
-            "ticker": "비상장",
-            "date": "20260411",
-            "file": "EMP벨스타_20260411.html",
-            "verdict": "IPO MONITOR"
-        },
-        {
-            "company": "엘리스그룹",
-            "ticker": "비상장",
-            "date": "20260411",
-            "file": "엘리스그룹_20260411.html",
-            "verdict": "IPO MONITOR"
-        },
-        {
-            "company": "웰컴저축은행",
-            "ticker": "비상장",
-            "date": "20260411",
-            "file": "웰컴저축은행_20260411.html",
-            "verdict": "IPO 모니터링"
-        },
-        {
-            "company": "현대건설",
-            "ticker": "000720",
-            "date": "20260411",
-            "file": "현대건설_20260411.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Accenture",
-            "ticker": "ACN",
-            "date": "20260409",
-            "file": "Accenture_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "Alphabet",
-            "ticker": "GOOGL",
-            "date": "20260409",
-            "file": "Alphabet_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "Amazon",
-            "ticker": "AMZN",
-            "date": "20260409",
-            "file": "Amazon_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "SK Telecom",
-            "ticker": "SKM",
-            "date": "20260409",
-            "file": "SK_Telecom_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "Snowflake",
-            "ticker": "SNOW",
-            "date": "20260409",
-            "file": "Snowflake_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Synopsys",
-            "ticker": "SNPS",
-            "date": "20260409",
-            "file": "Synopsys_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "CoreWeave",
-            "ticker": "CRWV",
-            "date": "20260409",
-            "file": "CoreWeave_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Coherent Corp",
-            "ticker": "COHR",
-            "date": "20260409",
-            "file": "Coherent_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Lumentum",
-            "ticker": "LITE",
-            "date": "20260409",
-            "file": "Lumentum_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Nebius Group",
-            "ticker": "NBIS",
-            "date": "20260409",
-            "file": "Nebius_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Constellation Energy",
-            "ticker": "CEG",
-            "date": "20260409",
-            "file": "Constellation_Energy_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "Arista Networks",
-            "ticker": "ANET",
-            "date": "20260409",
-            "file": "Arista_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "Marvell Technology",
-            "ticker": "MRVL",
-            "date": "20260409",
-            "file": "Marvell_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "Modine Manufacturing",
-            "ticker": "MOD",
-            "date": "20260409",
-            "file": "Modine_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "Ciena Corporation",
-            "ticker": "CIEN",
-            "date": "20260409",
-            "file": "Ciena_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "NVIDIA",
-            "ticker": "NVDA",
-            "date": "20260409",
-            "file": "NVIDIA_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "Vertiv Holdings",
-            "ticker": "VRT",
-            "date": "20260409",
-            "file": "Vertiv_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "Eaton Corporation",
-            "ticker": "ETN",
-            "date": "20260409",
-            "file": "Eaton_20260409.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "HD현대일렉트릭",
-            "ticker": "267260",
-            "date": "20260409",
-            "file": "HD현대일렉트릭_20260409.html",
-            "verdict": "STRONG BUY"
-        },
-        {
-            "company": "Equinix",
-            "ticker": "EQIX",
-            "date": "20260409",
-            "file": "Equinix_20260409.html",
-            "verdict": "LEAN BUY"
-        },
-        {
-            "company": "코람코자산운용",
-            "ticker": "비상장",
-            "date": "20260406",
-            "file": "코람코자산운용_20260406.html",
-            "verdict": "IPO MONITOR"
-        },
-        {
-            "company": "Vertiv Holdings",
-            "ticker": "VRT",
-            "date": "20260405",
-            "file": "Vertiv_20260405.html",
-            "verdict": "BUY"
-        },
-        {
-            "company": "Hewlett Packard Enterprise",
-            "ticker": "HPE",
-            "date": "20260405",
-            "file": "HPE_20260405.html",
-            "verdict": "LEAN BUY"
-        }
-    ]
+  "name": "stock-intel-dashboard",
+  "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
+  "reports": [
+    {
+      "company": "가비아",
+      "ticker": "079940",
+      "date": "20260412",
+      "file": "가비아_20260412.html",
+      "verdict": "HOLD"
+    },
+    {
+      "company": "KINX",
+      "ticker": "093320",
+      "date": "20260412",
+      "file": "KINX_20260412.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "EMP벨스타",
+      "ticker": "비상장",
+      "date": "20260411",
+      "file": "EMP벨스타_20260411.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
+      "company": "엘리스그룹",
+      "ticker": "비상장",
+      "date": "20260411",
+      "file": "엘리스그룹_20260411.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
+      "company": "웰컴저축은행",
+      "ticker": "비상장",
+      "date": "20260411",
+      "file": "웰컴저축은행_20260411.html",
+      "verdict": "IPO 모니터링"
+    },
+    {
+      "company": "현대건설",
+      "ticker": "000720",
+      "date": "20260411",
+      "file": "현대건설_20260411.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Accenture",
+      "ticker": "ACN",
+      "date": "20260409",
+      "file": "Accenture_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Alphabet",
+      "ticker": "GOOGL",
+      "date": "20260409",
+      "file": "Alphabet_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Amazon",
+      "ticker": "AMZN",
+      "date": "20260409",
+      "file": "Amazon_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "SK Telecom",
+      "ticker": "SKM",
+      "date": "20260409",
+      "file": "SK_Telecom_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Snowflake",
+      "ticker": "SNOW",
+      "date": "20260409",
+      "file": "Snowflake_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Synopsys",
+      "ticker": "SNPS",
+      "date": "20260409",
+      "file": "Synopsys_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "CoreWeave",
+      "ticker": "CRWV",
+      "date": "20260409",
+      "file": "CoreWeave_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Coherent Corp",
+      "ticker": "COHR",
+      "date": "20260409",
+      "file": "Coherent_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Lumentum",
+      "ticker": "LITE",
+      "date": "20260409",
+      "file": "Lumentum_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Nebius Group",
+      "ticker": "NBIS",
+      "date": "20260409",
+      "file": "Nebius_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Constellation Energy",
+      "ticker": "CEG",
+      "date": "20260409",
+      "file": "Constellation_Energy_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Arista Networks",
+      "ticker": "ANET",
+      "date": "20260409",
+      "file": "Arista_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Marvell Technology",
+      "ticker": "MRVL",
+      "date": "20260409",
+      "file": "Marvell_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Modine Manufacturing",
+      "ticker": "MOD",
+      "date": "20260409",
+      "file": "Modine_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "Ciena Corporation",
+      "ticker": "CIEN",
+      "date": "20260409",
+      "file": "Ciena_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "NVIDIA",
+      "ticker": "NVDA",
+      "date": "20260409",
+      "file": "NVIDIA_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Vertiv Holdings",
+      "ticker": "VRT",
+      "date": "20260409",
+      "file": "Vertiv_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Eaton Corporation",
+      "ticker": "ETN",
+      "date": "20260409",
+      "file": "Eaton_20260409.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "HD현대일렉트릭",
+      "ticker": "267260",
+      "date": "20260409",
+      "file": "HD현대일렉트릭_20260409.html",
+      "verdict": "STRONG BUY"
+    },
+    {
+      "company": "Equinix",
+      "ticker": "EQIX",
+      "date": "20260409",
+      "file": "Equinix_20260409.html",
+      "verdict": "LEAN BUY"
+    },
+    {
+      "company": "코람코자산운용",
+      "ticker": "비상장",
+      "date": "20260406",
+      "file": "코람코자산운용_20260406.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
+      "company": "Vertiv Holdings",
+      "ticker": "VRT",
+      "date": "20260405",
+      "file": "Vertiv_20260405.html",
+      "verdict": "BUY"
+    },
+    {
+      "company": "Hewlett Packard Enterprise",
+      "ticker": "HPE",
+      "date": "20260405",
+      "file": "HPE_20260405.html",
+      "verdict": "LEAN BUY"
+    }
+  ]
 }
