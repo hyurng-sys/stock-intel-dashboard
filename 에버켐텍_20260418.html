@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 에버켐텍 | IPO Monitor | 2026-04-18</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+  .header { text-align: center; padding: 40px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--ipo), transparent); }
+  .header-label { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--ipo); background: rgba(188, 140, 255, 0.1); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(188, 140, 255, 0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+  .ipo-banner { text-align: center; padding: 28px; border-radius: 16px; margin-bottom: 28px; background: rgba(188, 140, 255, 0.08); border: 1px solid rgba(188, 140, 255, 0.3); }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .overview-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .overview-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th { background: rgba(255,255,255,0.04); color: var(--text-secondary); font-weight: 600; font-size: 12px; letter-spacing: 0.5px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 14px; border-bottom: 1px solid rgba(48,54,61,0.6); color: var(--text-primary); vertical-align: top; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+  .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .risk-card { padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
+  .risk-card.high { border-color: rgba(244,112,103,0.3); background: rgba(244,112,103,0.05); }
+  .risk-card.mid { border-color: rgba(210,153,34,0.3); background: rgba(210,153,34,0.05); }
+  .risk-card.low { border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.05); }
+  .risk-type { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); }
+  .pipeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .pipeline-item { padding: 18px; border-radius: 12px; background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15); }
+  .pipeline-title { font-size: 13px; font-weight: 700; color: var(--uplus-magenta); margin-bottom: 6px; }
+  .pipeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .investment-timeline { position: relative; padding-left: 24px; }
+  .investment-timeline::before { content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-item::before { content: ''; position: absolute; left: -20px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--ipo); border: 2px solid var(--bg-primary); }
+  .timeline-date { font-size: 11px; font-weight: 700; color: var(--ipo); letter-spacing: 1px; margin-bottom: 4px; }
+  .timeline-content { font-size: 14px; color: var(--text-primary); margin-bottom: 2px; }
+  .timeline-sub { font-size: 12px; color: var(--text-secondary); }
+  .meeting-context { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.2); border-radius: 14px; padding: 22px 26px; margin-bottom: 28px; }
+  .meeting-context h3 { font-size: 13px; font-weight: 600; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .meeting-info { font-size: 14px; color: var(--text-secondary); line-height: 1.9; }
+  .meeting-info strong { color: var(--text-primary); }
+  .ai-axes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .ai-axis-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid var(--border); }
+  .ai-axis-score { font-size: 24px; flex-shrink: 0; }
+  .ai-axis-name { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .ai-axis-note { font-size: 12px; color: var(--text-secondary); }
+  .valuation-box { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.2); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .val-title { font-size: 12px; font-weight: 700; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
+  .val-range { font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+  .val-basis { font-size: 13px; color: var(--text-secondary); }
+  .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 8px; }
+  .product-card { padding: 18px; border-radius: 12px; background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15); }
+  .product-name { font-size: 14px; font-weight: 800; color: var(--uplus-magenta); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .product-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+  .disclaimer { margin-top: 32px; padding: 16px 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 10px; font-size: 12px; color: var(--text-muted); line-height: 1.7; }
+  footer.footer { text-align: center; padding: 32px 0 16px; font-size: 12px; color: var(--text-muted); }
+  @media (max-width: 768px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .risk-grid { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axes { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">IPO Monitor · Stock Intelligence</div>
+    <h1>에버켐텍 (EverChemTech)</h1>
+    <div class="date">2026-04-18 · 비상장 · 친환경 나노 신소재 / 기능성 코팅</div>
+  </div>
+
+  <!-- IPO Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">분석 모드</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장사 — 직접 주식 투자 불가 · 미팅 상대: 김영규 경영총괄부사장 (2026-04-13) · 코칭 서비스 공급사</div>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">설립</div>
+      <div class="overview-value">2008년</div>
+      <div class="overview-sub">경기도 화성시 소재</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">대표이사</div>
+      <div class="overview-value">이성민</div>
+      <div class="overview-sub">창업자 겸 오너 (화학박사)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">매출 (2024)</div>
+      <div class="overview-value">188.6억</div>
+      <div class="overview-sub">YoY +11.1%</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">직원 수</div>
+      <div class="overview-value">60명</div>
+      <div class="overview-sub">R&amp;D 인력 61%</div>
+    </div>
+  </div>
+
+  <!-- Meeting Context -->
+  <div class="meeting-context">
+    <h3>미팅 컨텍스트 — 2026-04-13</h3>
+    <div class="meeting-info">
+      <strong>미팅 상대:</strong> 김영규 경영총괄부사장 (에버켐텍 + 이언그룹 대표 + KAIST 기술경영 겸임교수)<br>
+      <strong>미팅 목적:</strong> LG U+ AI 사업(AIDC/AICC) 담당 임원 <strong>역량개발 코칭 프로그램 킥오프</strong> — 에버켐텍은 주식 투자 대상이 아닌 <strong>코칭 서비스 공급사</strong><br>
+      <strong>코칭 대상:</strong> AI DC 사업 담당 + AI 서비스 사업 담당 (2개 트랙)<br>
+      <strong>김영규 이력:</strong> 하나은행 → SAP Korea → 하이프로그룹(교육) → 이언그룹(전략컨설팅) → 에버켐텍 → KAIST 겸임<br>
+      <strong>에버켐텍의 U+ 관계:</strong> <span class="chip neutral">코칭 파트너</span> 주식 투자 대상 아님 — IPO 추진 여부 모니터링 목적
+    </div>
+  </div>
+
+  <!-- 사업 개요 -->
+  <div class="card">
+    <h3>사업 개요 — 에버켐텍 (EverChemTech)</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr>
+        <td>핵심 사업</td>
+        <td>수분산(Water Dispersion) 기반 기능성 코팅 소재 연구개발·생산. 디스플레이·스마트폰·친환경 포장재 적용 특수 소재 전문기업</td>
+      </tr>
+      <tr>
+        <td>주요 시장</td>
+        <td>OLED/LCD 디스플레이, 스마트폰 보호필름, 친환경 식품 포장재, 자동차 내장재</td>
+      </tr>
+      <tr>
+        <td>글로벌 인증</td>
+        <td>NEXRIER: LFGB (독일) + REACH (EU) + FDA 21 CFR 175.300 (미국) 트리플 인증 달성 (2025.07)</td>
+      </tr>
+      <tr>
+        <td>수상 이력</td>
+        <td>IR52 장영실상 (2024), WPO 월드스타 패키징어워드 (2023), APEC 식량안보 포장혁신 한국 대표 (2025.06)</td>
+      </tr>
+      <tr>
+        <td>R&amp;D 비중</td>
+        <td><span class="chip good">61%</span> 전체 60명 중 36명 이상 연구개발 인력</td>
+      </tr>
+      <tr>
+        <td>그룹 구조</td>
+        <td>에버켐텍그룹 계열사. 이성민 대표 창업자 과반 지분 보유 추정 (오너 경영)</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 주요 제품 -->
+  <div class="card">
+    <h3>주요 제품 라인업</h3>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-name">CONTIMER®</div>
+        <div class="product-desc">전도성 고분자·CNT 기반 정전기방지 코팅. 반도체·OLED 디스플레이 보호필름 및 스마트폰 이형필름에 적용. 핵심 매출원</div>
+      </div>
+      <div class="product-card">
+        <div class="product-name">SAMCO®</div>
+        <div class="product-desc">친환경 수성 기능성 코팅제. 종이·TPO·TPU 소재 적용. 스마트폰 케이스·자동차 내장재 표면처리. 친환경 규제 대응</div>
+      </div>
+      <div class="product-card">
+        <div class="product-name">NEXRIER®</div>
+        <div class="product-desc">천연물 기반 고차단성 배리어 코팅제. PE·PP·PET·나일론 필름 적용. LFGB/REACH/FDA 트리플 인증. 글로벌 확장 핵심 제품</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 재무 현황 -->
+  <div class="card">
+    <h3>재무 현황 (비상장 공시 기반)</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>2022</th><th>2023</th><th>2024</th><th>추세</th></tr>
+      <tr>
+        <td>매출액</td>
+        <td>153억</td>
+        <td>169.8억</td>
+        <td>188.6억</td>
+        <td><span class="chip good">연속 성장</span></td>
+      </tr>
+      <tr>
+        <td>영업이익</td>
+        <td>9.4억</td>
+        <td>△4.5억</td>
+        <td>2.0억</td>
+        <td><span class="chip neutral">흑자 회복</span></td>
+      </tr>
+      <tr>
+        <td>당기순이익</td>
+        <td>7.9억</td>
+        <td>△10.6억</td>
+        <td>△0.7억</td>
+        <td><span class="chip neutral">미미한 적자</span></td>
+      </tr>
+      <tr>
+        <td>영업이익률</td>
+        <td>6.1%</td>
+        <td>△2.7%</td>
+        <td>1.1%</td>
+        <td><span class="chip neutral">개선 중</span></td>
+      </tr>
+      <tr>
+        <td>자본금</td>
+        <td>9.1억</td>
+        <td>9.1억</td>
+        <td>9.1억</td>
+        <td><span class="chip neutral">변동 없음</span></td>
+      </tr>
+    </table>
+    <div style="margin-top:14px; font-size:13px; color:var(--text-secondary); line-height:1.8;">
+      ⚠️ 2023년 적자 전환(신제품 개발비 증가 추정) 후 2024년 흑자 회복. 매출은 3년 연속 성장(CAGR ~11%). 신사업(NEXRIER 포장재) 상업화 성과가 본격화되면 수익성 개선 기대. 2025년 반기 데이터 기준으로는 영업이익 6.7억(+227% YoY)으로 회복세 가속.
+    </div>
+  </div>
+
+  <!-- IPO 예상 밸류에이션 -->
+  <div class="card">
+    <h3>IPO 예상 밸류에이션 (비교 상장사 기준)</h3>
+    <div class="valuation-box">
+      <div class="val-title">예상 공모 시가총액 범위</div>
+      <div class="val-range">400억 ~ 700억원</div>
+      <div class="val-basis">PSR 2.1~3.7x (매출 188.6억 기준) · KOSDAQ 화학·신소재 업종 피어 기준</div>
+    </div>
+    <table class="tbl">
+      <tr><th>비교 상장사</th><th>시가총액</th><th>매출</th><th>PSR</th><th>비고</th></tr>
+      <tr>
+        <td>나노캠텍 (091970)</td>
+        <td>~640억</td>
+        <td>~170억 (추정)</td>
+        <td>~3.8x</td>
+        <td>KOSDAQ · 정밀화학 나노소재</td>
+      </tr>
+      <tr>
+        <td>나노신소재 (121600)</td>
+        <td>9,403억</td>
+        <td>1,117억</td>
+        <td>8.4x</td>
+        <td>KOSDAQ · 디스플레이·반도체 소재 (참고용, 규모 차이)</td>
+      </tr>
+      <tr>
+        <td><strong>에버켐텍 (추정)</strong></td>
+        <td><strong>400~700억</strong></td>
+        <td>188.6억</td>
+        <td>2.1~3.7x</td>
+        <td>기술특례상장 시 기술 프리미엄 가산 가능</td>
+      </tr>
+    </table>
+    <div style="margin-top:14px; font-size:13px; color:var(--text-secondary); line-height:1.8;">
+      📌 기술특례상장 시 기술성 평가에 따라 밸류에이션 할증 가능. NEXRIER 글로벌 인증 3개 획득(LFGB/REACH/FDA)으로 해외 매출 확장 시 PSR 4~5x 재평가 여지. 다만 현재 순이익 기반 수익성 지표(PER)는 적용 어려움.
+    </div>
+  </div>
+
+  <!-- IPO 타임라인 -->
+  <div class="card">
+    <h3>IPO 추진 타임라인</h3>
+    <div class="investment-timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">2008</div>
+        <div class="timeline-content">에버켐텍 설립 — 경기도 화성시</div>
+        <div class="timeline-sub">이성민 대표 창업, 연세대 화학과·첨단소재공학 박사</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2023.05</div>
+        <div class="timeline-content">NEXRIER®, WPO 월드스타 패키징어워드 수상</div>
+        <div class="timeline-sub">글로벌 포장재 분야 최고 권위상 수상 — 국제 인지도 확보</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024</div>
+        <div class="timeline-content">기술특례상장 목표 공표 — 진행 현황 비공개</div>
+        <div class="timeline-sub">IR52 장영실상 수상. IPO 추진 의향 언급하였으나 현재 비상장 유지 중</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025.06</div>
+        <div class="timeline-content">APEC 포장혁신 워크숍 한국 대표 참가 (대만 타이중)</div>
+        <div class="timeline-sub">NEXRIER로 글로벌 무대 발표 — 해외 파트너십 개척 중</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2025.07</div>
+        <div class="timeline-content">LFGB + REACH + FDA 트리플 인증 동시 달성</div>
+        <div class="timeline-sub">유럽·미국 식품포장재 시장 진입 전제조건 완비 — 해외 매출 본격화 기반 마련</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026.04.13</div>
+        <div class="timeline-content">LG U+와 코칭 프로그램 킥오프 미팅</div>
+        <div class="timeline-sub">김영규 부사장(이언그룹 대표)이 U+ AI 사업 임원 코칭 담당 — 에버켐텍 본업과 별개</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2026~?</div>
+        <div class="timeline-content">코스닥 기술특례상장 재추진 예상</div>
+        <div class="timeline-sub">NEXRIER 해외 매출 안정화 후 재추진 가능성. 정확한 시기 미확인</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI사업 연관성 -->
+  <div class="card">
+    <h3>U+ AI사업 연관성 평가</h3>
+    <div style="margin-bottom:16px; font-size:13px; color:var(--text-secondary); line-height:1.8;">
+      에버켐텍은 화학 소재 기업으로 LG U+ AI 사업(AIDC·AICC·Sovereign AI·AX)과 <strong>직접 기술 시너지가 없음</strong>. 현재 관계는 코칭 서비스 공급 관계(김영규 부사장의 컨설팅 역할). 투자 관점이 아닌 공급사 관계 관리 목적으로 분류.
+    </div>
+    <div class="ai-axes">
+      <div class="ai-axis-item">
+        <div class="ai-axis-score">✕</div>
+        <div>
+          <div class="ai-axis-name">AIDC 인프라</div>
+          <div class="ai-axis-note">화학 소재 기업 — GPU·서버·냉각 등 데이터센터 인프라와 직접 관련 없음</div>
+        </div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-score">✕</div>
+        <div>
+          <div class="ai-axis-name">AICC SaaS</div>
+          <div class="ai-axis-note">AI 컨택센터 솔루션과 무관. 소프트웨어·서비스 사업 아님</div>
+        </div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-score">✕</div>
+        <div>
+          <div class="ai-axis-name">Sovereign AI</div>
+          <div class="ai-axis-note">소버린 클라우드·EXAONE 등 AI 모델·인프라 사업과 연관 없음</div>
+        </div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-score">△</div>
+        <div>
+          <div class="ai-axis-name">AX 사업 파트너</div>
+          <div class="ai-axis-note">간접 관계 — 김영규 부사장의 스타트업 엑셀러레이팅·투자유치 네트워크 활용 가능. AI 스타트업 레퍼런스 소싱 가능성</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px; padding:14px; background:rgba(188,140,255,0.06); border-radius:10px; font-size:13px; color:var(--text-secondary);">
+      💡 <strong style="color:var(--text-primary);">활용 포인트:</strong> 에버켐텍 주식 투자보다는 김영규 부사장의 <strong>스타트업 네트워크(AI 분야 포함)</strong>를 U+ AI 파트너링·투자 후보 발굴에 활용하는 것이 현실적 가치. 이언그룹(EON Group) 통한 컨설팅 네트워크 접근.
+    </div>
+  </div>
+
+  <!-- 리스크 평가 -->
+  <div class="card">
+    <h3>리스크 평가 (IPO 관점)</h3>
+    <div class="risk-grid">
+      <div class="risk-card mid">
+        <div class="risk-type">수익성 위험</div>
+        <div class="risk-desc">2023~2024년 연속 순손실. 영업이익률 1%대로 수익성 기반 취약. 기술특례상장이 아닌 일반 상장 기준으로는 요건 미달 가능성.</div>
+        <div class="risk-meta">영향: 중간 | 확률: 높음</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">매출 집중 리스크</div>
+        <div class="risk-desc">CONTIMER 제품 디스플레이 산업 의존도 높음. 스마트폰·OLED 시장 둔화 시 매출 타격. 신제품(NEXRIER) 해외 매출 다변화 추진 중이나 아직 초기 단계.</div>
+        <div class="risk-meta">영향: 높음 | 확률: 중간</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">기술 경쟁력</div>
+        <div class="risk-desc">글로벌 3중 인증(LFGB/REACH/FDA) 보유. IR52 장영실상. R&D 인력 61%. 모방 난이도 높은 자체 특허 기술 보유 추정.</div>
+        <div class="risk-meta">영향: 낮음 | 확률: 낮음</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">경영권 안정성</div>
+        <div class="risk-desc">이성민 대표 창업자 오너 경영. 행동주의 투자자·경쟁 지배권 분쟁 없음. IPO 후 오너 지분 희석 관리 필요.</div>
+        <div class="risk-meta">영향: 낮음 | 확률: 낮음</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">IPO 타이밍 불확실</div>
+        <div class="risk-desc">2024년 기술특례상장 목표 발표 후 현재까지 비상장 유지. 주관사 선정·기술성 평가 통과 여부 불명. 코스닥 시장 환경에 따라 일정 유동적.</div>
+        <div class="risk-meta">영향: 중간 | 확률: 높음</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">친환경 규제 수혜</div>
+        <div class="risk-desc">EU REACH·탈플라스틱 규제 강화 → NEXRIER 포장재 수요 확대 트렌드. 글로벌 친환경 규제가 오히려 성장 기회.</div>
+        <div class="risk-meta">영향: 낮음 (긍정) | 확률: 높음</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 종합 판정 -->
+  <div class="card">
+    <h3>종합 판정</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>판정</th><th>코멘트</th></tr>
+      <tr>
+        <td>상장 여부</td>
+        <td><span class="chip ipo">비상장</span></td>
+        <td>현재 직접 투자 불가. 장외주식 시장(K-OTC 등) 거래 가능성 확인 필요</td>
+      </tr>
+      <tr>
+        <td>IPO 모니터링 등급</td>
+        <td><span class="chip neutral">B등급 — 관심</span></td>
+        <td>기술력 있으나 수익성·IPO 일정 불확실. 2~3년 내 재추진 가능성</td>
+      </tr>
+      <tr>
+        <td>예상 공모가 범위</td>
+        <td>-</td>
+        <td>기술특례 기준 400~700억원 시총 추정 (PSR 2.1~3.7x)</td>
+      </tr>
+      <tr>
+        <td>U+와의 비즈니스 관계</td>
+        <td><span class="chip neutral">코칭 파트너</span></td>
+        <td>주식 투자 대상 아님. 김영규 부사장의 컨설팅 역량 및 스타트업 네트워크 활용이 실질 가치</td>
+      </tr>
+      <tr>
+        <td>재검토 트리거</td>
+        <td><span class="chip ipo">IPO 시</span></td>
+        <td>코스닥 기술특례상장 주관사 선정·예비심사 신청 시 5축 풀 분석으로 전환</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 참고 소스 -->
+  <div class="card">
+    <h3>참고 소스</h3>
+    <table class="tbl">
+      <tr><th>#</th><th>소스</th><th>수집 정보</th></tr>
+      <tr><td>1</td><td>에버켐텍 공식 사이트 (everchemtech.com)</td><td>제품 라인업, 핵심 기술, 사업 방향</td></tr>
+      <tr><td>2</td><td>사람인 기업정보 (에버켐텍)</td><td>재무 현황: 매출·영업이익·순이익 2022~2025</td></tr>
+      <tr><td>3</td><td>이코노미스트 (2025.07)</td><td>NEXRIER·TPS OPV 트리플 인증 달성 보도</td></tr>
+      <tr><td>4</td><td>한국경제 (2023.05)</td><td>NEXRIER WPO 월드스타 패키징어워드 수상</td></tr>
+      <tr><td>5</td><td>디지털타임스 (2025.06)</td><td>APEC 워크숍 한국 대표 참가</td></tr>
+      <tr><td>6</td><td>EBN뉴스 / 뉴스와이어 (2024)</td><td>IR52 장영실상 수상</td></tr>
+      <tr><td>7</td><td>잡코리아 (에버켐텍)</td><td>기업 분류: 화학·에너지·환경, 에버켐텍그룹 계열</td></tr>
+      <tr><td>8</td><td>Notion 미팅준비 DB (내부)</td><td>미팅 맥락, 김영규 임원 프로파일, 지분구조, 코칭 목적</td></tr>
+      <tr><td>9</td><td>FnGuide — 나노신소재 (121600)</td><td>동종업계 비교 밸류에이션 (시총 9,403억, PSR)</td></tr>
+      <tr><td>10</td><td>나노캠텍 (091970) 공시</td><td>소규모 나노소재 KOSDAQ 비교사 시총 640억</td></tr>
+    </table>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 면책: 본 분석은 AI 에이전트가 공개 정보 및 내부 미팅 데이터를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 에버켐텍은 현재 비상장사로 직접 주식 거래가 불가합니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다. IPO 시 본 분석의 정확성을 재검증할 것을 권장합니다.
+  </div>
+
+  <footer class="footer">Stock Intelligence Agent · 2026-04-18 · IPO Monitor Mode</footer>
+
+</div>
+</body>
+</html>
