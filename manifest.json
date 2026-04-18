@@ -3,6 +3,20 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "아크도",
+      "ticker": "비상장",
+      "date": "20260418",
+      "file": "아크도_20260418.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
+      "company": "아크몬스터",
+      "ticker": "비상장",
+      "date": "20260418",
+      "file": "아크몬스터_20260418.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
       "company": "가비아",
       "ticker": "079940",
       "date": "20260412",
