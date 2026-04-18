@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "대교CNS",
+      "ticker": "비상장",
+      "date": "20260418",
+      "file": "대교CNS_20260418.html",
+      "verdict": "IPO MONITOR"
+    },
+    {
       "company": "에버켐텍",
       "ticker": "비상장",
       "date": "20260418",

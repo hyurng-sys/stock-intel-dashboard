@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 대교CNS | IPO Monitor | 2026-04-18</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+  .header { text-align: center; padding: 40px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--ipo), transparent); }
+  .header-label { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--ipo); background: rgba(188, 140, 255, 0.1); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(188, 140, 255, 0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+  .ipo-banner { text-align: center; padding: 28px; border-radius: 16px; margin-bottom: 28px; background: rgba(188, 140, 255, 0.08); border: 1px solid rgba(188, 140, 255, 0.3); }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .overview-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .overview-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th { background: rgba(255,255,255,0.04); color: var(--text-secondary); font-weight: 600; font-size: 12px; letter-spacing: 0.5px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 14px; border-bottom: 1px solid rgba(48,54,61,0.6); color: var(--text-primary); vertical-align: top; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+  .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .risk-card { padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
+  .risk-card.high { border-color: rgba(244,112,103,0.3); background: rgba(244,112,103,0.05); }
+  .risk-card.mid { border-color: rgba(210,153,34,0.3); background: rgba(210,153,34,0.05); }
+  .risk-card.low { border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.05); }
+  .risk-type { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); }
+  .pipeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .pipeline-item { padding: 18px; border-radius: 12px; background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15); }
+  .pipeline-title { font-size: 13px; font-weight: 700; color: var(--uplus-magenta); margin-bottom: 6px; }
+  .pipeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .fin-row { display: grid; grid-template-columns: 160px 1fr 1fr 1fr 1fr 1fr; gap: 0; border-bottom: 1px solid rgba(48,54,61,0.6); }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-label { font-size: 12px; color: var(--text-secondary); padding: 10px 14px; font-weight: 600; }
+  .fin-val { font-size: 13px; color: var(--text-primary); padding: 10px 14px; text-align: right; }
+  .fin-val.positive { color: var(--buy); }
+  .fin-val.negative { color: var(--sell); }
+  .fin-val.highlight { color: var(--ipo); font-weight: 700; }
+  .fin-header { display: grid; grid-template-columns: 160px 1fr 1fr 1fr 1fr 1fr; gap: 0; background: rgba(255,255,255,0.04); border-radius: 8px 8px 0 0; margin-bottom: 4px; }
+  .fin-header-cell { font-size: 11px; color: var(--text-muted); padding: 8px 14px; text-align: right; font-weight: 600; letter-spacing: 0.5px; }
+  .ai-axis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .ai-axis-item { padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
+  .ai-axis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .ai-axis-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .ai-score { font-size: 20px; font-weight: 800; }
+  .ai-score.core { color: var(--buy); }
+  .ai-score.linked { color: var(--uplus-magenta); }
+  .ai-score.indirect { color: var(--hold); }
+  .ai-score.none { color: var(--text-muted); }
+  .ai-axis-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .question-list { list-style: none; padding: 0; }
+  .question-list li { padding: 12px 0; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 14px; color: var(--text-secondary); padding-left: 20px; position: relative; }
+  .question-list li::before { content: '▸'; position: absolute; left: 0; color: var(--ipo); font-size: 11px; top: 14px; }
+  .question-list li:last-child { border-bottom: none; }
+  .disclaimer { font-size: 13px; color: var(--text-muted); padding: 20px 24px; border-radius: 12px; background: rgba(48,54,61,0.3); border: 1px solid var(--border); margin-bottom: 28px; line-height: 1.8; }
+  .footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 32px 0 16px; border-top: 1px solid var(--border); margin-top: 16px; }
+  @media (max-width: 768px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .risk-grid { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axis-grid { grid-template-columns: 1fr; }
+    .fin-row, .fin-header { grid-template-columns: 120px repeat(5, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">Stock Intelligence Report</div>
+    <h1>대교CNS — (주)대교씨엔에스</h1>
+    <div class="date">2026-04-18 · 미팅: 이령 대표 (2026-04-15) · 비상장 IT서비스</div>
+  </div>
+
+  <!-- IPO Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">Comprehensive Verdict</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장사 — 직접 주식 투자 불가 · 상장 계획 미공개 · 협력 파트너십 관점 우선</div>
+  </div>
+
+  <!-- Overview Grid -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">상장 여부</div>
+      <div class="overview-value" style="color: var(--ipo);">비상장</div>
+      <div class="overview-sub">KOSPI/KOSDAQ 미등재</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">2024년 매출</div>
+      <div class="overview-value" style="color: var(--buy);">830억원</div>
+      <div class="overview-sub">YoY +35.9% · 사상 최대</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">영업이익 (2024)</div>
+      <div class="overview-value" style="color: var(--hold);">~5억원</div>
+      <div class="overview-sub">흑자전환 · 이익률 0.6%</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">예상 기업가치</div>
+      <div class="overview-value" style="color: var(--ipo);">250~415억</div>
+      <div class="overview-sub">PSR 0.3~0.5x 추정</div>
+    </div>
+  </div>
+
+  <!-- 기업 개요 -->
+  <div class="card">
+    <h3>기업 개요</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>정식명</td><td>(주)대교씨엔에스 (Daekyoo CNS)</td></tr>
+      <tr><td>설립</td><td>1989년 대교에듀컴 창립 → 2005년 독립법인 분리</td></tr>
+      <tr><td>대표이사</td><td>이령 (건국대학교 정보통신대학원 출신)</td></tr>
+      <tr><td>임직원</td><td>약 155명 (2024년 기준)</td></tr>
+      <tr><td>본사</td><td>서울시 관악구 보라매로3길 23, 대교타워 7층</td></tr>
+      <tr><td>모회사</td><td>대교홀딩스 (지분 66.89%) — 강영중 회장 체제, 27개 계열사</td></tr>
+      <tr><td>주요사업</td><td>IT Outsourcing(ITO), IBM·Lenovo 총판, SaaS(터그보트), AI 컨설팅, 영상관제 플랫폼</td></tr>
+      <tr><td>상장 관련사</td><td>대교(주) KOSPI 019680 — 그룹 교육사업 본체 (CNS와 별도)</td></tr>
+    </table>
+  </div>
+
+  <!-- 재무 현황 -->
+  <div class="card">
+    <h3>재무 현황 — 매출 추이 (2019~2024)</h3>
+    <div class="fin-header">
+      <div class="fin-header-cell" style="text-align:left;">구분</div>
+      <div class="fin-header-cell">2019</div>
+      <div class="fin-header-cell">2020</div>
+      <div class="fin-header-cell">2021</div>
+      <div class="fin-header-cell">2022</div>
+      <div class="fin-header-cell highlight">2024(E)</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">매출</div>
+      <div class="fin-val">182억</div>
+      <div class="fin-val">241억</div>
+      <div class="fin-val">312억</div>
+      <div class="fin-val">477억</div>
+      <div class="fin-val highlight">830억</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">YoY 성장률</div>
+      <div class="fin-val">—</div>
+      <div class="fin-val positive">+32.4%</div>
+      <div class="fin-val positive">+29.5%</div>
+      <div class="fin-val positive">+52.9%</div>
+      <div class="fin-val positive highlight">+35.9%</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">영업이익</div>
+      <div class="fin-val">소폭흑자</div>
+      <div class="fin-val positive">17억</div>
+      <div class="fin-val positive">7억</div>
+      <div class="fin-val negative">-0.7억</div>
+      <div class="fin-val positive highlight">~5억</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">내부거래 비중</div>
+      <div class="fin-val">~85%</div>
+      <div class="fin-val">83%</div>
+      <div class="fin-val">57.7%</div>
+      <div class="fin-val">37.8%</div>
+      <div class="fin-val neutral highlight">~30% 추정</div>
+    </div>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px;">* 2022~2023년 2년 연속 적자 후 2024년 흑자전환. 2023년 매출 약 611억 추정. 내부거래 비중 지속 하락 = 대외사업 확대 신호. 출처: BizWatch 2025-04-08, 더벨 2023-09-18</p>
+  </div>
+
+  <!-- 사업 포트폴리오 -->
+  <div class="card">
+    <h3>사업 포트폴리오</h3>
+    <div class="pipeline-grid">
+      <div class="pipeline-item">
+        <div class="pipeline-title">ITO (IT Outsourcing)</div>
+        <div class="pipeline-desc">공공·금융기관 대상 시스템통합(SI) 및 운영유지보수(SM). 금융감독원 142억 정보화플랫폼 전환, 서울대·KITA·코레일테크 등 레퍼런스 보유. 매출 구성 最大 비중.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">채널사업 (IBM·Lenovo 총판)</div>
+        <div class="pipeline-desc">한국IBM 공인 총판 + 한국레노버 총판(2023년 신규 계약). X86 서버·스토리지·PC 공급망. AIDC 엣지 인프라 납품 채널로 활용 가능.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">SaaS — 터그보트(TUGBOAT)</div>
+        <div class="pipeline-desc">AI 감성인공지능 기반 스마트 학습케어 플랫폼. K-PaaS 인증, 조달청 디지털서비스몰 수의계약 등록. 8개 학습지표 + 집중력·감성 분석. 2024년 NIPA 초거대AI 사업 수주.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">영상관제 · AI 컨설팅</div>
+        <div class="pipeline-desc">AI 기반 스마트 비전 솔루션(AWS 클라우드·온프레미스·온디바이스). Qlik BI솔루션 유통. AI 전환 컨설팅 서비스 신설.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI사업 연관성 -->
+  <div class="card">
+    <h3>AI 사업 연관성 — LG U+ 협업 시너지</h3>
+    <div class="ai-axis-grid">
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">AIDC 인프라</div>
+          <div class="ai-score indirect">△</div>
+        </div>
+        <div class="ai-axis-desc">Lenovo 서버·스토리지 총판으로 AIDC 엣지 장비 공급 협력 가능. 대교 그룹 27개 계열사 IT 인프라 → U+ 코로케이션 이전 잠재 고객. 직접 대규모 거래보다는 채널·고객 역할.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">AICC SaaS</div>
+          <div class="ai-score linked">○</div>
+        </div>
+        <div class="ai-axis-desc">터그보트의 감성AI 엔진 → AICC 고객상담 감성분석 모듈과 기술 접점. 대교 그룹 교육사업(눈높이·눈높이러닝센터) 콜센터의 AICC 전환 수요 잠재. 교육 버티컬 공동 영업 가능.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">Sovereign AI / 공공클라우드</div>
+          <div class="ai-score indirect">△</div>
+        </div>
+        <div class="ai-axis-desc">K-PaaS 인증으로 공공 클라우드 시장 접점 보유. 금융감독원·공공기관 SI 레퍼런스 → U+ 공공 AIDC 사업 공동 입찰 연계 가능. 단, 직접 규모는 제한적.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">AX 사업화</div>
+          <div class="ai-score linked">○</div>
+        </div>
+        <div class="ai-axis-desc">대교그룹 27개 계열사 디지털전환 수요 내재. NIPA 초거대AI 컨설팅 수주 = U+ AX 솔루션 공동 제안 레퍼런스 기반. 교육AI + AX 버티컬 솔루션 공동 개발 잠재.</div>
+      </div>
+    </div>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 16px; line-height: 1.8;">
+      <strong style="color: var(--text-primary);">투자 관점 시사점:</strong> 대교CNS는 <em>직접 투자 대상</em>이 아닌 <em>교육 버티컬 채널 파트너</em>. 이령 대표 미팅(2026-04-15)에서 터그보트-AICC 연계, 그룹 인프라 U+ IDC 이전, 공공 SI 공동 입찰 가능성 구체화 필요.
+    </p>
+  </div>
+
+  <!-- 리스크 -->
+  <div class="card">
+    <h3>리스크 평가</h3>
+    <div class="risk-grid">
+      <div class="risk-card high">
+        <div class="risk-type">수익성 취약</div>
+        <div class="risk-desc">830억 매출 대비 영업이익 ~5억(0.6%). 구조적 저마진으로 투자 회수 불확실. 2022~2023년 2년 연속 적자 이력. 흑자 지속성 검증 필요.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 중간</div>
+      </div>
+      <div class="risk-card high">
+        <div class="risk-type">모그룹 의존 + 학령인구 감소</div>
+        <div class="risk-desc">내부거래 비중 여전히 ~30% 추정. 대교 교육사업 매출 감소 시 IT 내부 수요 위축. 학령인구 장기 감소로 그룹 주력사업 위협 → CNS 성장 한계.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 높음(장기)</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">오너 지배구조 집중</div>
+        <div class="risk-desc">강영중 회장 특수관계인 지분 98.2%. 장남(대교)/차남(대교홀딩스) 경영 분리. 후계 분쟁 가능성 보도 다수. IPO 시 지분 희석 불가피 → 오너 결정 불확실.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">비상장 재무 불투명성</div>
+        <div class="risk-desc">공시 제한적, ROE·FCF·부채비율 미공개. 실제 재무 건전성 외부 검증 불가. 계약 협상 시 재무 리스크 파악 어려움.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 해당 없음(현재)</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">대형 SI 경쟁 열위</div>
+        <div class="risk-desc">삼성SDS·LG CNS·SK AX 등 대형사 대비 규모·기술력 열위. 대형 공공 프로젝트 단독 수주 한계. 가격 경쟁 심화 시 수익성 추가 훼손.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 높음</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">비상장 투자 불가</div>
+        <div class="risk-desc">현재 비상장사로 직접 주식 투자 불가. IPO 계획 미공개. 투자 관점보다 협력 파트너십 관점이 유효. IPO 추진 시 재분석 필요.</div>
+        <div class="risk-meta">영향: 낮음 · 확률: 해당 없음</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPO 모니터링 -->
+  <div class="card">
+    <h3>IPO 모니터링 — 관찰 지표</h3>
+    <table class="tbl">
+      <tr><th>체크포인트</th><th>현재 상태</th><th>판단 기준</th></tr>
+      <tr>
+        <td>IPO 추진 의사</td>
+        <td><span class="chip bad">미공개</span></td>
+        <td>공식 IPO 언급 또는 증권사 주관사 선정 뉴스 시 관심 전환</td>
+      </tr>
+      <tr>
+        <td>매출 성장 지속</td>
+        <td><span class="chip good">830억 (2024)</span></td>
+        <td>매출 1,000억 돌파 + 영업이익률 5%+ 달성 시 코스닥 상장 현실화</td>
+      </tr>
+      <tr>
+        <td>흑자전환 지속성</td>
+        <td><span class="chip neutral">첫 흑자 (2024)</span></td>
+        <td>2025~2026년 2년 연속 흑자 확인 시 IPO 신뢰도 상승</td>
+      </tr>
+      <tr>
+        <td>대주주 지배구조</td>
+        <td><span class="chip bad">오너 98.2%</span></td>
+        <td>지분 분산 또는 PE 투자 유치 시 IPO 준비 신호</td>
+      </tr>
+      <tr>
+        <td>외부 투자 유치</td>
+        <td><span class="chip bad">이력 없음</span></td>
+        <td>VC/PE 시리즈 투자 유치 시 기업가치 공개 계기 + IPO 시동</td>
+      </tr>
+      <tr>
+        <td>터그보트 SaaS 성장</td>
+        <td><span class="chip neutral">K-PaaS 인증·조달 등록</span></td>
+        <td>터그보트 연간 ARR 50억 이상 달성 시 SaaS 밸류에이션 상향 가능</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 비교 기업 기반 예상 밸류에이션 -->
+  <div class="card">
+    <h3>비상장 추정 밸류에이션 — 유사 상장사 비교</h3>
+    <table class="tbl">
+      <tr><th>기업</th><th>시장</th><th>매출</th><th>PSR</th><th>시가총액</th><th>대교CNS 적용 시</th></tr>
+      <tr>
+        <td>LG CNS</td>
+        <td>KOSPI (2025 IPO)</td>
+        <td>~6조원</td>
+        <td>0.5x</td>
+        <td>~3조원</td>
+        <td>참조 (대형 SI)</td>
+      </tr>
+      <tr>
+        <td>케이사인</td>
+        <td>KOSDAQ</td>
+        <td>~400억</td>
+        <td>0.8x</td>
+        <td>~320억</td>
+        <td>IT보안 특화, 고 PSR</td>
+      </tr>
+      <tr>
+        <td>중소 IT서비스 평균</td>
+        <td>KOSDAQ</td>
+        <td>—</td>
+        <td>0.3~0.5x</td>
+        <td>—</td>
+        <td><strong style="color:var(--ipo);">250~415억 추정</strong></td>
+      </tr>
+    </table>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">* 비상장 IT서비스사 매출 830억 기준 PSR 0.3~0.5x 적용 시 약 250~415억원 추정. 터그보트 SaaS 성장 시 SaaS 프리미엄(PSR 2~3x) 부분 적용 가능 → 최대 400~800억원대 가능. 모두 추정치이며 공신력 없음.</p>
+  </div>
+
+  <!-- 미팅 준비 질문 -->
+  <div class="card">
+    <h3>미팅 준비 핵심 질문 — 이령 대표 (2026-04-15)</h3>
+    <ul class="question-list">
+      <li>대교CNS의 현재 주요 대외 고객 포트폴리오와 대교그룹 내부거래 비중 현황은? (대외 비중 목표 시점)</li>
+      <li>터그보트 SaaS의 현재 ARR(연간반복매출)과 주요 고객사는? LG U+ AICC 플랫폼과 감성AI 기술 연계 가능성 논의 희망</li>
+      <li>2024년 흑자전환의 주요 드라이버는? (수익성 개선 구조 이해를 위해)</li>
+      <li>Lenovo 서버 총판 사업에서 AI 서버(GPU 인프라) 수요 증가 체감 여부 및 AIDC 관련 공급 실적</li>
+      <li>대교그룹 27개 계열사 IT 인프라의 클라우드 전환 로드맵이 있는지? (LG U+ IDC/Sovereign Cloud 제안 기회)</li>
+      <li>IPO 중장기 계획 또는 외부 투자 유치 의향 여부 (파트너십 심화 투자 관점)</li>
+    </ul>
+  </div>
+
+  <!-- 참고 소스 -->
+  <div class="card">
+    <h3>참고 소스</h3>
+    <table class="tbl">
+      <tr><th>#</th><th>소스</th><th>수집 정보</th></tr>
+      <tr><td>1</td><td>BizWatch (2025-04-08)</td><td>대교그룹 2024년 실적 — CNS 830억 매출·흑자전환, 대교홀딩스 연결 159억 영업이익</td></tr>
+      <tr><td>2</td><td>더벨 (2023-09-18)</td><td>대교CNS 수익성 악화·내부거래 비중 추이 분석</td></tr>
+      <tr><td>3</td><td>뉴시스 (2024-03-15)</td><td>터그보트 조달청 디지털서비스이용지원시스템 등록 확인</td></tr>
+      <tr><td>4</td><td>한국경제 (2024-06-16)</td><td>NIPA 초거대AI 학습컨설팅 개발 지원사업 수주</td></tr>
+      <tr><td>5</td><td>뉴시스 (2023-03-27)</td><td>한국레노버 총판 계약 체결 보도</td></tr>
+      <tr><td>6</td><td>뉴스와이어</td><td>금융감독원 142억 정보화플랫폼 전환 사업 수주</td></tr>
+      <tr><td>7</td><td>나무위키 — 대교그룹</td><td>지배구조, 오너 지분 구조, 계열사 현황</td></tr>
+      <tr><td>8</td><td>캐치 / 인크루트</td><td>임직원 ~155명, 평균연봉 4,580~4,990만원</td></tr>
+      <tr><td>9</td><td>에듀모닝 (2025)</td><td>대교 실적 진단, 교육사업 추이</td></tr>
+      <tr><td>10</td><td>DART 전자공시</td><td>비상장사로 별도 공시 없음 확인. 대교홀딩스 연결 감사보고서 참조</td></tr>
+      <tr><td>11</td><td>daekyocns.com</td><td>사업 분야, 제품 포트폴리오, 연혁</td></tr>
+      <tr><td>12</td><td>LinkedIn — 이령 대표</td><td>건국대 정보통신대학원, 경력 확인</td></tr>
+    </table>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    ⚠️ 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 대교CNS는 비상장사로 직접 주식 투자가 불가합니다. 재무 데이터 일부는 추정치이며 공신력 없는 수치입니다. 모든 투자·사업 결정은 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">Stock Intelligence Report — Generated by Claude Code · 2026-04-18 · 대교CNS IPO Monitor</footer>
+
+</div>
+</body>
+</html>
