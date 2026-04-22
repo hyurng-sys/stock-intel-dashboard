@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Coinbase Global",
+      "ticker": "COIN",
+      "date": "20260422",
+      "file": "Coinbase_20260422.html",
+      "verdict": "HOLD"
+    },
+    {
       "company": "웰컴저축은행",
       "ticker": "비상장",
       "date": "20260418",
