@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "UiPath",
+      "ticker": "PATH",
+      "date": "20260422",
+      "file": "UiPath_20260422.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "Coinbase Global",
       "ticker": "COIN",
       "date": "20260422",
