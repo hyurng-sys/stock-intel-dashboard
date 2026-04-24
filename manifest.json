@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "GE Vernova",
+      "ticker": "GEV",
+      "date": "20260425",
+      "file": "GE_Vernova_20260425.html",
+      "verdict": "HOLD"
+    },
+    {
       "company": "UiPath",
       "ticker": "PATH",
       "date": "20260422",
