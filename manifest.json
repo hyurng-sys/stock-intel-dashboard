@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "네이버클라우드",
+      "ticker": "비상장 (NAVER 035420)",
+      "date": "20260425",
+      "file": "네이버클라우드_20260425.html",
+      "verdict": "BUY (IPO MONITOR)"
+    },
+    {
       "company": "GE Vernova",
       "ticker": "GEV",
       "date": "20260425",

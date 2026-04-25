@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 네이버클라우드 (비상장) | 2026-04-25</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --target1: #57AB5A;
+    --target2: #58A6FF;
+    --target3: #BC8CFF;
+    --stoploss: #F47067;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  /* IPO Banner */
+  .ipo-banner {
+    background: rgba(188,140,255,0.08);
+    border: 1px solid rgba(188,140,255,0.3);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #BC8CFF;
+    line-height: 1.6;
+  }
+  .ipo-banner strong { color: #D2B0FF; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--uplus-magenta), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--uplus-magenta);
+    background: rgba(88, 166, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(88, 166, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header .date {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* Verdict Banner */
+  .verdict-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-banner.buy { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.3); }
+  .verdict-banner.sell { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.3); }
+  .verdict-banner.hold { background: rgba(210,153,34,0.08); border: 1px solid rgba(210,153,34,0.3); }
+  .verdict-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-label { color: var(--buy); }
+  .verdict-banner.sell .verdict-label { color: var(--sell); }
+  .verdict-banner.hold .verdict-label { color: var(--hold); }
+  .verdict-text {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-text { color: var(--buy); }
+  .verdict-banner.sell .verdict-text { color: var(--sell); }
+  .verdict-banner.hold .verdict-text { color: var(--hold); }
+  .verdict-votes { font-size: 14px; color: var(--text-secondary); }
+  .verdict-votes .v-buy { color: var(--buy); font-weight: 700; }
+  .verdict-votes .v-hold { color: var(--hold); font-weight: 700; }
+  .verdict-votes .v-sell { color: var(--sell); font-weight: 700; }
+  .verdict-sub { font-size: 12px; color: #BC8CFF; margin-top: 8px; }
+
+  /* Price Target */
+  .price-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .price-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .price-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .price-table th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-table td { padding: 10px 12px; font-size: 14px; border-bottom: 1px solid rgba(48,54,61,0.5); }
+  .price-table .price-val { font-weight: 700; font-size: 16px; }
+  .price-table .pct-up { color: var(--buy); font-weight: 600; }
+  .price-table .pct-down { color: var(--sell); font-weight: 600; }
+  .price-bar-wrap {
+    position: relative;
+    height: 40px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    overflow: visible;
+    margin: 24px 0 40px;
+  }
+  .price-marker {
+    position: absolute; top: -6px; width: 3px; height: 52px; border-radius: 2px; z-index: 2;
+  }
+  .price-marker-label {
+    position: absolute; top: 52px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 600; white-space: nowrap;
+  }
+  .price-marker.current { background: var(--text-primary); }
+  .price-marker.stoploss { background: var(--stoploss); }
+  .price-marker.target1 { background: var(--target1); }
+  .price-marker.target2 { background: var(--target2); }
+  .price-marker.target3 { background: var(--target3); }
+
+  /* Timing Signals */
+  .timing-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .timing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .timing-header h3 {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .timing-verdict { font-size: 14px; font-weight: 700; padding: 4px 14px; border-radius: 12px; }
+  .timing-verdict.go { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.3); }
+  .timing-verdict.wait { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.3); }
+  .signal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .signal-card {
+    background: rgba(48,54,61,0.3); border-radius: 10px; padding: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .signal-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+  }
+  .signal-icon.met { background: rgba(63,185,80,0.15); color: var(--buy); }
+  .signal-icon.unmet { background: rgba(110,118,129,0.15); color: var(--text-muted); }
+  .signal-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .signal-value { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Charts Row */
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px;
+  }
+  .chart-card h3 {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .chart-wrap { display: flex; justify-content: center; align-items: center; height: 260px; }
+  .chart-wrap canvas { max-height: 260px; }
+
+  /* Metrics */
+  .metrics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .metric-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .metric-card h3 {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .metric-table { width: 100%; border-collapse: collapse; }
+  .metric-table th {
+    text-align: left; font-size: 11px; color: var(--text-muted);
+    font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--border);
+  }
+  .metric-table td { padding: 8px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.4); }
+  .verdict-chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+  .verdict-chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .verdict-chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .verdict-chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+
+  /* Guru Cards */
+  .section-title {
+    font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+  .guru-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .guru-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .guru-card:hover { border-color: rgba(88,166,255,0.3); transform: translateY(-2px); }
+  .guru-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .guru-name { font-size: 16px; font-weight: 700; }
+  .guru-style { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .guru-verdict { font-size: 13px; font-weight: 800; padding: 4px 12px; border-radius: 10px; }
+  .guru-verdict.buy { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.25); }
+  .guru-verdict.sell { background: rgba(244,112,103,0.12); color: var(--sell); border: 1px solid rgba(244,112,103,0.25); }
+  .guru-verdict.hold { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.25); }
+  .guru-confidence { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+  .guru-reasons { list-style: none; margin-bottom: 12px; }
+  .guru-reasons li {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.5;
+    padding-left: 14px; position: relative; margin-bottom: 4px;
+  }
+  .guru-reasons li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--uplus-magenta); opacity: 0.5;
+  }
+  .guru-target { font-size: 12px; color: var(--text-muted); padding-top: 10px; border-top: 1px solid var(--border); }
+  .guru-target strong { color: var(--uplus-pink); }
+
+  /* AI Relevance */
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+  }
+  .ai-section h3 {
+    font-size: 13px; font-weight: 600; color: var(--axis-ai);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .ai-alliance { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+  .ai-axes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ai-axis-card { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; text-align: center; }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  /* IPO Details */
+  .ipo-details {
+    background: rgba(188,140,255,0.05);
+    border: 1px solid rgba(188,140,255,0.2);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+  }
+  .ipo-details h3 {
+    font-size: 13px; font-weight: 600; color: #BC8CFF;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .ipo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .ipo-item { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; }
+  .ipo-item-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+  .ipo-item-value { font-size: 14px; color: var(--text-primary); font-weight: 600; }
+  .ipo-item-note { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Risks */
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid; }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  /* Sources */
+  .sources-section {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+  }
+  .sources-section h3 {
+    font-size: 13px; font-weight: 600; color: var(--text-secondary);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .source-list { list-style: none; }
+  .source-list li {
+    padding: 8px 0; border-bottom: 1px solid rgba(48,54,61,0.4);
+    font-size: 13px; color: var(--text-secondary);
+  }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: var(--uplus-magenta); text-decoration: none; }
+  .source-list a:hover { text-decoration: underline; }
+  .source-type { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 6px; margin-right: 8px; background: rgba(88,166,255,0.1); color: var(--uplus-pink); }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: rgba(244,112,103,0.05); border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 28px;
+    font-size: 12px; color: var(--text-muted); line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .charts-row, .metrics-row { grid-template-columns: 1fr; }
+    .guru-grid { grid-template-columns: 1fr; }
+    .signal-grid { grid-template-columns: 1fr 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+    .ipo-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .verdict-text { font-size: 28px; }
+    .signal-grid { grid-template-columns: 1fr; }
+    .ipo-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- IPO Alert Banner -->
+  <div class="ipo-banner">
+    <strong>비상장사 — IPO 모니터링 모드</strong><br>
+    네이버클라우드(주)는 NAVER Corp(035420.KS)의 100% 비상장 자회사입니다. 직접 투자 불가 — 모회사 <strong>NAVER 035420.KS</strong>를 통한 간접 노출만 가능. 아래 분석은 모회사 NAVER Corp 기준으로 작성되었습니다. 미팅 상대: 이정훈 CFO (2026-04-28).
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">Stock Intelligence · IPO Monitoring</div>
+    <h1>네이버클라우드 (비상장) <span style="font-size:18px;color:var(--text-muted);font-weight:400">| NAVER 035420.KS</span></h1>
+    <p class="date">2026-04-25 · KOSPI (Parent Co.)</p>
+  </header>
+
+  <!-- Verdict Banner -->
+  <div class="verdict-banner buy">
+    <div class="verdict-label">Comprehensive Verdict — NAVER Corp Proxy</div>
+    <div class="verdict-text">BUY</div>
+    <div class="verdict-votes">Guru Vote: <span class="v-buy">BUY 4</span> / <span class="v-hold">HOLD 2</span> / <span class="v-sell">SELL 0</span></div>
+    <div class="verdict-sub">네이버클라우드 IPO 시 별도 재검토 필요 | 현재 투자 경로: NAVER 035420.KS</div>
+  </div>
+
+  <!-- 1-Year Price Trend (NAVER 035420) -->
+  <div class="chart-card" style="margin-bottom:28px">
+    <h3>1-Year Price Trend — NAVER 035420.KS (Yahoo Finance)</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+
+  <!-- Price Target -->
+  <div class="price-section">
+    <h3>Price Target & Strategy — NAVER 035420.KS 기준</h3>
+    <table class="price-table">
+      <tr><th>구분</th><th>가격</th><th>비율</th><th>근거</th></tr>
+      <tr><td>현재가</td><td class="price-val">₩214,000</td><td>—</td><td>2026-04-22 종가 (Yahoo Finance)</td></tr>
+      <tr><td>매수 적정가</td><td class="price-val">₩210,000</td><td>—</td><td>현재 조정 구간 분할 매수 기준</td></tr>
+      <tr><td>1차 목표가</td><td class="price-val" style="color:var(--target1)">₩255,000</td><td class="pct-up">+19.2%</td><td>52주 고점(295,000) 대비 86% 회복 수준</td></tr>
+      <tr><td>2차 목표가</td><td class="price-val" style="color:var(--target2)">₩325,000</td><td class="pct-up">+51.9%</td><td>애널리스트 컨센서스 평균 (27명, investing.com)</td></tr>
+      <tr><td>3차 목표가</td><td class="price-val" style="color:var(--target3)">₩420,000</td><td class="pct-up">+96.3%</td><td>AI 클라우드 분사 기대감 + 5년 TAM 역산</td></tr>
+      <tr><td>손절가</td><td class="price-val" style="color:var(--stoploss)">₩193,000</td><td class="pct-down">-9.8%</td><td>52주 저점(181,100) 상단 버퍼, 안전마진 붕괴</td></tr>
+      <tr><td>트레일링 스톱</td><td class="price-val" style="color:var(--text-muted)">최고점 -15%</td><td>—</td><td>수익 방어</td></tr>
+    </table>
+    <div class="price-bar-wrap" id="price-bar"></div>
+  </div>
+
+  <!-- Timing Signals -->
+  <div class="timing-section">
+    <div class="timing-header">
+      <h3>Buy Timing Signals</h3>
+      <span class="timing-verdict wait" id="timing-verdict">4/6 — 분할 매수</span>
+    </div>
+    <div class="signal-grid">
+      <div class="signal-card">
+        <div class="signal-icon unmet">—</div>
+        <div>
+          <div class="signal-name">RSI &lt; 40</div>
+          <div class="signal-value">RSI(14) = 64.4 — 과매수 아님</div>
+        </div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon met">✓</div>
+        <div>
+          <div class="signal-name">MACD 골든크로스</div>
+          <div class="signal-value">MACD +1,695 — 매수 신호</div>
+        </div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon met">✓</div>
+        <div>
+          <div class="signal-name">120일선 하방</div>
+          <div class="signal-value">214,000 < MA120(241,062) — 할인 구간</div>
+        </div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon met">✓</div>
+        <div>
+          <div class="signal-name">PER 할인</div>
+          <div class="signal-value">2026E PER ~18x, 5년 평균 대비 28% 할인</div>
+        </div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon unmet">—</div>
+        <div>
+          <div class="signal-name">수급 전환</div>
+          <div class="signal-value">외국인/기관 순매수 데이터 미확인</div>
+        </div>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon met">✓</div>
+        <div>
+          <div class="signal-name">구루 4명+ BUY</div>
+          <div class="signal-value">4명 BUY (Buffett·Lynch·Cathie·AI Insider)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>5-Axis Analysis</h3>
+      <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Guru Consensus</h3>
+      <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Fundamentals & Valuation -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <h3>Fundamentals — 네이버클라우드 / NAVER 연결</h3>
+      <table class="metric-table">
+        <tr><th>지표</th><th>값</th><th>추이</th><th>판정</th></tr>
+        <tr><td>클라우드 매출 (2024)</td><td style="font-weight:600">1조3,990억</td><td>+16.9% YoY</td><td><span class="verdict-chip good">양호</span></td></tr>
+        <tr><td>NAVER 연결 클라우드</td><td style="font-weight:600">5,637억</td><td>+26.1% YoY</td><td><span class="verdict-chip good">우수</span></td></tr>
+        <tr><td>영업이익률 (클라우드)</td><td style="font-weight:600">7.7%</td><td>흑자전환</td><td><span class="verdict-chip good">개선</span></td></tr>
+        <tr><td>NAVER 연결 ROE</td><td style="font-weight:600">~12-14%</td><td>개선 중</td><td><span class="verdict-chip neutral">보통</span></td></tr>
+        <tr><td>FCF (NAVER 연결)</td><td style="font-weight:600">양호</td><td>클라우드 CAPEX↑</td><td><span class="verdict-chip neutral">보통</span></td></tr>
+        <tr><td>부채비율</td><td style="font-weight:600">안정</td><td>—</td><td><span class="verdict-chip good">안정</span></td></tr>
+      </table>
+    </div>
+    <div class="metric-card">
+      <h3>Valuation — NAVER 035420.KS</h3>
+      <table class="metric-table">
+        <tr><th>지표</th><th>현재</th><th>5년 평균</th><th>동종업계</th><th>판정</th></tr>
+        <tr><td>PER</td><td style="font-weight:600">~38x(2025E)</td><td>~25x</td><td>Kakao ~30x</td><td><span class="verdict-chip bad">고평가</span></td></tr>
+        <tr><td>2026E PER</td><td style="font-weight:600">~18x</td><td>—</td><td>—</td><td><span class="verdict-chip good">저평가</span></td></tr>
+        <tr><td>PBR</td><td style="font-weight:600">~1.4x</td><td>~2.0x</td><td>~1.5x</td><td><span class="verdict-chip good">저평가</span></td></tr>
+        <tr><td>EV/EBITDA</td><td style="font-weight:600">~14x</td><td>~18x</td><td>~15x</td><td><span class="verdict-chip good">저평가</span></td></tr>
+        <tr><td>업사이드</td><td style="font-weight:600">+51.9%</td><td colspan="2">컨센서스 325,296원</td><td><span class="verdict-chip good">매력적</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- IPO Monitoring Section -->
+  <div class="ipo-details">
+    <h3>IPO 모니터링 — 네이버클라우드(주) 비상장 분석</h3>
+    <div class="ipo-grid">
+      <div class="ipo-item">
+        <div class="ipo-item-label">IPO 상태</div>
+        <div class="ipo-item-value">공식 계획 없음</div>
+        <div class="ipo-item-note">2027~2030년 분사 가능성 시장 논의 중. 공식 발표 無.</div>
+      </div>
+      <div class="ipo-item">
+        <div class="ipo-item-label">추정 기업가치</div>
+        <div class="ipo-item-value">4~7조원</div>
+        <div class="ipo-item-note">PSR 3~5x 기준 (2024년 매출 1.4조). 독립 법인 공식 밸류에이션 없음.</div>
+      </div>
+      <div class="ipo-item">
+        <div class="ipo-item-label">최근 투자 라운드</div>
+        <div class="ipo-item-value">NAVER 100% 자회사</div>
+        <div class="ipo-item-note">외부 투자 라운드 없음. 모회사 자금 지원.</div>
+      </div>
+      <div class="ipo-item">
+        <div class="ipo-item-label">성장 모멘텀</div>
+        <div class="ipo-item-value">각 세종 IDC 확장</div>
+        <div class="ipo-item-note">47MW → 130MW+(2029), GPU 6만장, 연 1조원+ 투자.</div>
+      </div>
+      <div class="ipo-item">
+        <div class="ipo-item-label">비교 기업 (상장)</div>
+        <div class="ipo-item-value">KT클라우드, NHN클라우드</div>
+        <div class="ipo-item-note">국내 CSP 2~3위. 네이버클라우드 독파모 LLM 차별화.</div>
+      </div>
+      <div class="ipo-item">
+        <div class="ipo-item-label">IPO 트리거 조건</div>
+        <div class="ipo-item-value">클라우드 매출 2조원+</div>
+        <div class="ipo-item-note">2027년 달성 예상 시 분사 논의 구체화 가능.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Relevance -->
+  <div class="ai-section">
+    <h3>AI Business Relevance — LG U+ 관점</h3>
+    <div class="ai-alliance" style="font-size:16px;font-weight:600;margin-bottom:8px;">Alliance Rating: ★★☆ (잠재적 — 경쟁·협력 이중 포지션)</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;">네이버클라우드는 LG U+ AICC·소버린AI 사업의 직접 경쟁자이자 잠재 기술 파트너. CFO 미팅에서 협력 접점 vs 경쟁 구도 명확화 필요.</div>
+    <div class="ai-axes">
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AIDC 인프라</div>
+        <div class="ai-axis-score">○</div>
+        <div class="ai-axis-note">네이버 자체 IDC 보유 — U+ 코로케이션 고객 가능성 낮음. GPUaaS 시장 경쟁.</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AICC SaaS</div>
+        <div class="ai-axis-score">◎</div>
+        <div class="ai-axis-note">HyperCLOVA X 기반 AICC 직접 경쟁. 기술 협력 가능성 존재.</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">Sovereign AI</div>
+        <div class="ai-axis-score">○</div>
+        <div class="ai-axis-note">뉴로클라우드(온프레미스 소버린) vs U+ AWS소버린. 공공시장 경쟁.</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AX 사업화</div>
+        <div class="ai-axis-score">△</div>
+        <div class="ai-axis-note">K-LLM 공동 선정(네이버·LG AI). 정부 AI사업 간접 협력 여지.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guru Cards -->
+  <h2 class="section-title">Guru Persona Voting — NAVER 035420.KS 기준</h2>
+  <div class="guru-grid">
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">워런 버핏</div>
+          <div class="guru-style">가치투자</div>
+        </div>
+        <span class="guru-verdict buy">BUY</span>
+      </div>
+      <div class="guru-confidence">Confidence: 중간</div>
+      <ul class="guru-reasons">
+        <li>한국 인터넷·AI·클라우드 생태계의 경제적 해자 — 검색·쇼핑·금융·AI 수직통합. 전환비용 매우 높음.</li>
+        <li>2024년 클라우드 흑자전환, 2026E PER ~18x는 장기 가치투자 관점에서 진입 타이밍. ROE 개선 추세.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩290,000 (DCF 내재가치 추산)</div>
+    </div>
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">벤저민 그레이엄</div>
+          <div class="guru-style">안전마진</div>
+        </div>
+        <span class="guru-verdict hold">HOLD</span>
+      </div>
+      <div class="guru-confidence">Confidence: 중간</div>
+      <ul class="guru-reasons">
+        <li>2025E PER ~38x는 그레이엄 기준(PER<15) 대비 과도. 단, 2026E PER ~18x로 빠른 이익 정상화 추세.</li>
+        <li>PBR ~1.4x는 그레이엄 넘버 근방. 배당 미흡. 이익 예측 가시성 확보 전까지 HOLD 유지.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩235,000 (PER 15x 기준)</div>
+    </div>
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">피터 린치</div>
+          <div class="guru-style">성장투자 (GARP)</div>
+        </div>
+        <span class="guru-verdict buy">BUY</span>
+      </div>
+      <div class="guru-confidence">Confidence: 높음</div>
+      <ul class="guru-reasons">
+        <li>PEG 분석: 2026년 이익 증가율 60%+로 예상 시 PEG < 1. 클라우드 26% 성장 + 흑자전환 = 성장 스토리 명확.</li>
+        <li>HyperCLOVA X(독파모 1위) + 사우디 수출 + 각 세종 IDC 확장 = 향후 3년 성장 촉매제 복수 존재.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩330,000 (성장 모멘텀 PEG 1.2x)</div>
+    </div>
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">캐시 우드</div>
+          <div class="guru-style">혁신/파괴적 기술</div>
+        </div>
+        <span class="guru-verdict buy">BUY</span>
+      </div>
+      <div class="guru-confidence">Confidence: 높음</div>
+      <ul class="guru-reasons">
+        <li>HyperCLOVA X 오픈소스화(100만+ 다운로드) + GPUaaS 본격화 + 사우디 소버린 AI 수출 = 아시아 AI 파괴적 혁신 플레이어.</li>
+        <li>5년 TAM: 국내 AI 클라우드 30조+, 중동·동남아 진출 시 5년 후 매출 5조원 가능. 현 시가총액(32조) 대비 클라우드 부문 심각한 저평가.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩480,000 (5년 TAM 역산)</div>
+    </div>
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">기술적 분석가</div>
+          <div class="guru-style">차트 기반</div>
+        </div>
+        <span class="guru-verdict hold">HOLD</span>
+      </div>
+      <div class="guru-confidence">Confidence: 중간</div>
+      <ul class="guru-reasons">
+        <li>현재가(214,000)가 MA50(228,255)·MA200(225,359) 모두 하회 → 역배열 진입. 추세 반전 확인 전 진입 불리.</li>
+        <li>MACD +1,695 매수신호이나 RSI 64.4로 과매수 근접. 228,000 돌파 시 골든크로스 형성 — 그때 BUY로 전환.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩265,000 (MA50 돌파 후 전고점)</div>
+    </div>
+    <div class="guru-card">
+      <div class="guru-header">
+        <div>
+          <div class="guru-name">AI사업 내부자</div>
+          <div class="guru-style">LG U+ 관점</div>
+        </div>
+        <span class="guru-verdict buy">BUY</span>
+      </div>
+      <div class="guru-confidence">Confidence: 중간</div>
+      <ul class="guru-reasons">
+        <li>이정훈 CFO 미팅(0428): AICC 기술 협력 가능성 + 공공클라우드 경쟁 포지션 확인 필수. 네이버클라우드는 국내 B2B AI 인텔리전스 1순위 수집 대상.</li>
+        <li>K-LLM 정부 선정 + 사우디 IDC 수출 + GPUaaS 1조원 투자 = 2026~2027년 클라우드 사업 분사 가능성 높아지면 NAVER 주가 리레이팅 이벤트 발생.</li>
+      </ul>
+      <div class="guru-target"><strong>Target:</strong> ₩350,000 (분사 기대감 반영)</div>
+    </div>
+  </div>
+
+  <!-- Risks -->
+  <h2 class="section-title">Risk Assessment</h2>
+  <div class="risk-grid">
+    <div class="risk-card high">
+      <div class="risk-type">경쟁 Risk</div>
+      <div class="risk-desc">AWS(60%)·MS(24%)의 민간 클라우드 압도적 장악. CSAP 하등급 개방 시 외산 CSP의 공공시장 진입 → 네이버클라우드 유일 공공 SaaS 허브 지위 위협.</div>
+      <div class="risk-meta">Impact: 높음 · Probability: 높음</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-type">기업 Risk</div>
+      <div class="risk-desc">라인야후 사태: 소프트뱅크 지분 압박으로 일본 사업 수익성 약화. LY서비스가 CLOVA 대신 OpenAI 채택 → NAVER AI 기술 레버리지 상실.</div>
+      <div class="risk-meta">Impact: 높음 · Probability: 실현 중</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">규제 Risk</div>
+      <div class="risk-desc">공정위 네이버 독과점 이슈. CSAP 제도 개편으로 외산 CSP 공공시장 진입 허용 시 국내 CSP 특수 약화. 두나무 합병 관련 규제 불확실성.</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 중간</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">매크로 Risk</div>
+      <div class="risk-desc">글로벌 AI 버블 우려 시 클라우드 투자 감속. 원/달러 환율 강세로 엔비디아 GPU 조달 비용 상승. 미국 반도체 수출규제 강화 시 GPU 확보 차질.</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 중간</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">수급 Risk</div>
+      <div class="risk-desc">현재가(214,000)가 52주 최고(295,000) 대비 -27.5% 하락. 외국인/기관 수급 약화 우려. MA50·MA200 모두 상회하는 역배열 구간.</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 중간</div>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-section">
+    <h3>참고 소스 (15개)</h3>
+    <ul class="source-list">
+      <li><span class="source-type">재무</span>네이버클라우드(주) 2024년 재무정보 — 매출 1조3,990억, 영업이익 1,073억 (사람인 기업정보)</li>
+      <li><span class="source-type">실적</span><a href="https://www.newspim.com/news/view/20250207000224" target="_blank">네이버 클라우드 4Q 매출 1,776억, B2B 성장 — 뉴스핌 2025-02-07</a></li>
+      <li><span class="source-type">실적</span><a href="https://m.ddaily.co.kr/page/view/2025020710303392520" target="_blank">네이버 2024 연매출 10조 돌파, 클라우드 +26.1% — 디지털데일리</a></li>
+      <li><span class="source-type">주가</span><a href="https://www.investing.com/equities/nhn-corp" target="_blank">NAVER 035420 현재가 214,000원, 52주 H/L 295,000/181,100 — investing.com</a></li>
+      <li><span class="source-type">컨센서스</span><a href="https://www.investing.com/equities/nhn-corp-consensus-estimates" target="_blank">27명 애널리스트 평균 목표가 325,296원, 매수 24명 — investing.com</a></li>
+      <li><span class="source-type">기술분석</span><a href="https://kr.investing.com/equities/nhn-corp-technical" target="_blank">RSI(14) 64.4, MACD +1,695 — investing.com 기술분석</a></li>
+      <li><span class="source-type">시장</span><a href="https://zdnet.co.kr/view/?no=20250312154930" target="_blank">SaaS CSAP 68%가 네이버클라우드 선택 — ZDNet 2025-03-12</a></li>
+      <li><span class="source-type">AI전략</span>HyperCLOVA X 추론모델·오픈소스 SEED 출시, 누적 100만+ 다운로드 — navercloudcorp.com 보도자료</li>
+      <li><span class="source-type">AIDC</span><a href="https://www.etnews.com/20251028000113" target="_blank">각 세종 2·3단계 착공, 47MW→130MW+(2029), GPU 6만장 — 전자신문 2025-10-28</a></li>
+      <li><span class="source-type">해외</span><a href="https://zdnet.co.kr/view/?no=20260424112401" target="_blank">네이버클라우드·한미글로벌 사우디 IDC 동맹 — ZDNet 2026-04-24</a></li>
+      <li><span class="source-type">소버린</span>네이버클라우드·한국은행 소버린 생성형 AI 플랫폼 구축 계약 — cio.com</li>
+      <li><span class="source-type">리스크</span>소프트뱅크 지분 재검토, 라인야후 경영권 압박 — 머니투데이 2024-07-17</li>
+      <li><span class="source-type">리포트</span>유진투자증권 NAVER BUY 목표가 340,000원 — 2025-11-06</li>
+      <li><span class="source-type">기업정보</span>NAVER Cloud Corp — 비상장 확인 (PitchBook 2026)</li>
+      <li><span class="source-type">주가데이터</span>NAVER 035420.KS 1년 일봉 데이터 — Yahoo Finance API (2025-04-24 ~ 2026-04-22)</li>
+    </ul>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다. 네이버클라우드(주)는 비상장 자회사로 직접 투자가 불가하며, 모회사 NAVER Corp(035420.KS) 주식을 통한 간접 노출만 가능합니다.
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Stock Intelligence Report — Generated by Claude Code | 미팅: 이정훈 CFO (네이버클라우드) 2026-04-28
+  </footer>
+
+</div>
+
+<script>
+// Price Bar
+const allPrices = [193000, 214000, 210000, 255000, 325000, 420000];
+const minP = Math.min(...allPrices) * 0.95;
+const maxP = Math.max(...allPrices) * 1.05;
+const range = maxP - minP;
+function barPos(price) { return ((price - minP) / range * 100).toFixed(1) + '%'; }
+const barEl = document.getElementById('price-bar');
+const markers = [
+  { price: 193000, cls: 'stoploss', label: '손절 ₩193,000' },
+  { price: 214000, cls: 'current', label: '현재 ₩214,000' },
+  { price: 255000, cls: 'target1', label: '1차 ₩255,000' },
+  { price: 325000, cls: 'target2', label: '2차 ₩325,000' },
+  { price: 420000, cls: 'target3', label: '3차 ₩420,000' }
+];
+markers.forEach(m => {
+  const colorMap = { stoploss: 'var(--stoploss)', current: 'var(--text-primary)', target1: 'var(--target1)', target2: 'var(--target2)', target3: 'var(--target3)' };
+  barEl.innerHTML += `<div class="price-marker ${m.cls}" style="left:${barPos(m.price)}"><div class="price-marker-label" style="color:${colorMap[m.cls]}">${m.label}</div></div>`;
+});
+
+// 1-Year Price Chart
+const priceHistory = [{"date":"2025-04-24","close":191500},{"date":"2025-05-02","close":197400},{"date":"2025-05-13","close":188200},{"date":"2025-05-20","close":185000},{"date":"2025-05-27","close":183800},{"date":"2025-06-04","close":185500},{"date":"2025-06-12","close":198900},{"date":"2025-06-19","close":252000},{"date":"2025-06-26","close":261000},{"date":"2025-07-03","close":253000},{"date":"2025-07-10","close":259500},{"date":"2025-07-17","close":243500},{"date":"2025-07-24","close":227000},{"date":"2025-07-31","close":235000},{"date":"2025-08-07","close":235500},{"date":"2025-08-14","close":224500},{"date":"2025-08-22","close":222000},{"date":"2025-08-29","close":214500},{"date":"2025-09-05","close":229000},{"date":"2025-09-12","close":236000},{"date":"2025-09-22","close":232000},{"date":"2025-09-29","close":274500},{"date":"2025-10-13","close":262500},{"date":"2025-10-20","close":258000},{"date":"2025-10-27","close":251000},{"date":"2025-11-03","close":274500},{"date":"2025-11-10","close":260000},{"date":"2025-11-17","close":255000},{"date":"2025-11-24","close":261000},{"date":"2025-12-01","close":243000},{"date":"2025-12-08","close":249000},{"date":"2025-12-15","close":240500},{"date":"2025-12-22","close":238000},{"date":"2025-12-30","close":242500},{"date":"2026-01-08","close":251000},{"date":"2026-01-15","close":247500},{"date":"2026-01-22","close":245500},{"date":"2026-01-29","close":287000},{"date":"2026-02-05","close":257000},{"date":"2026-02-12","close":255500},{"date":"2026-02-24","close":255000},{"date":"2026-03-04","close":208000},{"date":"2026-03-11","close":222000},{"date":"2026-03-18","close":226500},{"date":"2026-03-25","close":215500},{"date":"2026-04-01","close":210500},{"date":"2026-04-08","close":201500},{"date":"2026-04-15","close":211000},{"date":"2026-04-22","close":214000}];
+const priceMA120 = [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,228541,231309,234411,237427,240386,243040,245085,245994,244094,243281,243144,243444,243744,245515,247015,248190,249460,250423,250306,249906,249146,247463,244808,242513,241063];
+
+const priceCtx = document.getElementById('priceChart').getContext('2d');
+const gradient = priceCtx.createLinearGradient(0, 0, 0, 320);
+gradient.addColorStop(0, 'rgba(88, 166, 255, 0.25)');
+gradient.addColorStop(1, 'rgba(88, 166, 255, 0.0)');
+new Chart(priceCtx, {
+  type: 'line',
+  data: {
+    labels: priceHistory.map(p => p.date),
+    datasets: [
+      {
+        label: 'NAVER 035420',
+        data: priceHistory.map(p => p.close),
+        borderColor: '#58A6FF',
+        backgroundColor: gradient,
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHitRadius: 8
+      },
+      {
+        label: '120일 MA',
+        data: priceMA120,
+        borderColor: 'rgba(210,153,34,0.6)',
+        borderWidth: 1.5,
+        borderDash: [6, 3],
+        fill: false,
+        tension: 0.3,
+        pointRadius: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        display: true, position: 'top',
+        labels: { color: '#8B949E', font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'line', padding: 16 }
+      },
+      tooltip: {
+        backgroundColor: '#161B22', borderColor: '#30363D', borderWidth: 1,
+        titleColor: '#E6EDF3', bodyColor: '#8B949E',
+        callbacks: { label: ctx => ctx.dataset.label + ': ₩' + ctx.parsed.y.toLocaleString('ko-KR') }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(48,54,61,0.4)' },
+        ticks: { color: '#6E7681', font: { size: 10 }, maxTicksLimit: 12 }
+      },
+      y: {
+        grid: { color: 'rgba(48,54,61,0.4)' },
+        ticks: { color: '#6E7681', font: { size: 10 }, callback: v => '₩' + v.toLocaleString('ko-KR') }
+      }
+    }
+  }
+});
+
+// Radar Chart
+new Chart(document.getElementById('radarChart').getContext('2d'), {
+  type: 'radar',
+  data: {
+    labels: ['Fundamentals', 'Valuation', 'Technicals', 'AI Relevance', 'Risk (inv.)'],
+    datasets: [{
+      label: 'Score',
+      data: [2.5, 1.5, 1.5, 3.0, 1.5],
+      backgroundColor: 'rgba(88, 166, 255, 0.12)',
+      borderColor: '#58A6FF',
+      borderWidth: 2,
+      pointBackgroundColor: '#58A6FF',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
+      pointRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        beginAtZero: true, max: 3,
+        ticks: { stepSize: 1, color: '#5A5A78', backdropColor: 'transparent', font: { size: 10 } },
+        grid: { color: 'rgba(42,42,74,0.6)' },
+        angleLines: { color: 'rgba(42,42,74,0.6)' },
+        pointLabels: { color: '#B0B0C0', font: { size: 12, weight: '600', family: 'Pretendard Variable' } }
+      }
+    }
+  }
+});
+
+// Donut Chart
+new Chart(document.getElementById('donutChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['BUY', 'HOLD', 'SELL'],
+    datasets: [{
+      data: [4, 2, 0],
+      backgroundColor: ['#3FB950', '#D29922', '#F47067'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#B0B0C0', padding: 16, font: { size: 12, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
