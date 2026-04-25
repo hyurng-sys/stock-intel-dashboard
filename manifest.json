@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Schneider Electric",
+      "ticker": "SU.PA",
+      "date": "20260426",
+      "file": "Schneider_Electric_20260426.html",
+      "verdict": "HOLD"
+    },
+    {
       "company": "솔트룩스",
       "ticker": "304100",
       "date": "20260425",
