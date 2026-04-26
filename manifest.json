@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "지엔씨에너지",
+      "ticker": "119850",
+      "date": "20260427",
+      "file": "지엔씨에너지_20260427.html",
+      "verdict": "BUY"
+    },
+    {
       "company": "미쓰비시중공업",
       "date": "20260426",
       "file": "Mitsubishi_Heavy_20260426.html",
