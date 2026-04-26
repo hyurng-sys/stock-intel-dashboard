@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "미쓰비시중공업",
+      "date": "20260426",
+      "file": "Mitsubishi_Heavy_20260426.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "LS일렉트릭",
       "date": "20260426",
       "file": "LS일렉트릭_20260426.html",
