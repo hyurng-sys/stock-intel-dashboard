@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "씨이랩",
+      "ticker": "189330",
+      "date": "20260427",
+      "file": "씨이랩_20260427.html",
+      "verdict": "HOLD"
+    },
+    {
       "company": "지엔씨에너지",
       "ticker": "119850",
       "date": "20260427",
