@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — LS일렉트릭 | 2026-04-26</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --target1: #57AB5A;
+    --target2: #58A6FF;
+    --target3: #BC8CFF;
+    --stoploss: #F47067;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--uplus-magenta), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--uplus-magenta);
+    background: rgba(88, 166, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(88, 166, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header .date {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* Verdict Banner */
+  .verdict-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    border-radius: 16px;
+  }
+  .verdict-banner.buy { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.3); }
+  .verdict-banner.sell { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.3); }
+  .verdict-banner.hold { background: rgba(210,153,34,0.08); border: 1px solid rgba(210,153,34,0.3); }
+  .verdict-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-label { color: var(--buy); }
+  .verdict-banner.sell .verdict-label { color: var(--sell); }
+  .verdict-banner.hold .verdict-label { color: var(--hold); }
+  .verdict-text {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-text { color: var(--buy); }
+  .verdict-banner.sell .verdict-text { color: var(--sell); }
+  .verdict-banner.hold .verdict-text { color: var(--hold); }
+  .verdict-votes {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .verdict-votes .v-buy { color: var(--buy); font-weight: 700; }
+  .verdict-votes .v-hold { color: var(--hold); font-weight: 700; }
+  .verdict-votes .v-sell { color: var(--sell); font-weight: 700; }
+
+  /* Price Target Gauge */
+  .price-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .price-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .price-table th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .price-table .price-val { font-weight: 700; font-size: 16px; }
+  .price-table .pct-up { color: var(--buy); font-weight: 600; }
+  .price-table .pct-down { color: var(--sell); font-weight: 600; }
+  .price-bar-wrap {
+    position: relative;
+    height: 40px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    overflow: visible;
+    margin: 24px 0 40px;
+  }
+  .price-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 52px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .price-marker-label {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .price-marker.current { background: var(--text-primary); }
+  .price-marker.stoploss { background: var(--stoploss); }
+  .price-marker.target1 { background: var(--target1); }
+  .price-marker.target2 { background: var(--target2); }
+  .price-marker.target3 { background: var(--target3); }
+
+  /* Timing Signals */
+  .timing-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .timing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .timing-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .timing-verdict {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 12px;
+  }
+  .timing-verdict.go { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.3); }
+  .timing-verdict.wait { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.3); }
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .signal-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .signal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .signal-icon.met { background: rgba(63,185,80,0.15); color: var(--buy); }
+  .signal-icon.unmet { background: rgba(110,118,129,0.15); color: var(--text-muted); }
+  .signal-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .signal-value { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Charts Row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .chart-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 260px;
+  }
+  .chart-wrap canvas { max-height: 260px; }
+
+  /* Fundamentals & Valuation Cards */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .metric-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .metric-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .metric-table th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .metric-table td {
+    padding: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(48,54,61,0.4);
+  }
+  .verdict-chip {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+  .verdict-chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .verdict-chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .verdict-chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+
+  /* Guru Cards */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .guru-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .guru-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .guru-card:hover {
+    border-color: rgba(88,166,255,0.3);
+    transform: translateY(-2px);
+  }
+  .guru-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .guru-name { font-size: 16px; font-weight: 700; }
+  .guru-style { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .guru-verdict {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 10px;
+  }
+  .guru-verdict.buy { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.25); }
+  .guru-verdict.sell { background: rgba(244,112,103,0.12); color: var(--sell); border: 1px solid rgba(244,112,103,0.25); }
+  .guru-verdict.hold { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.25); }
+  .guru-confidence {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .guru-reasons {
+    list-style: none;
+    margin-bottom: 12px;
+  }
+  .guru-reasons li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .guru-reasons li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--uplus-magenta);
+    opacity: 0.5;
+  }
+  .guru-target {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .guru-target strong { color: var(--uplus-pink); }
+
+  /* AI Relevance */
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axis-ai);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .ai-alliance {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .ai-axes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .ai-axis-card {
+    background: rgba(13,17,23,0.5);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  /* Risks */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .risk-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 3px solid;
+  }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .charts-row, .metrics-row { grid-template-columns: 1fr; }
+    .guru-grid { grid-template-columns: 1fr; }
+    .signal-grid { grid-template-columns: 1fr 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .verdict-text { font-size: 28px; }
+    .signal-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">Stock Intelligence</div>
+    <h1 id="header-title"></h1>
+    <p class="date" id="header-date"></p>
+  </header>
+
+  <!-- Verdict Banner -->
+  <div class="verdict-banner" id="verdict-banner">
+    <div class="verdict-label">COMPREHENSIVE VERDICT</div>
+    <div class="verdict-text" id="verdict-text"></div>
+    <div class="verdict-votes" id="verdict-votes"></div>
+  </div>
+
+  <!-- 1-Year Price Trend -->
+  <div class="chart-card" style="margin-bottom:28px">
+    <h3>1-Year Price Trend</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+
+  <!-- Price Target -->
+  <div class="price-section">
+    <h3>Price Target & Strategy</h3>
+    <table class="price-table" id="price-table"></table>
+    <div class="price-bar-wrap" id="price-bar"></div>
+  </div>
+
+  <!-- Timing Signals -->
+  <div class="timing-section">
+    <div class="timing-header">
+      <h3>Buy Timing Signals</h3>
+      <span class="timing-verdict" id="timing-verdict"></span>
+    </div>
+    <div class="signal-grid" id="signal-grid"></div>
+  </div>
+
+  <!-- Charts Row: 5-Axis Radar + Guru Donut -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>5-Axis Analysis</h3>
+      <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Guru Consensus</h3>
+      <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Fundamentals & Valuation -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <h3>Fundamentals</h3>
+      <table class="metric-table" id="fund-table"></table>
+    </div>
+    <div class="metric-card">
+      <h3>Valuation</h3>
+      <table class="metric-table" id="val-table"></table>
+    </div>
+  </div>
+
+  <!-- AI Relevance -->
+  <div class="ai-section">
+    <h3>AI Business Relevance</h3>
+    <div class="ai-alliance" id="ai-alliance"></div>
+    <div class="ai-axes" id="ai-axes"></div>
+  </div>
+
+  <!-- Guru Cards -->
+  <h2 class="section-title">Guru Persona Voting</h2>
+  <div class="guru-grid" id="guru-grid"></div>
+
+  <!-- Risks -->
+  <h2 class="section-title">Risk Assessment</h2>
+  <div class="risk-grid" id="risk-grid"></div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Stock Intelligence Report &mdash; Generated by Claude Code
+  </footer>
+
+</div>
+
+<script>
+// ===== DATA INJECTION POINT =====
+const D = {
+  "date": "2026-04-26",
+  "company": "LS일렉트릭",
+  "ticker": "010120",
+  "market": "KOSPI",
+  "verdict": "BUY",
+  "guruVotes": {
+    "buy": 4,
+    "hold": 1,
+    "sell": 1
+  },
+  "currentPrice": 226500,
+  "currency": "KRW",
+  "priceTarget": {
+    "buyPrice": 200000,
+    "target1": {
+      "price": 250000,
+      "pct": 10.4,
+      "basis": "컨센서스 평균(₩227K) + 동종업계 PER 33x 적용"
+    },
+    "target2": {
+      "price": 300000,
+      "pct": 32.5,
+      "basis": "DCF 적정가치 (2027F EPS × Forward PE 35x)"
+    },
+    "target3": {
+      "price": 400000,
+      "pct": 76.6,
+      "basis": "5년 TAM 역산 (북미 AIDC 점유율 유지 + 매출 10조 시나리오)"
+    },
+    "stopLoss": {
+      "price": 200000,
+      "pct": -11.7,
+      "basis": "대신증권 보수 목표가 / 분할직후 단기 지지선"
+    },
+    "trailingStop": -15
+  },
+  "priceHistory": [
+    {
+      "date": "2025-04-24",
+      "close": 35880.0
+    },
+    {
+      "date": "2025-05-02",
+      "close": 42100.0
+    },
+    {
+      "date": "2025-05-13",
+      "close": 46900.0
+    },
+    {
+      "date": "2025-05-20",
+      "close": 50500.0
+    },
+    {
+      "date": "2025-05-27",
+      "close": 51900.0
+    },
+    {
+      "date": "2025-06-04",
+      "close": 51300.0
+    },
+    {
+      "date": "2025-06-12",
+      "close": 52500.0
+    },
+    {
+      "date": "2025-06-19",
+      "close": 55500.0
+    },
+    {
+      "date": "2025-06-26",
+      "close": 56800.0
+    },
+    {
+      "date": "2025-07-03",
+      "close": 55300.0
+    },
+    {
+      "date": "2025-07-10",
+      "close": 55600.0
+    },
+    {
+      "date": "2025-07-17",
+      "close": 55400.0
+    },
+    {
+      "date": "2025-07-24",
+      "close": 57800.0
+    },
+    {
+      "date": "2025-07-31",
+      "close": 62100.0
+    },
+    {
+      "date": "2025-08-07",
+      "close": 65100.0
+    },
+    {
+      "date": "2025-08-14",
+      "close": 61400.0
+    },
+    {
+      "date": "2025-08-22",
+      "close": 56300.0
+    },
+    {
+      "date": "2025-08-29",
+      "close": 56900.0
+    },
+    {
+      "date": "2025-09-05",
+      "close": 58600.0
+    },
+    {
+      "date": "2025-09-12",
+      "close": 63200.0
+    },
+    {
+      "date": "2025-09-22",
+      "close": 58600.0
+    },
+    {
+      "date": "2025-09-29",
+      "close": 54900.0
+    },
+    {
+      "date": "2025-10-13",
+      "close": 59200.0
+    },
+    {
+      "date": "2025-10-20",
+      "close": 63900.0
+    },
+    {
+      "date": "2025-10-27",
+      "close": 75000.0
+    },
+    {
+      "date": "2025-11-03",
+      "close": 97700.0
+    },
+    {
+      "date": "2025-11-10",
+      "close": 95600.0
+    },
+    {
+      "date": "2025-11-17",
+      "close": 94000.0
+    },
+    {
+      "date": "2025-11-24",
+      "close": 87200.0
+    },
+    {
+      "date": "2025-12-01",
+      "close": 88600.0
+    },
+    {
+      "date": "2025-12-08",
+      "close": 103600.0
+    },
+    {
+      "date": "2025-12-15",
+      "close": 96600.0
+    },
+    {
+      "date": "2025-12-22",
+      "close": 95000.0
+    },
+    {
+      "date": "2025-12-30",
+      "close": 92000.0
+    },
+    {
+      "date": "2026-01-08",
+      "close": 96500.0
+    },
+    {
+      "date": "2026-01-15",
+      "close": 105200.0
+    },
+    {
+      "date": "2026-01-22",
+      "close": 103400.0
+    },
+    {
+      "date": "2026-01-29",
+      "close": 111400.0
+    },
+    {
+      "date": "2026-02-05",
+      "close": 123800.0
+    },
+    {
+      "date": "2026-02-12",
+      "close": 134200.0
+    },
+    {
+      "date": "2026-02-24",
+      "close": 149200.0
+    },
+    {
+      "date": "2026-03-04",
+      "close": 125200.0
+    },
+    {
+      "date": "2026-03-11",
+      "close": 144400.0
+    },
+    {
+      "date": "2026-03-18",
+      "close": 166600.0
+    },
+    {
+      "date": "2026-03-25",
+      "close": 168800.0
+    },
+    {
+      "date": "2026-04-01",
+      "close": 158800.0
+    },
+    {
+      "date": "2026-04-08",
+      "close": 157600.0
+    },
+    {
+      "date": "2026-04-15",
+      "close": 186800.0
+    },
+    {
+      "date": "2026-04-22",
+      "close": 194200.0
+    },
+    {
+      "date": "2026-04-24",
+      "close": 226500.0
+    }
+  ],
+  "priceMA120": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    55942.83,
+    57894.17,
+    59882.5,
+    61849.17,
+    63581.67,
+    65245.0,
+    67180.83,
+    69008.33,
+    70550.83,
+    72014.17,
+    73857.5,
+    75807.5,
+    77804.17,
+    79779.17,
+    82088.33,
+    84863.33,
+    88412.5,
+    92171.67,
+    95684.17,
+    99508.33,
+    104037.5,
+    108231.67,
+    112299.17,
+    116978.33,
+    121895.0,
+    124250.0
+  ],
+  "timingSignals": {
+    "total": 3,
+    "max": 6,
+    "verdict": "분할 매수",
+    "signals": [
+      {
+        "name": "RSI < 40",
+        "met": false,
+        "value": "과매수 영역(52주 신고가 갱신)"
+      },
+      {
+        "name": "MACD 골든크로스",
+        "met": true,
+        "value": "강매수 시그널 유지(2025-12 발효)"
+      },
+      {
+        "name": "120일선 부근",
+        "met": false,
+        "value": "120일선 대비 +50% 이상 상회"
+      },
+      {
+        "name": "PER 5년 평균 -20%",
+        "met": false,
+        "value": "PER 36x vs 5년평균 16x (+125% 프리미엄)"
+      },
+      {
+        "name": "외국인 순매수",
+        "met": true,
+        "value": "외국인 21.7→22.3% 증가, 4월 순매수 추세"
+      },
+      {
+        "name": "구루 4명+ BUY",
+        "met": true,
+        "value": "BUY 4명 / HOLD 1 / SELL 1"
+      }
+    ]
+  },
+  "fundamentals": {
+    "revenue": {
+      "value": "1Q26 1.38조 (+33%)",
+      "growth": "2025연 4.96조 (+9%)",
+      "verdict": "우수"
+    },
+    "operatingMargin": {
+      "value": "1Q26 9.2%",
+      "trend": "북미 +80%·초고압 +83%",
+      "verdict": "양호"
+    },
+    "roe": {
+      "value": "17.2% (2025) → 23.9% (2027F)",
+      "verdict": "우수"
+    },
+    "fcf": {
+      "value": "수주잔고 5.6조 (분기 +6,000억)",
+      "verdict": "양호"
+    },
+    "debtRatio": {
+      "value": "126.8%(2025) → 103.8%(전망)",
+      "verdict": "안정"
+    }
+  },
+  "valuation": {
+    "per": {
+      "current": 36.3,
+      "avg5y": 16.0,
+      "peer": 33.0,
+      "verdict": "고평가"
+    },
+    "pbr": {
+      "current": 6.7,
+      "avg5y": 2.5,
+      "peer": 4.5,
+      "verdict": "고평가"
+    },
+    "evEbitda": {
+      "current": 22.0,
+      "peer": 18.5,
+      "verdict": "고평가"
+    },
+    "peg": {
+      "value": 0.8,
+      "verdict": "매력적"
+    }
+  },
+  "technicals": {
+    "ma20": "위",
+    "ma60": "위",
+    "ma120": "위",
+    "ma200": "위",
+    "rsi": 75,
+    "macd": "골든크로스 유지(강매수)",
+    "bollingerPos": "상단 돌파",
+    "volume": "액분 후 평균 대비 200%+"
+  },
+  "aiRelevance": {
+    "allianceRating": "★★★ (사실상 ★★★ — 신규 평가)",
+    "axes": {
+      "AIDC": {
+        "score": "◎",
+        "note": "LG U+ 파주 AIDC 직접 공급 (GIS·수배전반·DC그리드)"
+      },
+      "AICC": {
+        "score": "△",
+        "note": "LLM 기반 대화형 설비 진단 — 산업AI 한정"
+      },
+      "SovereignAI": {
+        "score": "✕",
+        "note": "해당 없음"
+      },
+      "AX": {
+        "score": "◎",
+        "note": "AI 팩토리·비전AI·팩토리블랙박스 — 제조 AX 핵심"
+      }
+    }
+  },
+  "risks": [
+    {
+      "type": "규제",
+      "desc": "한전 입찰 담합(7년·145건·6,700억) 과징금/소송 리스크",
+      "impact": "높음",
+      "probability": "중간"
+    },
+    {
+      "type": "수급",
+      "desc": "PER 36x 컨센서스 평균(₩227K) 거의 도달 → 추가 상승여력 제한",
+      "impact": "높음",
+      "probability": "높음"
+    },
+    {
+      "type": "수급",
+      "desc": "5:1 액면분할(4/8) 직후 단기 차익실현 매물",
+      "impact": "중간",
+      "probability": "높음"
+    },
+    {
+      "type": "경쟁",
+      "desc": "HD현대일렉·효성중공업 초고압 강자 (LS는 중저압 주력)",
+      "impact": "중간",
+      "probability": "중간"
+    },
+    {
+      "type": "매크로",
+      "desc": "美 트럼프 관세 → 빅테크 직거래 변압기 가격경쟁력 위협",
+      "impact": "높음",
+      "probability": "중간"
+    }
+  ],
+  "gurus": [
+    {
+      "name": "워런 버핏",
+      "style": "가치투자",
+      "verdict": "HOLD",
+      "confidence": "중간",
+      "target": 200000,
+      "reasons": [
+        "전력 인프라 해자(브랜드·수주잔고·대규모 CAPEX 진입장벽) 명확하나 PER 36x는 안전마진 부족",
+        "ROE 17%→24% 우수하나 DCF 내재가치 ~₩200K 수준 — 현재가는 +13% 프리미엄"
+      ]
+    },
+    {
+      "name": "벤저민 그레이엄",
+      "style": "안전마진",
+      "verdict": "SELL",
+      "confidence": "높음",
+      "target": 80000,
+      "reasons": [
+        "PBR 6.7배(>1.5), PER 36배(>15) — 그레이엄 기준 모두 위반",
+        "그레이엄 넘버 √(22.5×EPS×BPS) ≈ ₩80K — 현재가는 그레이엄 가치의 2.8배"
+      ]
+    },
+    {
+      "name": "피터 린치",
+      "style": "성장투자",
+      "verdict": "BUY",
+      "confidence": "높음",
+      "target": 280000,
+      "reasons": [
+        "1Q26 영업이익 +45% 성장 → PEG = 36/45 = 0.80 (1 미만, 매력적)",
+        "AI 데이터센터 전력 슈퍼사이클 + 북미 매출 +80% — 명확한 'tenbagger 스토리'"
+      ]
+    },
+    {
+      "name": "캐시 우드",
+      "style": "혁신투자",
+      "verdict": "STRONG BUY",
+      "confidence": "높음",
+      "target": 500000,
+      "reasons": [
+        "글로벌 AI DC 전력시장 5년 4배 성장 + 북미 빅테크 직거래(2,395억 수주) 확대",
+        "DC 그리드 솔루션(LG에너지솔루션 협업) — 전력손실 25%→15% 파괴적 혁신"
+      ]
+    },
+    {
+      "name": "기술적 분석가",
+      "style": "차트분석",
+      "verdict": "BUY",
+      "confidence": "중간",
+      "target": 260000,
+      "reasons": [
+        "MACD 골든크로스 유지·이동평균 정배열·52주 신고가 갱신 추세",
+        "다만 RSI ~75 과매수 + 액분 직후 변동성 → 분할 진입 권고 (피보나치 1.618 = ₩260K)"
+      ]
+    },
+    {
+      "name": "AI사업 내부자",
+      "style": "U+ 관점",
+      "verdict": "BUY",
+      "confidence": "높음",
+      "target": 240000,
+      "reasons": [
+        "LG U+ 파주 AIDC(200MW·12만GPU) 전력 인프라 직접 공급 — 사업 모멘텀 최상위",
+        "범LG '원팀' AIDC 협업 + 미국 빅테크 직거래 — 성장 가시성 매우 강함"
+      ]
+    }
+  ],
+  "axisRadar": {
+    "fundamentals": 2.7,
+    "valuation": 0.7,
+    "technicals": 2.4,
+    "aiRelevance": 3.0,
+    "risk": 1.4
+  },
+  "disclaimer": "본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.",
+  "_priceUpdatedFromYahoo": {
+    "old": "분석 시점 분할 직후 추정",
+    "new": 226500,
+    "note": "Yahoo Finance 2026-04-24 종가 사용 (5:1 액면분할 후)"
+  }
+};
+
+// ===== HELPERS =====
+const fmt = (n, cur) => {
+  if (cur === 'USD') return '$' + n.toLocaleString('en-US');
+  return '₩' + n.toLocaleString('ko-KR');
+};
+const pct = (n) => (n > 0 ? '+' : '') + n + '%';
+function verdictClass(v) {
+  v = v.toUpperCase();
+  if (v.includes('BUY')) return 'buy';
+  if (v.includes('SELL')) return 'sell';
+  return 'hold';
+}
+function chipClass(v) {
+  const s = (v || '').toString();
+  if (['우수','양호','매력적','저평가','안정'].some(k => s.includes(k))) return 'good';
+  if (['위험','고평가','부정적','과대','취약'].some(k => s.includes(k))) return 'bad';
+  return 'neutral';
+}
+
+// ===== HEADER =====
+document.getElementById('header-title').textContent = D.company + ' (' + D.ticker + ')';
+document.getElementById('header-date').textContent = D.date + ' · ' + D.market;
+
+// ===== VERDICT =====
+const vb = document.getElementById('verdict-banner');
+vb.classList.add(verdictClass(D.verdict));
+document.getElementById('verdict-text').textContent = D.verdict;
+document.getElementById('verdict-votes').innerHTML =
+  'Guru Vote: <span class="v-buy">BUY ' + D.guruVotes.buy + '</span> / ' +
+  '<span class="v-hold">HOLD ' + D.guruVotes.hold + '</span> / ' +
+  '<span class="v-sell">SELL ' + D.guruVotes.sell + '</span>';
+
+// ===== PRICE TABLE =====
+const pt = D.priceTarget;
+const cur = D.currency;
+document.getElementById('price-table').innerHTML = `
+  <tr><th>구분</th><th>가격</th><th>비율</th><th>근거</th></tr>
+  <tr><td>현재가</td><td class="price-val">${fmt(D.currentPrice, cur)}</td><td>—</td><td>${D.date} 종가</td></tr>
+  <tr><td>매수 적정가</td><td class="price-val">${fmt(pt.buyPrice, cur)}</td><td>—</td><td>구루 가중평균</td></tr>
+  <tr><td>1차 목표가</td><td class="price-val" style="color:var(--target1)">${fmt(pt.target1.price, cur)}</td><td class="pct-up">${pct(pt.target1.pct)}</td><td>${pt.target1.basis}</td></tr>
+  <tr><td>2차 목표가</td><td class="price-val" style="color:var(--target2)">${fmt(pt.target2.price, cur)}</td><td class="pct-up">${pct(pt.target2.pct)}</td><td>${pt.target2.basis}</td></tr>
+  <tr><td>3차 목표가</td><td class="price-val" style="color:var(--target3)">${fmt(pt.target3.price, cur)}</td><td class="pct-up">${pct(pt.target3.pct)}</td><td>${pt.target3.basis}</td></tr>
+  <tr><td>손절가</td><td class="price-val" style="color:var(--stoploss)">${fmt(pt.stopLoss.price, cur)}</td><td class="pct-down">${pct(pt.stopLoss.pct)}</td><td>${pt.stopLoss.basis}</td></tr>
+  <tr><td>트레일링 스톱</td><td class="price-val" style="color:var(--text-muted)">최고점 ${pt.trailingStop}%</td><td>—</td><td>수익 방어</td></tr>
+`;
+
+// Price Bar
+const allPrices = [pt.stopLoss.price, D.currentPrice, pt.buyPrice, pt.target1.price, pt.target2.price, pt.target3.price];
+const minP = Math.min(...allPrices) * 0.95;
+const maxP = Math.max(...allPrices) * 1.05;
+const range = maxP - minP;
+function barPos(price) { return ((price - minP) / range * 100).toFixed(1) + '%'; }
+
+const barEl = document.getElementById('price-bar');
+const markers = [
+  { price: pt.stopLoss.price, cls: 'stoploss', label: '손절 ' + fmt(pt.stopLoss.price, cur) },
+  { price: D.currentPrice, cls: 'current', label: '현재 ' + fmt(D.currentPrice, cur) },
+  { price: pt.target1.price, cls: 'target1', label: '1차 ' + fmt(pt.target1.price, cur) },
+  { price: pt.target2.price, cls: 'target2', label: '2차 ' + fmt(pt.target2.price, cur) },
+  { price: pt.target3.price, cls: 'target3', label: '3차 ' + fmt(pt.target3.price, cur) }
+];
+markers.forEach(m => {
+  barEl.innerHTML += `<div class="price-marker ${m.cls}" style="left:${barPos(m.price)}"><div class="price-marker-label" style="color:var(--${m.cls === 'current' ? 'text-primary' : m.cls})">${m.label}</div></div>`;
+});
+
+// ===== TIMING SIGNALS =====
+const ts = D.timingSignals;
+const tv = document.getElementById('timing-verdict');
+tv.textContent = ts.total + '/' + ts.max + ' — ' + ts.verdict;
+tv.classList.add(ts.total >= 4 ? 'go' : 'wait');
+document.getElementById('signal-grid').innerHTML = ts.signals.map(s => `
+  <div class="signal-card">
+    <div class="signal-icon ${s.met ? 'met' : 'unmet'}">${s.met ? '✓' : '—'}</div>
+    <div>
+      <div class="signal-name">${s.name}</div>
+      <div class="signal-value">${s.value}</div>
+    </div>
+  </div>
+`).join('');
+
+// ===== 1-YEAR PRICE CHART =====
+if (D.priceHistory && D.priceHistory.length > 0) {
+  const ph = D.priceHistory;
+  const priceCtx = document.getElementById('priceChart').getContext('2d');
+  const gradient = priceCtx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, 'rgba(88, 166, 255, 0.25)');
+  gradient.addColorStop(1, 'rgba(88, 166, 255, 0.0)');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: ph.map(p => p.date),
+      datasets: [
+        {
+          label: 'Price',
+          data: ph.map(p => p.close),
+          borderColor: '#58A6FF',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHitRadius: 8
+        },
+        ...(D.priceMA120 ? [{
+          label: '120-day MA',
+          data: D.priceMA120,
+          borderColor: 'rgba(210,153,34,0.6)',
+          borderWidth: 1.5,
+          borderDash: [6, 3],
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#8B949E', font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'line', padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#161B22',
+          borderColor: '#30363D',
+          borderWidth: 1,
+          titleColor: '#E6EDF3',
+          bodyColor: '#8B949E',
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + fmt(ctx.parsed.y, D.currency);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10, family: 'Pretendard Variable' }, maxTicksLimit: 12 }
+        },
+        y: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10 }, callback: v => fmt(v, D.currency) }
+        }
+      }
+    }
+  });
+}
+
+// ===== RADAR CHART =====
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+const ar = D.axisRadar;
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['Fundamentals', 'Valuation', 'Technicals', 'AI Relevance', 'Risk (inv.)'],
+    datasets: [{
+      label: 'Score',
+      data: [ar.fundamentals, ar.valuation, ar.technicals, ar.aiRelevance, ar.risk],
+      backgroundColor: 'rgba(88, 166, 255, 0.12)',
+      borderColor: '#58A6FF',
+      borderWidth: 2,
+      pointBackgroundColor: '#58A6FF',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
+      pointRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        beginAtZero: true, max: 3,
+        ticks: { stepSize: 1, color: '#5A5A78', backdropColor: 'transparent', font: { size: 10 } },
+        grid: { color: 'rgba(42,42,74,0.6)' },
+        angleLines: { color: 'rgba(42,42,74,0.6)' },
+        pointLabels: { color: '#B0B0C0', font: { size: 12, weight: '600', family: 'Pretendard Variable' } }
+      }
+    }
+  }
+});
+
+// ===== DONUT CHART =====
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['BUY', 'HOLD', 'SELL'],
+    datasets: [{
+      data: [D.guruVotes.buy, D.guruVotes.hold, D.guruVotes.sell],
+      backgroundColor: ['#3FB950', '#D29922', '#F47067'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#B0B0C0', padding: 16, font: { size: 12, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+
+// ===== FUNDAMENTALS =====
+const f = D.fundamentals;
+document.getElementById('fund-table').innerHTML = `
+  <tr><th>지표</th><th>값</th><th>추이</th><th>판정</th></tr>
+  ${Object.entries(f).map(([k, v]) => `
+    <tr><td>${k === 'revenue' ? '매출' : k === 'operatingMargin' ? '영업이익률' : k === 'roe' ? 'ROE' : k === 'fcf' ? 'FCF' : k === 'debtRatio' ? '부채비율' : k}</td>
+    <td style="font-weight:600">${v.value}</td>
+    <td>${v.growth || v.trend || '—'}</td>
+    <td><span class="verdict-chip ${chipClass(v.verdict)}">${v.verdict}</span></td></tr>
+  `).join('')}
+`;
+
+// ===== VALUATION =====
+const val = D.valuation;
+document.getElementById('val-table').innerHTML = `
+  <tr><th>지표</th><th>현재</th><th>5년 평균</th><th>동종업계</th><th>판정</th></tr>
+  ${Object.entries(val).map(([k, v]) => `
+    <tr><td>${k.toUpperCase()}</td>
+    <td style="font-weight:600">${v.current || v.value || '—'}</td>
+    <td>${v.avg5y || '—'}</td>
+    <td>${v.peer || '—'}</td>
+    <td><span class="verdict-chip ${chipClass(v.verdict)}">${v.verdict}</span></td></tr>
+  `).join('')}
+`;
+
+// ===== AI RELEVANCE =====
+document.getElementById('ai-alliance').innerHTML = 'Alliance Rating: ' + D.aiRelevance.allianceRating;
+const axisNames = { AIDC: 'AIDC 인프라', AICC: 'AICC SaaS', SovereignAI: 'Sovereign AI', AX: 'AX 사업화' };
+document.getElementById('ai-axes').innerHTML = Object.entries(D.aiRelevance.axes).map(([k, v]) => `
+  <div class="ai-axis-card">
+    <div class="ai-axis-name">${axisNames[k] || k}</div>
+    <div class="ai-axis-score">${v.score}</div>
+    <div class="ai-axis-note">${v.note}</div>
+  </div>
+`).join('');
+
+// ===== GURU CARDS =====
+document.getElementById('guru-grid').innerHTML = D.gurus.map(g => `
+  <div class="guru-card">
+    <div class="guru-header">
+      <div>
+        <div class="guru-name">${g.name}</div>
+        <div class="guru-style">${g.style}</div>
+      </div>
+      <span class="guru-verdict ${verdictClass(g.verdict)}">${g.verdict}</span>
+    </div>
+    <div class="guru-confidence">Confidence: ${g.confidence}</div>
+    <ul class="guru-reasons">
+      ${g.reasons.map(r => `<li>${r}</li>`).join('')}
+    </ul>
+    <div class="guru-target"><strong>Target:</strong> ${fmt(g.target, D.currency)}</div>
+  </div>
+`).join('');
+
+// ===== RISKS =====
+function riskLevel(impact) {
+  if (impact === '높음') return 'high';
+  if (impact === '중간') return 'mid';
+  return 'low';
+}
+document.getElementById('risk-grid').innerHTML = D.risks.map(r => `
+  <div class="risk-card ${riskLevel(r.impact)}">
+    <div class="risk-type">${r.type} Risk</div>
+    <div class="risk-desc">${r.desc}</div>
+    <div class="risk-meta">Impact: ${r.impact} · Probability: ${r.probability}</div>
+  </div>
+`).join('');
+
+// ===== DISCLAIMER =====
+document.getElementById('disclaimer').innerHTML = '<strong>Disclaimer:</strong> ' + D.disclaimer;
+</script>
+</body>
+</html>

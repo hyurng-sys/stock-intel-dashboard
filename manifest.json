@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "LS일렉트릭",
+      "date": "20260426",
+      "file": "LS일렉트릭_20260426.html",
+      "verdict": "BUY"
+    },
+    {
       "type": "theme",
       "theme": "액체냉각·열관리",
       "category": "upstream",
