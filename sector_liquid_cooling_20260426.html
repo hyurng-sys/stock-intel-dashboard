@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sector Theme Intel — 액체냉각·열관리 | 2026-04-26</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--border:#262b35;--text:#e6e8ec;--mute:#9aa3b2;--accent:#5b9dff;--up:#22c55e;--down:#ef4444;--upstream:#3b82f6;--downstream:#f59e0b}
+*{box-sizing:border-box}
+body{margin:0;padding:32px 16px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;line-height:1.55}
+.container{max-width:1180px;margin:0 auto}
+.hdr{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-bottom:8px}
+.title{font-size:32px;font-weight:700;letter-spacing:-0.02em;margin:0}
+.sub{color:var(--mute);font-size:14px}
+.cat-tag{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;margin-left:8px}
+.cat-up{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.4)}
+.cat-down{background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.4)}
+.grid{display:grid;gap:16px;margin-top:24px}
+.grid-2{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card h2{margin:0 0 12px 0;font-size:18px}
+.card h3{margin:0 0 8px 0;font-size:15px;color:var(--mute)}
+.kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--border);font-size:14px}
+.kv:last-child{border-bottom:none}
+.kv .k{color:var(--mute)}
+.kv .v{font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+th{color:var(--mute);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:0.05em}
+.tickerflag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600;margin-left:4px}
+.flag-us{background:rgba(91,157,255,0.2);color:#5b9dff}
+.flag-jp{background:rgba(239,68,68,0.18);color:#fca5a5}
+.score{display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px;font-size:11px;font-weight:700}
+.s-double{background:rgba(34,197,94,0.2);color:#4ade80}
+.s-circle{background:rgba(59,130,246,0.2);color:#60a5fa}
+.s-tri{background:rgba(245,158,11,0.2);color:#fbbf24}
+.s-x{background:rgba(239,68,68,0.18);color:#f87171}
+.pick{border-left:3px solid var(--accent);padding-left:12px;margin-bottom:14px}
+.pick .pname{font-size:16px;font-weight:700;margin-bottom:4px}
+.pick .pone{color:var(--mute);font-size:13px;margin-bottom:6px}
+.pick ul{margin:6px 0 0 0;padding-left:18px;font-size:13px}
+.macro{font-size:14px;line-height:1.7}
+.macro p{margin:8px 0}
+.implication{background:rgba(91,157,255,0.06);border:1px solid rgba(91,157,255,0.25);border-radius:8px;padding:14px 16px;font-size:14px;line-height:1.7}
+.disclaimer{margin-top:24px;padding:14px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;font-size:12px;color:var(--mute)}
+.chart-wrap{height:280px}
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;margin-right:4px}
+.chip-buy{background:rgba(34,197,94,0.18);color:#4ade80}
+.chip-watch{background:rgba(245,158,11,0.18);color:#fbbf24}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hdr">
+    <h1 class="title">Sector Theme Intel — <span id="themeName"></span><span id="catTag"></span></h1>
+  </div>
+  <div class="sub" id="subtitle"></div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h2>1. 매크로 분석</h2>
+      <div id="macroKV"></div>
+      <div class="macro" id="macroText" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h2>한국·LG U+ 사업 시사점</h2>
+      <div class="implication" id="implication"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>2. 종목 풀 비교 매트릭스</h2>
+    <div style="overflow-x:auto">
+      <table id="poolTable">
+        <thead><tr>
+          <th>티커</th><th>기업</th><th>시총</th><th>매출(TTM)</th><th>YoY</th><th>Forward PE</th><th>1년 수익률</th><th>AI 익스포저</th><th>U+ 관련성</th><th>분류</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:16px">
+    <div class="card">
+      <h2>3. Top 3 픽</h2>
+      <div id="picks"></div>
+    </div>
+    <div class="card">
+      <h2>4. 워치리스트</h2>
+      <table id="watchTable">
+        <thead><tr><th>기업 (티커)</th><th>다음 분기 트리거</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>5. 시총 vs 1년 수익률 — 풀 분포</h2>
+    <div class="chart-wrap"><canvas id="bubble"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>참고 소스</h2>
+    <table id="sourcesTable">
+      <thead><tr><th>#</th><th>유형</th><th>출처/URL</th><th>수집 정보</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="disclaimer" id="disclaimer"></div>
+
+</div>
+
+<script>
+const D = {"theme": "액체냉각·열관리", "category": "upstream", "date": "2026-04-26", "isoWeek": 17, "cycleIdx": 1, "macro": {"tam": "$5.7B(2026) → $16.2B(2030) → $27.1B(2035)", "cagr": "26%(2026~2030), 28.7% 전망 중앙값", "aiTrigger": "GB300 NVL72 랙당 132~155kW → 액냉 의무화; 빅4 CapEx $630B(+62% YoY)", "bottleneck": "CDU 리드타임 연장, QDC 4개사 집중, 인증 PSU 공급사 4개사", "koreaImplication": "EU 폐열 재활용 의무(2026.7~) → CSAP/K-Cloud 선제 대응 필요", "text": "NVIDIA GB300 NVL72는 랙당 TDP 132~155kW로 공기냉각의 물리적 한계를 초과했다. 랙당 액냉 시스템 비용은 $49,860이며 차세대 NVL144는 $56,000이다. 2025년에 이미 액체냉각 캐파가 공기냉각을 따라잡았고, 2026년에는 2배를 돌파한다.\n빅4 하이퍼스케일러의 2026 합산 CapEx는 $630B(+62% YoY). AI 인프라 비중 75%, 액체냉각은 DC 건설비의 2~4% = 직접 시장 $12~25B. 이머전 냉각은 2033년 $4.9B로 연 27% 성장 중.\n공급망 측면에서 업계 전문가 83%가 '공급사슬 미비'를 인정한다. CDU·QDC·인증 PSU는 소수 공급사에 집중, 공급 제약이 가격 결정력으로 작동한다."}, "koreaImplication": "① LG U+ 파주 AIDC 액냉 PoC: CDU 리드타임 6~12개월 → 2026 Q2~Q3 발주가 2027년 말 준공 리스크를 막는 최적 윈도우. Vertiv·JCI·Daikin 3사 레퍼런스 도입 시 「글로벌 스펙 호환 AIDC」 마케팅 가능.\n② DBO 사업 가치 제고: 부산장림·인천도화·경기안산 DBO 센터에 「액냉 레디 설계」 추가 시 NOC 협상 Exit Multiple 상향 논리. 코람코·브룩필드 협상 차별화 포인트.\n③ 경쟁 분리: KT는 현재 공기냉각 중심 AIDC 운영. LG U+가 액냉 스펙을 선점하면 고밀도 GPU 임대 시장에서 명확한 기술 차별화 달성.\n④ 모니터링 (Q2 2026): Vertiv Q1 실적(4월 말), JCI Silent-Aire CDU 한국 공급 계약, Daikin Applied 한국 하이퍼스케일러 수주 여부.", "pool": [{"ticker": "VRT", "market": "US", "name": "Vertiv Holdings", "marketCap": 124, "revenue": "$10.2B (TTM)", "revGrowth": "+27.7%", "fwdPe": "50x", "return1y": "+272.0", "aiExposure": "◎", "uplusRel": "◎", "role": "pick"}, {"ticker": "MOD", "market": "US", "name": "Modine Manufacturing", "marketCap": 13, "revenue": "$2.6B (TTM)", "revGrowth": "+7.3% (DC +60%)", "fwdPe": "34x", "return1y": "+210.2", "aiExposure": "◎", "uplusRel": "○", "role": "pick"}, {"ticker": "JCI", "market": "US", "name": "Johnson Controls", "marketCap": 184, "revenue": "$27B (TTM)", "revGrowth": "+5% (DC 고성장)", "fwdPe": "25x", "return1y": "+75.1", "aiExposure": "○", "uplusRel": "○", "role": "watch"}, {"ticker": "WTS", "market": "US", "name": "Watts Water Technologies", "marketCap": 13, "revenue": "$2.5B (TTM)", "revGrowth": "+8~12%", "fwdPe": "30x", "return1y": "+45.6", "aiExposure": "△", "uplusRel": "△", "role": "watch"}, {"ticker": "FLR", "market": "US", "name": "Fluor Corporation", "marketCap": 6, "revenue": "$20B (TTM)", "revGrowth": "+8%", "fwdPe": "18x", "return1y": "+35.6", "aiExposure": "△", "uplusRel": "△", "role": "watch"}, {"ticker": "6367.T", "market": "JP", "name": "다이킨공업 (Daikin)", "marketCap": 39, "revenue": "¥4.4T", "revGrowth": "+8~10%", "fwdPe": "26x", "return1y": "+34.9", "aiExposure": "○", "uplusRel": "◎", "role": "pick"}, {"ticker": "6471.T", "market": "JP", "name": "NSK", "marketCap": 3, "revenue": "¥503B", "revGrowth": "+10%", "fwdPe": "20x", "return1y": "+91.2", "aiExposure": "△", "uplusRel": "✕", "role": "watch"}, {"ticker": "6473.T", "market": "JP", "name": "NTN", "marketCap": 5, "revenue": "¥700B", "revGrowth": "+8%", "fwdPe": "22x", "return1y": "+62.9", "aiExposure": "△", "uplusRel": "✕", "role": "watch"}], "picks": [{"name": "Vertiv Holdings", "ticker": "VRT", "market": "US", "oneLine": "NVIDIA GB300 필수 CDU·UPS 공급사 — $15B 수주잔고, AI 인프라 필수재 지위 확립", "currentPrice": "$323.46", "buyPrice": "$295~310", "target1": "$380 (+18%)", "stopLoss": "$290 (-10%)", "risks": ["Forward PE 50x — AI 센티먼트 조정 시 30%+ 급락 가능", "하이퍼스케일러 CapEx 집행 지연 시 수주잔고 취소 리스크"]}, {"name": "Modine Manufacturing", "ticker": "MOD", "market": "US", "oneLine": "소형 순수 플레이 — DC 매출 1년 내 $1B 돌파, Franklin 신공장 풀가동 돌입", "currentPrice": "$251.70", "buyPrice": "$220~235", "target1": "$290 (+15%)", "stopLoss": "$225 (-11%)", "risks": ["1년 +210% 이미 반영 — 추가 서프라이즈 여지 좁음", "단일 DC 테마 의존 高, AI 수요 둔화 시 멀티플 압축 가속"]}, {"name": "다이킨공업 Daikin Industries", "ticker": "6367.T", "market": "JP", "oneLine": "Chilldyne 인수로 직냉 기술 내재화 — 일본 하이퍼스케일러 액냉 최선호 벤더", "currentPrice": "¥21,565", "buyPrice": "¥19,500~20,500", "target1": "¥25,000 (+16%)", "stopLoss": "¥18,500 (-14%)", "risks": ["엔/달러 환율 강세 전환 시 수출 마진 압박", "DC 냉각이 전체 매출 소수 부문 — 주가 반응 제한 가능"]}], "watchlist": [{"name": "Johnson Controls", "ticker": "JCI", "market": "US", "trigger": "Silent-Aire CDU Q2 수주 발표 또는 DC 매출 비중 공개 (5월 실적)"}, {"name": "Watts Water Technologies", "ticker": "WTS", "market": "US", "trigger": "DC 냉각 밸브 매출 비중 3%→5% 돌파 확인 (Q1 2026 실적)"}, {"name": "Fluor Corporation", "ticker": "FLR", "market": "US", "trigger": "TeraWulf 480MW 켄터키 DC 착공 공식 확인 또는 아시아 EPC 계약 발표"}, {"name": "NSK", "ticker": "6471.T", "market": "JP", "trigger": "DC 쿨링 펌프 OEM 전용 공급 계약 공시 또는 Q2 매출 가속 확인"}, {"name": "NTN", "ticker": "6473.T", "market": "JP", "trigger": "CDU/펌프 조립업체 OEM 계약 공시 또는 DC 전용 베어링 라인업 발표"}], "sources": [{"type": "시장 리포트", "url": "https://www.globenewswire.com/news-release/2026/02/04/3232076/", "info": "DC 액체냉각 시장 2030 $16.2B, CAGR 26%"}, {"type": "시장 리포트", "url": "https://www.delloro.com/news/data-center-liquid-cooling-market-to-approach-7-billion-by-2029", "info": "Dell'Oro: 2029년 $7B 접근"}, {"type": "기업 IR", "url": "https://investors.vertiv.com/news/news-details/2025/Vertiv-Reports-Strong-Third-Quarter-Results", "info": "Vertiv Q3 2025 유기적 수주 +60%, $15B 수주잔고"}, {"type": "기업 IR", "url": "https://investors.modine.com/news/news-details/2025/Modine-Secures-180-Million-in-Orders", "info": "Modine $180M DC 냉각 신규 수주"}, {"type": "기업 뉴스", "url": "https://www.johnsoncontrols.com/media-center/news/press-releases/2026/02/02/johnson-controls-launches-series-of-thermal-management-reference-design-guides-for-gigawattscale-ai", "info": "JCI 1GW AI DC 열관리 레퍼런스 가이드 발표"}, {"type": "기업 뉴스", "url": "https://www.daikin.com/press/2025/20251105_1", "info": "다이킨 Chilldyne 인수 (네거티브 프레셔 직냉 기술)"}, {"type": "기술 분석", "url": "https://www.tomshardware.com/pc-components/cooling/cooling-system-for-a-single-nvidia-blackwell-ultra-nvl72-rack-costs-a-staggering-usd50-000", "info": "NVIDIA GB300 NVL72 랙당 액냉 비용 $49,860"}, {"type": "매크로", "url": "https://datacenterrichness.substack.com/p/hyperscalers-plan-630-billion-in", "info": "빅4 하이퍼스케일러 2026 CapEx $630B (+62% YoY)"}, {"type": "규제·정책", "url": "https://foleyhoag.com/news-and-insights/blogs/energy-and-climate-counsel/2026/march/the-data-act-of-2026", "info": "DATA Act 2026 미국 연방 DC 개발 규제"}, {"type": "산업 분석", "url": "https://www.lombardodier.com/insights/2026/january/ai-supercharges-the-race.html", "info": "Lombard Odier: 2026년 액체냉각이 AI DC 지배"}, {"type": "기업 뉴스", "url": "https://newsroom.fluor.com/news-releases/news-details/2026/Fluor-Signs-Limited-Notice-to-Proceed-with-TeraWulf", "info": "Fluor TeraWulf 480MW DC 켄터키 LNtP 계약"}, {"type": "기업 뉴스", "url": "https://www.johnsoncontrols.com/media-center/news/press-releases/2026/02/18/johnson-controls-signs-agreement-to-acquire-alloy-enterprises", "info": "JCI Alloy Enterprises 인수 (직냉 효율 +35%)"}], "disclaimer": "본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다."};
+
+document.getElementById('themeName').textContent = D.theme;
+document.getElementById('catTag').className = 'cat-tag ' + (D.category === 'upstream' ? 'cat-up' : 'cat-down');
+document.getElementById('catTag').textContent = (D.category === 'upstream' ? '후방(Upstream)' : '전방(Downstream)');
+document.getElementById('subtitle').textContent = `${D.date} · ISO Week ${D.isoWeek} · 사이클 인덱스 ${D.cycleIdx}/15`;
+document.title = `Sector Theme Intel — ${D.theme} | ${D.date}`;
+
+// Macro KV
+const macroKV = document.getElementById('macroKV');
+['tam','cagr','aiTrigger','bottleneck','koreaImplication'].forEach(k=>{
+  const labels = {tam:'TAM', cagr:'CAGR', aiTrigger:'AI 수요 트리거', bottleneck:'병목', koreaImplication:'한국 시사점'};
+  const v = D.macro[k] || '-';
+  const div = document.createElement('div'); div.className='kv';
+  div.innerHTML = `<span class="k">${labels[k]}</span><span class="v">${v}</span>`;
+  macroKV.appendChild(div);
+});
+document.getElementById('macroText').innerHTML = (D.macro.text || '').split('\n').map(p=>`<p>${p}</p>`).join('');
+
+// Implication
+document.getElementById('implication').innerHTML = (D.koreaImplication || '').split('\n').map(p=>`<p>${p}</p>`).join('');
+
+// Pool table
+const sScore = (s)=>{
+  const m = {'◎':'s-double','○':'s-circle','△':'s-tri','✕':'s-x'};
+  return `<span class="score ${m[s]||'s-tri'}">${s}</span>`;
+};
+const flag = (mkt) => mkt === 'JP' ? '<span class="tickerflag flag-jp">JP</span>' : '<span class="tickerflag flag-us">US</span>';
+const poolTbody = document.querySelector('#poolTable tbody');
+D.pool.forEach(s=>{
+  const tr = document.createElement('tr');
+  const ret = (s.return1y || '');
+  const retCol = ret.startsWith('-') ? 'var(--down)' : ret.startsWith('+') ? 'var(--up)' : 'var(--text)';
+  tr.innerHTML = `
+    <td><strong>${s.ticker}</strong>${flag(s.market)}</td>
+    <td>${s.name}</td>
+    <td>${s.marketCap || '-'}</td>
+    <td>${s.revenue || '-'}</td>
+    <td>${s.revGrowth || '-'}</td>
+    <td>${s.fwdPe || '-'}</td>
+    <td style="color:${retCol}">${ret || '-'}</td>
+    <td>${sScore(s.aiExposure)}</td>
+    <td>${sScore(s.uplusRel)}</td>
+    <td><span class="chip ${s.role==='pick'?'chip-buy':'chip-watch'}">${s.role==='pick'?'Top 픽':s.role==='watch'?'워치':''}</span></td>
+  `;
+  poolTbody.appendChild(tr);
+});
+
+// Top 3 picks
+const picksDiv = document.getElementById('picks');
+D.picks.forEach((p,i)=>{
+  const div = document.createElement('div'); div.className='pick';
+  div.innerHTML = `
+    <div class="pname">픽 ${i+1}: ${p.name} (${p.ticker})${flag(p.market)}</div>
+    <div class="pone">${p.oneLine || ''}</div>
+    <div class="kv"><span class="k">현재가 / 매수가</span><span class="v">${p.currentPrice} / ${p.buyPrice}</span></div>
+    <div class="kv"><span class="k">1차 목표가 / 손절가</span><span class="v">${p.target1} / ${p.stopLoss}</span></div>
+    <ul>${(p.risks||[]).map(r=>`<li>${r}</li>`).join('')}</ul>
+  `;
+  picksDiv.appendChild(div);
+});
+
+// Watch table
+const wtb = document.querySelector('#watchTable tbody');
+(D.watchlist || []).forEach(w=>{
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><strong>${w.name}</strong> (${w.ticker})${flag(w.market)}</td><td>${w.trigger}</td>`;
+  wtb.appendChild(tr);
+});
+
+// Sources
+const stb = document.querySelector('#sourcesTable tbody');
+(D.sources || []).forEach((s,i)=>{
+  const tr = document.createElement('tr');
+  const url = s.url ? `<a href="${s.url}" target="_blank" style="color:var(--accent)">${s.url}</a>` : (s.source || '-');
+  tr.innerHTML = `<td>${i+1}</td><td>${s.type || '-'}</td><td>${url}</td><td>${s.info || '-'}</td>`;
+  stb.appendChild(tr);
+});
+
+document.getElementById('disclaimer').textContent = D.disclaimer || '본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.';
+
+// Bubble chart — 시총(x) vs 1년 수익률(y) vs AI 익스포저 가중치(r)
+const aiWeight = (s)=>({'◎':14,'○':10,'△':6,'✕':3}[s]||5);
+const parseNum = (s)=>{
+  if(!s) return null;
+  const m = String(s).match(/-?[\d,.]+/);
+  if(!m) return null;
+  return parseFloat(m[0].replace(/,/g,''));
+};
+const bubData = D.pool.map(s=>({
+  x: parseNum(s.marketCap) || 0,
+  y: parseNum(s.return1y) || 0,
+  r: aiWeight(s.aiExposure),
+  label: s.ticker,
+  market: s.market
+})).filter(d=>d.x);
+const ctx = document.getElementById('bubble').getContext('2d');
+new Chart(ctx, {
+  type:'bubble',
+  data:{datasets:[
+    {label:'미국', data:bubData.filter(d=>d.market!=='JP'), backgroundColor:'rgba(91,157,255,0.6)', borderColor:'#5b9dff', borderWidth:1},
+    {label:'일본', data:bubData.filter(d=>d.market==='JP'), backgroundColor:'rgba(239,68,68,0.6)', borderColor:'#ef4444', borderWidth:1}
+  ]},
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{labels:{color:'#e6e8ec'}},
+      tooltip:{callbacks:{label:(c)=>`${c.raw.label}: 시총 ${c.raw.x}, 1Y ${c.raw.y}%`}}
+    },
+    scales:{
+      x:{title:{display:true,text:'시가총액 (단위: 입력 그대로)',color:'#9aa3b2'},ticks:{color:'#9aa3b2'},grid:{color:'rgba(255,255,255,0.05)'}},
+      y:{title:{display:true,text:'1년 수익률 (%)',color:'#9aa3b2'},ticks:{color:'#9aa3b2'},grid:{color:'rgba(255,255,255,0.05)'}}
+    }
+  }
+});
+</script>
+</body>
+</html>

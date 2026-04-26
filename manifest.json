@@ -3,6 +3,19 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "type": "theme",
+      "theme": "액체냉각·열관리",
+      "category": "upstream",
+      "isoWeek": "2026-W17",
+      "date": "20260426",
+      "file": "sector_liquid_cooling_20260426.html",
+      "topPicks": [
+        "VRT",
+        "MOD",
+        "6367.T"
+      ]
+    },
+    {
       "company": "Schneider Electric",
       "ticker": "SU.PA",
       "date": "20260426",
