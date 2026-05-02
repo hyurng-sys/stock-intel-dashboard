@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — MBC C&I | IPO Monitor | 2026-05-02</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+  .header { text-align: center; padding: 40px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 120px; height: 2px; background: linear-gradient(90deg, transparent, var(--ipo), transparent); }
+  .header-label { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--ipo); background: rgba(188, 140, 255, 0.1); padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(188, 140, 255, 0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+  .ipo-banner { text-align: center; padding: 28px; border-radius: 16px; margin-bottom: 28px; background: rgba(188, 140, 255, 0.08); border: 1px solid rgba(188, 140, 255, 0.3); }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; margin-bottom: 28px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .overview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .overview-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .overview-sub { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th { background: rgba(255,255,255,0.04); color: var(--text-secondary); font-weight: 600; font-size: 12px; letter-spacing: 0.5px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 12px 14px; border-bottom: 1px solid rgba(48,54,61,0.6); color: var(--text-primary); vertical-align: top; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+  .risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .risk-card { padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
+  .risk-card.high { border-color: rgba(244,112,103,0.3); background: rgba(244,112,103,0.05); }
+  .risk-card.mid { border-color: rgba(210,153,34,0.3); background: rgba(210,153,34,0.05); }
+  .risk-card.low { border-color: rgba(63,185,80,0.3); background: rgba(63,185,80,0.05); }
+  .risk-type { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); }
+  .pipeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .pipeline-item { padding: 18px; border-radius: 12px; background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.15); }
+  .pipeline-title { font-size: 13px; font-weight: 700; color: var(--uplus-magenta); margin-bottom: 6px; }
+  .pipeline-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+  .fin-row { display: grid; grid-template-columns: 180px 1fr 1fr 1fr; gap: 0; border-bottom: 1px solid rgba(48,54,61,0.6); }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-label { font-size: 12px; color: var(--text-secondary); padding: 10px 14px; font-weight: 600; }
+  .fin-val { font-size: 13px; color: var(--text-primary); padding: 10px 14px; text-align: right; }
+  .fin-val.positive { color: var(--buy); }
+  .fin-val.negative { color: var(--sell); }
+  .fin-val.highlight { color: var(--ipo); font-weight: 700; }
+  .fin-header { display: grid; grid-template-columns: 180px 1fr 1fr 1fr; gap: 0; background: rgba(255,255,255,0.04); border-radius: 8px 8px 0 0; margin-bottom: 4px; }
+  .fin-header-cell { font-size: 11px; color: var(--text-muted); padding: 8px 14px; text-align: right; font-weight: 600; letter-spacing: 0.5px; }
+  .ai-axis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .ai-axis-item { padding: 18px; border-radius: 12px; border: 1px solid var(--border); }
+  .ai-axis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .ai-axis-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+  .ai-score { font-size: 20px; font-weight: 800; }
+  .ai-score.core { color: var(--buy); }
+  .ai-score.linked { color: var(--uplus-magenta); }
+  .ai-score.indirect { color: var(--hold); }
+  .ai-score.none { color: var(--text-muted); }
+  .question-list { list-style: none; padding: 0; }
+  .question-list li { padding: 12px 0; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 14px; color: var(--text-secondary); padding-left: 20px; position: relative; }
+  .question-list li::before { content: '▸'; position: absolute; left: 0; color: var(--ipo); font-size: 11px; top: 14px; }
+  .question-list li:last-child { border-bottom: none; }
+  .highlight-box { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.2); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+  .highlight-box .title { font-size: 13px; font-weight: 700; color: var(--uplus-magenta); margin-bottom: 6px; }
+  .highlight-box .body { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .mou-badge { display: inline-block; background: rgba(86,212,221,0.12); color: #56D4DD; border: 1px solid rgba(86,212,221,0.3); border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; margin-left: 8px; }
+  .ceo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ceo-item { padding: 14px 18px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+  .ceo-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; letter-spacing: 0.5px; }
+  .ceo-value { font-size: 14px; color: var(--text-primary); }
+  .disclaimer { font-size: 13px; color: var(--text-muted); padding: 20px 24px; border-radius: 12px; background: rgba(48,54,61,0.3); border: 1px solid var(--border); margin-bottom: 28px; line-height: 1.8; }
+  .footer { text-align: center; font-size: 12px; color: var(--text-muted); padding: 32px 0 16px; border-top: 1px solid var(--border); margin-top: 16px; }
+  @media (max-width: 768px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .risk-grid { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axis-grid { grid-template-columns: 1fr; }
+    .ceo-grid { grid-template-columns: 1fr; }
+    .fin-row, .fin-header { grid-template-columns: 140px repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-label">Stock Intelligence Report</div>
+    <h1>MBC C&amp;I — 주식회사 엠비씨씨앤아이</h1>
+    <div class="date">2026-05-02 · 미팅: 도인태 대표이사 사장 (2026-05-09) · 비상장 방송인프라·콘텐츠</div>
+  </div>
+
+  <!-- IPO Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">Comprehensive Verdict</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장사 — 직접 주식 투자 불가 · IPO 가능성 5% 미만 · LG 생태계 연계 협력 파트너십 관점 접근</div>
+  </div>
+
+  <!-- Overview Grid -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">상장 여부</div>
+      <div class="overview-value" style="color: var(--ipo);">비상장</div>
+      <div class="overview-sub">KOSPI/KOSDAQ 미등재</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">모기업 MBC 매출</div>
+      <div class="overview-value" style="color: var(--buy);">7,220억</div>
+      <div class="overview-sub">2024년 · MBC C&I 추정 ~1,300억</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">모기업 영업이익</div>
+      <div class="overview-value" style="color: var(--hold);">65억</div>
+      <div class="overview-sub">2024년 · 광고 매출 2,064억</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">예상 기업가치</div>
+      <div class="overview-value" style="color: var(--ipo);">650~1,300억</div>
+      <div class="overview-sub">PSR 0.5~1.0x 추정 (참고치)</div>
+    </div>
+  </div>
+
+  <!-- 핵심 발견: LG AI연구원 MOU -->
+  <div class="card">
+    <h3>핵심 발견 — LG 생태계 연결고리</h3>
+    <div class="highlight-box">
+      <div class="title">MBC × LG AI연구원 × 광주광역시 3자 MOU <span class="mou-badge">2024.7.31 체결</span></div>
+      <div class="body">
+        문화방송(안형준 사장), LG AI연구원(배경훈 원장), 광주광역시(강기정 시장) 3자가 <strong style="color: var(--text-primary);">K-콘텐츠 특화 생성형 AI 모델·솔루션 공동 개발</strong> MOU 체결. MBC의 60년 방송 콘텐츠 데이터 × LG AI연구원 EXAONE 멀티모달 기술 × 광주 AI 데이터센터 인프라 결합 구조.<br><br>
+        <strong style="color: var(--uplus-magenta);">LG U+ 포지셔닝 기회:</strong> LG AI연구원이 이미 MBC와 AI 협력 생태계를 구축한 상황. LG U+는 이 생태계 내에서 통신 인프라·AICC·클라우드 실행 파트너로 자연스럽게 진입 가능. 도인태 대표 미팅에서 LG 계열사 협력 프레임으로 접근 시 수용도 높음.
+      </div>
+    </div>
+  </div>
+
+  <!-- 기업 개요 -->
+  <div class="card">
+    <h3>기업 개요</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>정식명</td><td>주식회사 엠비씨씨앤아이 (MBC C&amp;I)</td></tr>
+      <tr><td>설립</td><td>1991년 1월 10일 (2011년 8월 MBC프로덕션 + MBC미디어텍 통합 출범)</td></tr>
+      <tr><td>대표이사</td><td>도인태 사장 (2024년 3월 취임)</td></tr>
+      <tr><td>임직원</td><td>약 175~200명 (추정)</td></tr>
+      <tr><td>본사</td><td>서울시 마포구 성암로 255, 상암 MBC미디어센터 10층</td></tr>
+      <tr><td>제2사옥</td><td>경기도 고양시 일산동구 호수로 596, MBC드림센터</td></tr>
+      <tr><td>모회사</td><td>문화방송(주) — 100% 지분 보유 (방문진 70% + 정수장학회 30% 지배)</td></tr>
+      <tr><td>주요사업</td><td>교양·예능·드라마 제작, 콘텐츠 유통, 방송SI·기술인프라, 협찬·광고대행, 방송아카데미</td></tr>
+      <tr><td>사업자등록</td><td>116-81-59673</td></tr>
+    </table>
+  </div>
+
+  <!-- 대표이사 프로파일 -->
+  <div class="card">
+    <h3>대표이사 프로파일 — 도인태 사장</h3>
+    <div class="ceo-grid" style="margin-bottom: 16px;">
+      <div class="ceo-item">
+        <div class="ceo-label">생년 / 입사</div>
+        <div class="ceo-value">1964년생 · 1993년 MBC 입사 (보도국 사회부)</div>
+      </div>
+      <div class="ceo-item">
+        <div class="ceo-label">현 직책 (취임)</div>
+        <div class="ceo-value">MBC C&amp;I 대표이사 사장 (2024년 3월 ~)</div>
+      </div>
+      <div class="ceo-item">
+        <div class="ceo-label">핵심 경력</div>
+        <div class="ceo-value">탐사보도팀장(2008) → 뉴욕특파원(2010) → 국제부장(2015) → 디지털뉴스 부국장(2018~2020) → 미디어전략본부장(2020~2023) → 특임이사(2023.12~2024.2)</div>
+      </div>
+      <div class="ceo-item">
+        <div class="ceo-label">인물 특성 (미팅 전략)</div>
+        <div class="ceo-value">기자·편집국 출신 → <strong>"콘텐츠 경쟁력 강화" 언어 선호</strong>. 미디어전략본부장 3년 → 디지털·OTT 전략 이해. "효율화·비용 절감" 프레임보다 "품질·혁신" 프레임이 효과적.</div>
+      </div>
+    </div>
+    <p style="font-size:13px; color: var(--text-muted);">⚠️ MBC 내부 정치(방문진 이사회 개편), 노사 갈등 관련 언급 금지. 도 대표는 2024년 3월 취임 2년차로 전략 실행 단계 진입 중.</p>
+  </div>
+
+  <!-- 재무 현황 -->
+  <div class="card">
+    <h3>재무 현황 — MBC 본사 연결 기준 (MBC C&amp;I 단독 공시 없음)</h3>
+    <div class="fin-header">
+      <div class="fin-header-cell" style="text-align:left;">구분</div>
+      <div class="fin-header-cell">2022</div>
+      <div class="fin-header-cell">2023</div>
+      <div class="fin-header-cell highlight">2024</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">MBC 연결 매출</div>
+      <div class="fin-val">~6,500억(E)</div>
+      <div class="fin-val">~6,800억(E)</div>
+      <div class="fin-val highlight">7,220억</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">MBC 광고 매출</div>
+      <div class="fin-val">~1,800억(E)</div>
+      <div class="fin-val">~1,900억(E)</div>
+      <div class="fin-val positive highlight">2,064억</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">MBC 영업이익</div>
+      <div class="fin-val negative">적자</div>
+      <div class="fin-val negative">소폭적자</div>
+      <div class="fin-val positive highlight">65억</div>
+    </div>
+    <div class="fin-row">
+      <div class="fin-label">MBC C&amp;I 추정 매출</div>
+      <div class="fin-val">~1,100억(E)</div>
+      <div class="fin-val">~1,200억(E)</div>
+      <div class="fin-val highlight">~1,260~1,360억(E)</div>
+    </div>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px;">* MBC C&amp;I 단독 재무제표 미공시. MBC 본사 2024년 광고 매출 2,064억원은 지상파 3사 중 유일한 광고 매출 증가. MBC 2024년 상반기 영업이익 186억원 (목표 대비 186% 초과). C&amp;I 매출 추정치는 채용 플랫폼 기재값 기반 (공신력 없음).</p>
+  </div>
+
+  <!-- 사업 포트폴리오 -->
+  <div class="card">
+    <h3>사업 포트폴리오</h3>
+    <div class="pipeline-grid">
+      <div class="pipeline-item">
+        <div class="pipeline-title">콘텐츠 본부</div>
+        <div class="pipeline-desc">교양·예능·드라마 제작, 콘텐츠 기획·유통, 협찬/간접광고 대행, YouTube·디지털 채널 광고 대행. MBC 60년 아카이브 콘텐츠 자산의 실행 조직.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">인프라 본부 (방송 SI)</div>
+        <div class="pipeline-desc">중계기술, 영상제작, 종합편집, 방송SI(시스템통합), 기술연구. MBC 차세대 NPS(뉴스·제작 시스템) 구축 사업과 연계. 오픈베이스 IT인프라 통합 유지보수 수주 기반.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">아카데미 본부</div>
+        <div class="pipeline-desc">방송 인재 교육 (아나운서·PD·구성작가·기술직). MBC아카데미뷰티 연계. 자산운영 포함. B2B 기업 AI 미디어 리터러시 교육으로 확장 가능성.</div>
+      </div>
+      <div class="pipeline-item">
+        <div class="pipeline-title">경영지원센터</div>
+        <div class="pipeline-desc">총무·인사·회계·법무 등 내부 지원 기능. MBC 본사 공유서비스 구조로 운영. 독립적 수익 창출보다 모기업 지원 중심.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI사업 연관성 -->
+  <div class="card">
+    <h3>AI 사업 연관성 — LG U+ 협업 시너지 매트릭스</h3>
+    <div class="ai-axis-grid">
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">EXAONE 생태계 연계 <span class="mou-badge" style="font-size:10px;">핵심</span></div>
+          <div class="ai-score core">◎</div>
+        </div>
+        <div class="ai-axis-desc">LG AI연구원이 MBC와 K-콘텐츠 AI 협약 체결. MBC C&amp;I 인프라 본부가 EXAONE 기반 방송 AI 솔루션 구축의 실행 조직. LG U+는 LG 계열사로서 이 생태계 내 통신·클라우드 역할로 자연스러운 진입 경로 보유.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">클라우드·IDC 인프라</div>
+          <div class="ai-score linked">○</div>
+        </div>
+        <div class="ai-axis-desc">MBC 차세대 NPS 구축 후 운영 단계에서 하이브리드 클라우드 전환 수요 예상. 상암·일산 스튜디오 대규모 방송 데이터 저장·처리 인프라. LG U+ IDC 코로케이션 + 전용 기업회선 번들 제안 가능.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">AICC SaaS</div>
+          <div class="ai-score linked">○</div>
+        </div>
+        <div class="ai-axis-desc">시청자 서비스 콜센터, 광고주 응대, 아카데미 입학 문의 등 B2C 콘택 채널 보유. AI 콘택센터 전환 시 LG U+ AICC SaaS 적용 가능. 방송 버티컬 특화 시나리오 공동 개발 여지.</div>
+      </div>
+      <div class="ai-axis-item">
+        <div class="ai-axis-header">
+          <div class="ai-axis-name">AI 콘텐츠 분석·AX</div>
+          <div class="ai-score indirect">△</div>
+        </div>
+        <div class="ai-axis-desc">방송 영상 AI 분류·메타데이터 자동화, 편집 자동화 수요 내재. MBC 아카데미의 B2B AI 미디어 교육 확장 시 LG U+ AX 솔루션 공동 제안 가능. 단기보다 중장기 기회.</div>
+      </div>
+    </div>
+    <p style="font-size: 13px; color: var(--text-secondary); margin-top: 16px; line-height: 1.8;">
+      <strong style="color: var(--text-primary);">투자 관점 시사점:</strong> MBC C&amp;I는 <em>직접 투자 대상</em>이 아닌 <em>방송·미디어 버티컬 전략 파트너</em>. LG AI연구원-MBC MOU를 레버리지 삼아 LG U+가 통신 인프라·AICC·클라우드 실행자로 참여하는 3각 협력 구조 설계가 최우선 어젠다.
+    </p>
+  </div>
+
+  <!-- 리스크 -->
+  <div class="card">
+    <h3>리스크 평가</h3>
+    <div class="risk-grid">
+      <div class="risk-card high">
+        <div class="risk-type">지배구조 불확실성</div>
+        <div class="risk-desc">방문진 이사회 9→13명 개편 진행 중(방송3법 2025.8). 정치 변수에 따른 MBC 경영 방향 급변 가능성. 파트너십 의사결정 지연 또는 우선순위 변동 위험.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 중간</div>
+      </div>
+      <div class="risk-card high">
+        <div class="risk-type">지상파 광고 구조적 하락</div>
+        <div class="risk-desc">MBC 2024년 광고 매출은 일시 반등이나 지상파 광고 시장 장기 하락 추세 불변. OTT 경쟁 심화로 콘텐츠 투자 수익성 압박. MBC C&amp;I 매출 기반 위협.</div>
+        <div class="risk-meta">영향: 높음 · 확률: 높음(장기)</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">노사 갈등</div>
+        <div class="risk-desc">자주평등노조의 부당노동행위 고발, 조직 슬림화 갈등 이력. 구조조정 시도 시 파업 리스크 → 방송 제작 차질 가능성. 도인태 대표 리더십 시험대.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">SI 외주화 경쟁</div>
+        <div class="risk-desc">CJ올리브네트웍스가 MBC 차세대 NPS 수주. 외부 SI 업체가 MBC 내부 시스템 수주하면 MBC C&amp;I 인프라 본부 역할 축소 우려. 핵심 SI 역량 유지가 관건.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card mid">
+        <div class="risk-type">도인태 대표 전문성 한계</div>
+        <div class="risk-desc">기자·편집국 출신으로 기술·AI 사업 직접 경험 제한. AI 솔루션 구매 의사결정 시 내부 기술 조직(인프라 본부장)이 실질적 gatekeepfer일 가능성. 복수 접촉선 확보 필요.</div>
+        <div class="risk-meta">영향: 중간 · 확률: 중간</div>
+      </div>
+      <div class="risk-card low">
+        <div class="risk-type">비상장 투자 불가</div>
+        <div class="risk-desc">현재 비상장사로 직접 주식 투자 불가. IPO 계획 미공개, 공익재단 지배구조로 IPO 가능성 5% 미만. 투자 관점보다 B2B 협력 파트너십 관점이 유효.</div>
+        <div class="risk-meta">영향: 낮음 · 확률: 해당 없음</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IPO 모니터링 -->
+  <div class="card">
+    <h3>IPO 모니터링 — 관찰 지표</h3>
+    <table class="tbl">
+      <tr><th>체크포인트</th><th>현재 상태</th><th>판단 기준</th></tr>
+      <tr>
+        <td>IPO 추진 의사</td>
+        <td><span class="chip bad">가능성 없음</span></td>
+        <td>방문진·정수장학회 지배 구조상 IPO 가능성 사실상 없음. 제도적 변화(민영화 등) 시 재검토.</td>
+      </tr>
+      <tr>
+        <td>지배구조 변화</td>
+        <td><span class="chip neutral">방송3법 개편 중</span></td>
+        <td>방문진 이사회 구성 변화 또는 민영화 논의 시 MBC 계열사 전략 재편 가능성. 모니터링 필요.</td>
+      </tr>
+      <tr>
+        <td>LG AI연구원 MOU 이행 현황</td>
+        <td><span class="chip good">MOU 체결 (2024.7)</span></td>
+        <td>MOU가 실제 제품·서비스로 구체화되면 LG U+ 연계 사업 기회 본격화. 분기별 진행 상황 확인.</td>
+      </tr>
+      <tr>
+        <td>MBC C&I 독자 AI 사업 출시</td>
+        <td><span class="chip neutral">인프라 본부 고도화 중</span></td>
+        <td>MBC C&I 명의 AI 솔루션 또는 SaaS 제품 출시 시 기업가치 재평가 계기.</td>
+      </tr>
+      <tr>
+        <td>외부 투자 유치</td>
+        <td><span class="chip bad">이력 없음</span></td>
+        <td>VC/PE 또는 전략적 투자자 유치 시 기업가치 공개. 현재로선 가능성 낮음.</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 비교 기업 기반 예상 밸류에이션 -->
+  <div class="card">
+    <h3>비상장 추정 밸류에이션 — 유사 상장사 비교</h3>
+    <table class="tbl">
+      <tr><th>기업</th><th>시장</th><th>사업 유사성</th><th>멀티플</th><th>시가총액 수준</th></tr>
+      <tr>
+        <td>SBS콘텐츠허브</td>
+        <td>KOSDAQ</td>
+        <td>방송 콘텐츠 유통</td>
+        <td>PER ~15x</td>
+        <td>~2,000억대</td>
+      </tr>
+      <tr>
+        <td>제이콘텐트리</td>
+        <td>KOSPI</td>
+        <td>드라마 제작·유통</td>
+        <td>PER ~20x</td>
+        <td>~3,000억대</td>
+      </tr>
+      <tr>
+        <td>쇼박스</td>
+        <td>KOSDAQ</td>
+        <td>콘텐츠 제작·투자</td>
+        <td>PER ~18x</td>
+        <td>~1,500억대</td>
+      </tr>
+      <tr>
+        <td><strong>MBC C&amp;I 가상 추정</strong></td>
+        <td>비상장</td>
+        <td>방송인프라+콘텐츠+SI</td>
+        <td>PSR 0.5~1.0x</td>
+        <td><strong style="color:var(--ipo);">650~1,300억원 (추정)</strong></td>
+      </tr>
+    </table>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: 12px;">* 매출 약 1,300억원 기준 PSR 0.5~1.0x 적용 추정. 방송 SI + 콘텐츠 복합사업체 특성상 순수 콘텐츠사 대비 할인 적용. 실제 IPO 미추진이므로 참고치에 불과. 공신력 없음.</p>
+  </div>
+
+  <!-- 미팅 준비 질문 -->
+  <div class="card">
+    <h3>미팅 준비 핵심 질문 — 도인태 대표이사 사장 (2026-05-09)</h3>
+    <ul class="question-list">
+      <li>LG AI연구원과의 K-콘텐츠 AI 협약이 현장에서 어떻게 구체화되고 있는지 — 방송 제작 워크플로에 AI가 실제 적용된 사례가 있는지?</li>
+      <li>MBC 차세대 NPS(제작시스템) 구축 이후 운영 단계에서 클라우드 전환 계획이 있는지 — 온프레미스에서 하이브리드 클라우드로 이행 시 LG U+ IDC·기업회선 연계 논의 가능?</li>
+      <li>시청자 서비스 콜센터·광고주 응대 부문에서 AI 콘택센터(AICC) 도입 검토 또는 수요가 있는지?</li>
+      <li>MBC 아카데미 사업을 기업 대상 AI·미디어 리터러시 교육으로 확장하는 계획이 있는지 — LG U+ AX 교육 솔루션과 공동 개발 가능성?</li>
+      <li>방송 영상 데이터 AI 분류·메타데이터 자동화 등 콘텐츠 아카이브 AI 활용에 관심이 있는지 — MBC 60년 아카이브 활용 전략은?</li>
+    </ul>
+    <div style="margin-top: 16px; padding: 14px 18px; background: rgba(188,140,255,0.05); border: 1px solid rgba(188,140,255,0.2); border-radius: 10px;">
+      <div style="font-size: 12px; font-weight: 700; color: var(--ipo); margin-bottom: 6px;">미팅 전략 핵심</div>
+      <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">도인태 대표는 기자·미디어 전략 출신. <strong style="color: var(--text-primary);">"효율화·비용 절감"보다 "콘텐츠 경쟁력·혁신" 언어</strong>로 접근. LG AI연구원과의 기존 협약을 레버리지 삼아 <strong style="color: var(--text-primary);">"LG 생태계 내 자연스러운 협력 확장"</strong> 포지셔닝. 기술 세부사항은 인프라 본부장과 별도 후속 미팅 설정 권장.</div>
+    </div>
+  </div>
+
+  <!-- 참고 소스 -->
+  <div class="card">
+    <h3>참고 소스</h3>
+    <table class="tbl">
+      <tr><th>#</th><th>소스</th><th>수집 정보</th></tr>
+      <tr><td>1</td><td>Wikipedia (ko) — MBC C&amp;I</td><td>설립·합병 이력, 사업 부문 구조, 법인 정보</td></tr>
+      <tr><td>2</td><td>Wikipedia (ko) — 도인태</td><td>대표이사 경력·이력 전반</td></tr>
+      <tr><td>3</td><td>연합뉴스·한국경제 (2025.5)</td><td>도인태 대표 모친상 부고 — 현직 확인</td></tr>
+      <tr><td>4</td><td>DuckDuckGo — MBC·LG AI연구원·광주시 MOU 보도 (2024.7.31)</td><td>3자 생성형 AI 협약 내용, 참여 기관 확인</td></tr>
+      <tr><td>5</td><td>DuckDuckGo — MBC 2024 재무 실적</td><td>연결 매출 7,220억, 영업이익 65억, 광고 매출 2,064억</td></tr>
+      <tr><td>6</td><td>DuckDuckGo — CJ올리브네트웍스 MBC NPS 수주</td><td>차세대 제작시스템 수주 경쟁 현황</td></tr>
+      <tr><td>7</td><td>DuckDuckGo — 오픈베이스 MBC IT인프라 유지보수</td><td>IT인프라 통합유지보수 수주 보도</td></tr>
+      <tr><td>8</td><td>DuckDuckGo — 방문진 이사회 개편 (방송3법 2025.8)</td><td>지배구조 변화 현황, 9→13명 개편 진행</td></tr>
+      <tr><td>9</td><td>Catch / Incruit / Wanted</td><td>MBC C&I 직원수(~175~200명), 평균연봉(5,776~7,318만원) 추정</td></tr>
+      <tr><td>10</td><td>JobKorea</td><td>MBC C&I 사업자등록번호, 본사 소재지 확인</td></tr>
+    </table>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    ⚠️ 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. MBC C&amp;I는 비상장사로 직접 주식 투자가 불가합니다. 재무 데이터 일부는 추정치이며 공신력 없는 수치입니다. 모든 투자·사업 결정은 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">Stock Intelligence Report — Generated by Claude Code · 2026-05-02 · MBC C&amp;I IPO Monitor · 미팅: 도인태 대표이사 (2026-05-09)</footer>
+
+</div>
+</body>
+</html>
