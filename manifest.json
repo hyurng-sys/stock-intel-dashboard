@@ -3,6 +3,16 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "네이버클라우드",
+      "ticker": null,
+      "date": "20260502",
+      "file": "네이버클라우드_20260502.html",
+      "verdict": "IPO_MONITOR",
+      "market": "비상장",
+      "mode": "ipo_monitor",
+      "meetingCounterpart": "김유원 대표"
+    },
+    {
       "company": "MBC C&I",
       "ticker": "비상장",
       "date": "20260502",
