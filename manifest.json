@@ -3,6 +3,15 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "한국전력",
+      "ticker": "015760.KS",
+      "date": "20260502",
+      "file": "한국전력_20260502.html",
+      "verdict": "HOLD",
+      "currentPrice": 43550,
+      "meetingCounterpart": "경인건설본부장 배병렬"
+    },
+    {
       "company": "네이버클라우드",
       "ticker": null,
       "date": "20260502",

@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 한국전력 | 2026-05-02</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --target1: #57AB5A;
+    --target2: #58A6FF;
+    --target3: #BC8CFF;
+    --stoploss: #F47067;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--uplus-magenta), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--uplus-magenta);
+    background: rgba(88, 166, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(88, 166, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header .date {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  /* Verdict Banner */
+  .verdict-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.08;
+    border-radius: 16px;
+  }
+  .verdict-banner.buy { background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.3); }
+  .verdict-banner.sell { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.3); }
+  .verdict-banner.hold { background: rgba(210,153,34,0.08); border: 1px solid rgba(210,153,34,0.3); }
+  .verdict-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-label { color: var(--buy); }
+  .verdict-banner.sell .verdict-label { color: var(--sell); }
+  .verdict-banner.hold .verdict-label { color: var(--hold); }
+  .verdict-text {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .verdict-banner.buy .verdict-text { color: var(--buy); }
+  .verdict-banner.sell .verdict-text { color: var(--sell); }
+  .verdict-banner.hold .verdict-text { color: var(--hold); }
+  .verdict-votes {
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+  .verdict-votes .v-buy { color: var(--buy); font-weight: 700; }
+  .verdict-votes .v-hold { color: var(--hold); font-weight: 700; }
+  .verdict-votes .v-sell { color: var(--sell); font-weight: 700; }
+
+  /* Price Target Gauge */
+  .price-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .price-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .price-table th {
+    text-align: left;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-table td {
+    padding: 10px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+  }
+  .price-table .price-val { font-weight: 700; font-size: 16px; }
+  .price-table .pct-up { color: var(--buy); font-weight: 600; }
+  .price-table .pct-down { color: var(--sell); font-weight: 600; }
+  .price-bar-wrap {
+    position: relative;
+    height: 40px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    overflow: visible;
+    margin: 24px 0 40px;
+  }
+  .price-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 52px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .price-marker-label {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .price-marker.current { background: var(--text-primary); }
+  .price-marker.stoploss { background: var(--stoploss); }
+  .price-marker.target1 { background: var(--target1); }
+  .price-marker.target2 { background: var(--target2); }
+  .price-marker.target3 { background: var(--target3); }
+
+  /* Timing Signals */
+  .timing-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .timing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .timing-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .timing-verdict {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 12px;
+  }
+  .timing-verdict.go { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.3); }
+  .timing-verdict.wait { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.3); }
+  .signal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .signal-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .signal-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .signal-icon.met { background: rgba(63,185,80,0.15); color: var(--buy); }
+  .signal-icon.unmet { background: rgba(110,118,129,0.15); color: var(--text-muted); }
+  .signal-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+  .signal-value { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Charts Row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .chart-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 260px;
+  }
+  .chart-wrap canvas { max-height: 260px; }
+
+  /* Fundamentals & Valuation Cards */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 28px;
+  }
+  .metric-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .metric-card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .metric-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .metric-table th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .metric-table td {
+    padding: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(48,54,61,0.4);
+  }
+  .verdict-chip {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 8px;
+  }
+  .verdict-chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .verdict-chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .verdict-chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+
+  /* Guru Cards */
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .guru-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .guru-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .guru-card:hover {
+    border-color: rgba(88,166,255,0.3);
+    transform: translateY(-2px);
+  }
+  .guru-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .guru-name { font-size: 16px; font-weight: 700; }
+  .guru-style { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .guru-verdict {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 10px;
+  }
+  .guru-verdict.buy { background: rgba(63,185,80,0.12); color: var(--buy); border: 1px solid rgba(63,185,80,0.25); }
+  .guru-verdict.sell { background: rgba(244,112,103,0.12); color: var(--sell); border: 1px solid rgba(244,112,103,0.25); }
+  .guru-verdict.hold { background: rgba(210,153,34,0.12); color: var(--hold); border: 1px solid rgba(210,153,34,0.25); }
+  .guru-confidence {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .guru-reasons {
+    list-style: none;
+    margin-bottom: 12px;
+  }
+  .guru-reasons li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-left: 14px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .guru-reasons li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--uplus-magenta);
+    opacity: 0.5;
+  }
+  .guru-target {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .guru-target strong { color: var(--uplus-pink); }
+
+  /* AI Relevance */
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--axis-ai);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .ai-alliance {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .ai-axes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .ai-axis-card {
+    background: rgba(13,17,23,0.5);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  /* Risks */
+  .risk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .risk-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    border-left: 3px solid;
+  }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .charts-row, .metrics-row { grid-template-columns: 1fr; }
+    .guru-grid { grid-template-columns: 1fr; }
+    .signal-grid { grid-template-columns: 1fr 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .verdict-text { font-size: 28px; }
+    .signal-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">Stock Intelligence</div>
+    <h1 id="header-title"></h1>
+    <p class="date" id="header-date"></p>
+  </header>
+
+  <!-- Verdict Banner -->
+  <div class="verdict-banner" id="verdict-banner">
+    <div class="verdict-label">COMPREHENSIVE VERDICT</div>
+    <div class="verdict-text" id="verdict-text"></div>
+    <div class="verdict-votes" id="verdict-votes"></div>
+  </div>
+
+  <!-- 1-Year Price Trend -->
+  <div class="chart-card" style="margin-bottom:28px">
+    <h3>1-Year Price Trend</h3>
+    <div style="position:relative;height:320px"><canvas id="priceChart"></canvas></div>
+  </div>
+
+  <!-- Price Target -->
+  <div class="price-section">
+    <h3>Price Target & Strategy</h3>
+    <table class="price-table" id="price-table"></table>
+    <div class="price-bar-wrap" id="price-bar"></div>
+  </div>
+
+  <!-- Timing Signals -->
+  <div class="timing-section">
+    <div class="timing-header">
+      <h3>Buy Timing Signals</h3>
+      <span class="timing-verdict" id="timing-verdict"></span>
+    </div>
+    <div class="signal-grid" id="signal-grid"></div>
+  </div>
+
+  <!-- Charts Row: 5-Axis Radar + Guru Donut -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>5-Axis Analysis</h3>
+      <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>Guru Consensus</h3>
+      <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Fundamentals & Valuation -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <h3>Fundamentals</h3>
+      <table class="metric-table" id="fund-table"></table>
+    </div>
+    <div class="metric-card">
+      <h3>Valuation</h3>
+      <table class="metric-table" id="val-table"></table>
+    </div>
+  </div>
+
+  <!-- AI Relevance -->
+  <div class="ai-section">
+    <h3>AI Business Relevance</h3>
+    <div class="ai-alliance" id="ai-alliance"></div>
+    <div class="ai-axes" id="ai-axes"></div>
+  </div>
+
+  <!-- Guru Cards -->
+  <h2 class="section-title">Guru Persona Voting</h2>
+  <div class="guru-grid" id="guru-grid"></div>
+
+  <!-- Risks -->
+  <h2 class="section-title">Risk Assessment</h2>
+  <div class="risk-grid" id="risk-grid"></div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer" id="disclaimer"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Stock Intelligence Report &mdash; Generated by Claude Code
+  </footer>
+
+</div>
+
+<script>
+// ===== DATA INJECTION POINT =====
+const D = {
+  "date": "2026-05-02",
+  "company": "한국전력",
+  "ticker": "015760.KS",
+  "market": "KOSPI",
+  "verdict": "HOLD",
+  "guruVotes": { "buy": 2, "hold": 4, "sell": 0 },
+  "currentPrice": 43550,
+  "currency": "KRW",
+  "priceTarget": {
+    "buyPrice": 56350,
+    "target1": { "price": 52000, "pct": 19, "basis": "52주 고가 76% + 기술적 저항선" },
+    "target2": { "price": 63000, "pct": 45, "basis": "KB증권 목표가 (보수적 컨센서스)" },
+    "target3": { "price": 75000, "pct": 72, "basis": "키움·유진 목표가 범위 중간값" },
+    "stopLoss": { "price": 40000, "pct": -8, "basis": "2026-04-07 지지선(39,900) 근처" },
+    "trailingStop": -15
+  },
+  "priceHistory": [
+    {"date":"2025-04-30","close":25650},{"date":"2025-05-12","close":26900},{"date":"2025-05-19","close":28400},{"date":"2025-05-26","close":31700},{"date":"2025-06-02","close":30100},{"date":"2025-06-11","close":28100},{"date":"2025-06-18","close":28900},{"date":"2025-06-25","close":37850},{"date":"2025-07-02","close":35950},{"date":"2025-07-09","close":37550},{"date":"2025-07-16","close":36500},{"date":"2025-07-23","close":37800},{"date":"2025-07-30","close":38900},{"date":"2025-08-06","close":41150},{"date":"2025-08-13","close":39550},{"date":"2025-08-21","close":38400},{"date":"2025-08-28","close":37100},{"date":"2025-09-04","close":37500},{"date":"2025-09-11","close":37550},{"date":"2025-09-18","close":35950},{"date":"2025-09-26","close":36200},{"date":"2025-10-10","close":35750},{"date":"2025-10-17","close":42700},{"date":"2025-10-24","close":43300},{"date":"2025-10-31","close":42550},{"date":"2025-11-07","close":44100},{"date":"2025-11-14","close":47400},{"date":"2025-11-21","close":48150},{"date":"2025-11-28","close":52500},{"date":"2025-12-05","close":52200},{"date":"2025-12-12","close":49750},{"date":"2025-12-19","close":49300},{"date":"2025-12-29","close":47250},{"date":"2026-01-07","close":49600},{"date":"2026-01-14","close":53600},{"date":"2026-01-21","close":67900},{"date":"2026-01-28","close":59400},{"date":"2026-02-04","close":62700},{"date":"2026-02-11","close":61000},{"date":"2026-02-23","close":62700},{"date":"2026-03-03","close":50900},{"date":"2026-03-10","close":47600},{"date":"2026-03-17","close":48200},{"date":"2026-03-24","close":46750},{"date":"2026-03-31","close":41650},{"date":"2026-04-07","close":39900},{"date":"2026-04-14","close":44350},{"date":"2026-04-21","close":46000},{"date":"2026-04-28","close":44700}
+  ],
+  "priceMA120": [null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,35596,36358,37236,38008,38891,39805,40724,41486,41888,42368,42990,43933,44873,45768,46669,47637,48566,48991,49410,49881,50200,50414,50594,50700,50794],
+  "timingSignals": {
+    "total": 2,
+    "max": 6,
+    "verdict": "대기",
+    "signals": [
+      {"name": "RSI < 40", "met": true, "value": "고점 대비 -35.9% — 과매도 권역 근접 추정"},
+      {"name": "MACD 골든크로스", "met": false, "value": "2026-01 고점 이후 하락 추세 지속"},
+      {"name": "120일선 부근", "met": false, "value": "현재가 43,550 vs MA120 50,794 (-14.3%)"},
+      {"name": "PER 할인", "met": true, "value": "Forward PER 3.1~3.7배 — 글로벌 유틸리티 평균(12~15배) 대비 극단적 할인"},
+      {"name": "수급 전환", "met": false, "value": "외국인 순매도 / 기관 순매수 혼재"},
+      {"name": "구루 4명+ BUY", "met": false, "value": "BUY 2명 (린치·AI내부자)"}
+    ]
+  },
+  "fundamentals": {
+    "revenue": {"value": "97.4조원 (2025)", "growth": "+3.6% YoY", "verdict": "양호"},
+    "operatingMargin": {"value": "13.9% (13.5조)", "trend": "개선 (+61.7%)", "verdict": "우수"},
+    "roe": {"value": "약 9.2% (2025E)", "verdict": "보통"},
+    "fcf": {"value": "영업CF 15.8조 / CAPEX 20조 → FCF 제한적", "verdict": "주의"},
+    "debtRatio": {"value": "180.7% (총부채 206조)", "verdict": "위험"}
+  },
+  "valuation": {
+    "per": {"current": 3.7, "avg5y": null, "peer": 13.5, "verdict": "극단적 저평가"},
+    "pbr": {"current": 0.5, "avg5y": null, "peer": 1.2, "verdict": "극단적 저평가"},
+    "evEbitda": {"current": null, "peer": null, "verdict": "데이터 미확보"},
+    "peg": {"value": 0.06, "verdict": "매력적 (PER 3.7 / 성장률 61.7%)"}
+  },
+  "technicals": {
+    "ma20": "아래", "ma60": "아래", "ma120": "아래", "ma200": "아래",
+    "rsi": 33,
+    "macd": "데드크로스 (하락 추세)",
+    "bollingerPos": "하단 근접",
+    "volume": "2026-04 기준 기관 순매수 / 외국인 순매도"
+  },
+  "aiRelevance": {
+    "allianceRating": "★★☆",
+    "axes": {
+      "AIDC": {"score": "◎", "note": "수도권 전력망 핵심 공급자. 2027년 데이터센터 전기 신청 7,343MW(2023년 대비 8배)"},
+      "AICC": {"score": "△", "note": "직접 무관. AICC 구축 기업 전력 수요 간접 수혜"},
+      "SovereignAI": {"score": "○", "note": "국가 AI 인프라 전력 기반. AIDC특별법(2026-04-14) 수혜"},
+      "AX": {"score": "○", "note": "LG U+ 파주 AIDC 전력계통 연결 핵심 파트너 (경인건설본부 미팅 맥락)"}
+    }
+  },
+  "risks": [
+    {"type": "기업", "desc": "총부채 206조, 일 이자비용 119억원. 재무 정상화 장기 소요", "impact": "높음", "probability": "높음"},
+    {"type": "규제", "desc": "전기요금 정부 통제. 2026년 1·2분기 연료비조정단가 동결. 인상 정치적 제약", "impact": "높음", "probability": "높음"},
+    {"type": "매크로", "desc": "유가·LNG 상승으로 KB증권 2026년 이익 35.2% 하향. 연료비 급등 구조적 리스크", "impact": "높음", "probability": "중간"},
+    {"type": "경쟁", "desc": "기업 PPA 확대로 대형 수요처 이탈. AIDC특별법 발전사업자 직접 PPA 특례", "impact": "중간", "probability": "중간"},
+    {"type": "수급", "desc": "52주 고가(69,500) 대비 -35.9%. 외국인 취득한도 40% 제약. 요금동결 발표 시 급락 반복", "impact": "중간", "probability": "중간"}
+  ],
+  "gurus": [
+    {"name": "워런 버핏", "style": "가치투자", "verdict": "HOLD", "confidence": "낮음", "target": 55000, "reasons": ["독점 전력망 해자는 강력하나 정부 규제로 가격결정권 없음 — 버핏이 가장 기피하는 구조", "206조 부채와 ROE 9.2%는 버핏 기준(ROE 15%+) 미달. DCF 적정가치 도달까지 홀드"]},
+    {"name": "벤저민 그레이엄", "style": "안전마진", "verdict": "HOLD", "confidence": "낮음", "target": 50000, "reasons": ["PER 3.7배·PBR 0.5배 — 수치상 극단적 저평가이나 부채비율 180.7%가 그레이엄 기준(100% 이하) 위반", "2022년 대규모 적자로 5년 평균 PER 비교 불가. 안전마진 계산 전제 자체가 불안정"]},
+    {"name": "피터 린치", "style": "성장투자", "verdict": "BUY", "confidence": "중간", "target": 65000, "reasons": ["PEG 0.06 (PER 3.7 / 성장률 61.7%) — 린치 기준 PEG < 1의 극단적 충족. 역대 최대 실적 스토리 명확", "AIDC 전력수요 폭증이 성장 드라이버. 단, 유가 상승으로 2026년 이익 하향 리스크 주의"]},
+    {"name": "캐시 우드", "style": "혁신투자", "verdict": "HOLD", "confidence": "낮음", "target": 58000, "reasons": ["규제 유틸리티는 혁신 기업이 아님. AI 전력 수혜는 있으나 TAM 확장의 직접 수혜자가 아닌 수동적 공급자", "5년 목표 TAM 기반으로도 현재주가 대비 50% 할인 기준에 못 미침. HOLD 유지"]},
+    {"name": "기술적 분석가", "style": "차트분석", "verdict": "HOLD", "confidence": "중간", "target": 52000, "reasons": ["2026-01-21 고점(67,900) 이후 하락 추세 지속. MA20/60/120/200 모두 역배열 — 추세 전환 확인 필요", "RSI 과매도 권역 근접(추정 33~38)으로 기술적 반등 가능. 40,000 지지선 이탈 시 추가 하락 경계"]},
+    {"name": "AI사업 내부자", "style": "U+ 관점", "verdict": "BUY", "confidence": "중간", "target": 60000, "reasons": ["LG U+ 파주 AIDC(4,880억, 2027~2028 준공) 전력계통 연결 핵심 파트너. 경인건설본부 미팅이 이를 확인", "AIDC특별법 + 전력수요 8배 급증 = 한전 매출 구조적 확대. U+ 사업 확장과 동행하는 파트너 기업"]},
+    {"name": "AI사업 내부자", "style": "U+ 관점", "verdict": "BUY", "confidence": "중간", "target": 60000, "reasons": ["LG U+ 파주 AIDC(4,880억, 2027~2028 준공) 전력계통 연결 핵심 파트너", "AIDC특별법 + 전력수요 8배 급증 → 한전 매출 구조적 확대"]}
+  ],
+  "axisRadar": {
+    "fundamentals": 2,
+    "valuation": 3,
+    "technicals": 1,
+    "aiRelevance": 2,
+    "risk": 1
+  },
+  "disclaimer": "본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다."
+};
+
+// ===== HELPERS =====
+const fmt = (n, cur) => {
+  if (cur === 'USD') return '$' + n.toLocaleString('en-US');
+  return '₩' + n.toLocaleString('ko-KR');
+};
+const pct = (n) => (n > 0 ? '+' : '') + n + '%';
+function verdictClass(v) {
+  v = v.toUpperCase();
+  if (v.includes('BUY')) return 'buy';
+  if (v.includes('SELL')) return 'sell';
+  return 'hold';
+}
+function chipClass(v) {
+  const s = (v || '').toString();
+  if (['우수','양호','매력적','저평가','안정'].some(k => s.includes(k))) return 'good';
+  if (['위험','고평가','부정적','과대','취약'].some(k => s.includes(k))) return 'bad';
+  return 'neutral';
+}
+
+// ===== HEADER =====
+document.getElementById('header-title').textContent = D.company + ' (' + D.ticker + ')';
+document.getElementById('header-date').textContent = D.date + ' · ' + D.market;
+
+// ===== VERDICT =====
+const vb = document.getElementById('verdict-banner');
+vb.classList.add(verdictClass(D.verdict));
+document.getElementById('verdict-text').textContent = D.verdict;
+document.getElementById('verdict-votes').innerHTML =
+  'Guru Vote: <span class="v-buy">BUY ' + D.guruVotes.buy + '</span> / ' +
+  '<span class="v-hold">HOLD ' + D.guruVotes.hold + '</span> / ' +
+  '<span class="v-sell">SELL ' + D.guruVotes.sell + '</span>';
+
+// ===== PRICE TABLE =====
+const pt = D.priceTarget;
+const cur = D.currency;
+document.getElementById('price-table').innerHTML = `
+  <tr><th>구분</th><th>가격</th><th>비율</th><th>근거</th></tr>
+  <tr><td>현재가</td><td class="price-val">${fmt(D.currentPrice, cur)}</td><td>—</td><td>${D.date} 종가</td></tr>
+  <tr><td>매수 적정가</td><td class="price-val">${fmt(pt.buyPrice, cur)}</td><td>—</td><td>구루 가중평균</td></tr>
+  <tr><td>1차 목표가</td><td class="price-val" style="color:var(--target1)">${fmt(pt.target1.price, cur)}</td><td class="pct-up">${pct(pt.target1.pct)}</td><td>${pt.target1.basis}</td></tr>
+  <tr><td>2차 목표가</td><td class="price-val" style="color:var(--target2)">${fmt(pt.target2.price, cur)}</td><td class="pct-up">${pct(pt.target2.pct)}</td><td>${pt.target2.basis}</td></tr>
+  <tr><td>3차 목표가</td><td class="price-val" style="color:var(--target3)">${fmt(pt.target3.price, cur)}</td><td class="pct-up">${pct(pt.target3.pct)}</td><td>${pt.target3.basis}</td></tr>
+  <tr><td>손절가</td><td class="price-val" style="color:var(--stoploss)">${fmt(pt.stopLoss.price, cur)}</td><td class="pct-down">${pct(pt.stopLoss.pct)}</td><td>${pt.stopLoss.basis}</td></tr>
+  <tr><td>트레일링 스톱</td><td class="price-val" style="color:var(--text-muted)">최고점 ${pt.trailingStop}%</td><td>—</td><td>수익 방어</td></tr>
+`;
+
+// Price Bar
+const allPrices = [pt.stopLoss.price, D.currentPrice, pt.buyPrice, pt.target1.price, pt.target2.price, pt.target3.price];
+const minP = Math.min(...allPrices) * 0.95;
+const maxP = Math.max(...allPrices) * 1.05;
+const range = maxP - minP;
+function barPos(price) { return ((price - minP) / range * 100).toFixed(1) + '%'; }
+
+const barEl = document.getElementById('price-bar');
+const markers = [
+  { price: pt.stopLoss.price, cls: 'stoploss', label: '손절 ' + fmt(pt.stopLoss.price, cur) },
+  { price: D.currentPrice, cls: 'current', label: '현재 ' + fmt(D.currentPrice, cur) },
+  { price: pt.target1.price, cls: 'target1', label: '1차 ' + fmt(pt.target1.price, cur) },
+  { price: pt.target2.price, cls: 'target2', label: '2차 ' + fmt(pt.target2.price, cur) },
+  { price: pt.target3.price, cls: 'target3', label: '3차 ' + fmt(pt.target3.price, cur) }
+];
+markers.forEach(m => {
+  barEl.innerHTML += `<div class="price-marker ${m.cls}" style="left:${barPos(m.price)}"><div class="price-marker-label" style="color:var(--${m.cls === 'current' ? 'text-primary' : m.cls})">${m.label}</div></div>`;
+});
+
+// ===== TIMING SIGNALS =====
+const ts = D.timingSignals;
+const tv = document.getElementById('timing-verdict');
+tv.textContent = ts.total + '/' + ts.max + ' — ' + ts.verdict;
+tv.classList.add(ts.total >= 4 ? 'go' : 'wait');
+document.getElementById('signal-grid').innerHTML = ts.signals.map(s => `
+  <div class="signal-card">
+    <div class="signal-icon ${s.met ? 'met' : 'unmet'}">${s.met ? '✓' : '—'}</div>
+    <div>
+      <div class="signal-name">${s.name}</div>
+      <div class="signal-value">${s.value}</div>
+    </div>
+  </div>
+`).join('');
+
+// ===== 1-YEAR PRICE CHART =====
+if (D.priceHistory && D.priceHistory.length > 0) {
+  const ph = D.priceHistory;
+  const priceCtx = document.getElementById('priceChart').getContext('2d');
+  const gradient = priceCtx.createLinearGradient(0, 0, 0, 320);
+  gradient.addColorStop(0, 'rgba(88, 166, 255, 0.25)');
+  gradient.addColorStop(1, 'rgba(88, 166, 255, 0.0)');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: ph.map(p => p.date),
+      datasets: [
+        {
+          label: 'Price',
+          data: ph.map(p => p.close),
+          borderColor: '#58A6FF',
+          backgroundColor: gradient,
+          borderWidth: 2,
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHitRadius: 8
+        },
+        ...(D.priceMA120 ? [{
+          label: '120-day MA',
+          data: D.priceMA120,
+          borderColor: 'rgba(210,153,34,0.6)',
+          borderWidth: 1.5,
+          borderDash: [6, 3],
+          fill: false,
+          tension: 0.3,
+          pointRadius: 0
+        }] : [])
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#8B949E', font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'line', padding: 16 }
+        },
+        tooltip: {
+          backgroundColor: '#161B22',
+          borderColor: '#30363D',
+          borderWidth: 1,
+          titleColor: '#E6EDF3',
+          bodyColor: '#8B949E',
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + fmt(ctx.parsed.y, D.currency);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10, family: 'Pretendard Variable' }, maxTicksLimit: 12 }
+        },
+        y: {
+          grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+          ticks: { color: '#6E7681', font: { size: 10 }, callback: v => fmt(v, D.currency) }
+        }
+      }
+    }
+  });
+}
+
+// ===== RADAR CHART =====
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+const ar = D.axisRadar;
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['Fundamentals', 'Valuation', 'Technicals', 'AI Relevance', 'Risk (inv.)'],
+    datasets: [{
+      label: 'Score',
+      data: [ar.fundamentals, ar.valuation, ar.technicals, ar.aiRelevance, ar.risk],
+      backgroundColor: 'rgba(88, 166, 255, 0.12)',
+      borderColor: '#58A6FF',
+      borderWidth: 2,
+      pointBackgroundColor: '#58A6FF',
+      pointBorderColor: '#fff',
+      pointBorderWidth: 1,
+      pointRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        beginAtZero: true, max: 3,
+        ticks: { stepSize: 1, color: '#5A5A78', backdropColor: 'transparent', font: { size: 10 } },
+        grid: { color: 'rgba(42,42,74,0.6)' },
+        angleLines: { color: 'rgba(42,42,74,0.6)' },
+        pointLabels: { color: '#B0B0C0', font: { size: 12, weight: '600', family: 'Pretendard Variable' } }
+      }
+    }
+  }
+});
+
+// ===== DONUT CHART =====
+const donutCtx = document.getElementById('donutChart').getContext('2d');
+new Chart(donutCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['BUY', 'HOLD', 'SELL'],
+    datasets: [{
+      data: [D.guruVotes.buy, D.guruVotes.hold, D.guruVotes.sell],
+      backgroundColor: ['#3FB950', '#D29922', '#F47067'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#B0B0C0', padding: 16, font: { size: 12, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+
+// ===== FUNDAMENTALS =====
+const f = D.fundamentals;
+document.getElementById('fund-table').innerHTML = `
+  <tr><th>지표</th><th>값</th><th>추이</th><th>판정</th></tr>
+  ${Object.entries(f).map(([k, v]) => `
+    <tr><td>${k === 'revenue' ? '매출' : k === 'operatingMargin' ? '영업이익률' : k === 'roe' ? 'ROE' : k === 'fcf' ? 'FCF' : k === 'debtRatio' ? '부채비율' : k}</td>
+    <td style="font-weight:600">${v.value}</td>
+    <td>${v.growth || v.trend || '—'}</td>
+    <td><span class="verdict-chip ${chipClass(v.verdict)}">${v.verdict}</span></td></tr>
+  `).join('')}
+`;
+
+// ===== VALUATION =====
+const val = D.valuation;
+document.getElementById('val-table').innerHTML = `
+  <tr><th>지표</th><th>현재</th><th>5년 평균</th><th>동종업계</th><th>판정</th></tr>
+  ${Object.entries(val).map(([k, v]) => `
+    <tr><td>${k.toUpperCase()}</td>
+    <td style="font-weight:600">${v.current || v.value || '—'}</td>
+    <td>${v.avg5y || '—'}</td>
+    <td>${v.peer || '—'}</td>
+    <td><span class="verdict-chip ${chipClass(v.verdict)}">${v.verdict}</span></td></tr>
+  `).join('')}
+`;
+
+// ===== AI RELEVANCE =====
+document.getElementById('ai-alliance').innerHTML = 'Alliance Rating: ' + D.aiRelevance.allianceRating;
+const axisNames = { AIDC: 'AIDC 인프라', AICC: 'AICC SaaS', SovereignAI: 'Sovereign AI', AX: 'AX 사업화' };
+document.getElementById('ai-axes').innerHTML = Object.entries(D.aiRelevance.axes).map(([k, v]) => `
+  <div class="ai-axis-card">
+    <div class="ai-axis-name">${axisNames[k] || k}</div>
+    <div class="ai-axis-score">${v.score}</div>
+    <div class="ai-axis-note">${v.note}</div>
+  </div>
+`).join('');
+
+// ===== GURU CARDS =====
+document.getElementById('guru-grid').innerHTML = D.gurus.map(g => `
+  <div class="guru-card">
+    <div class="guru-header">
+      <div>
+        <div class="guru-name">${g.name}</div>
+        <div class="guru-style">${g.style}</div>
+      </div>
+      <span class="guru-verdict ${verdictClass(g.verdict)}">${g.verdict}</span>
+    </div>
+    <div class="guru-confidence">Confidence: ${g.confidence}</div>
+    <ul class="guru-reasons">
+      ${g.reasons.map(r => `<li>${r}</li>`).join('')}
+    </ul>
+    <div class="guru-target"><strong>Target:</strong> ${fmt(g.target, D.currency)}</div>
+  </div>
+`).join('');
+
+// ===== RISKS =====
+function riskLevel(impact) {
+  if (impact === '높음') return 'high';
+  if (impact === '중간') return 'mid';
+  return 'low';
+}
+document.getElementById('risk-grid').innerHTML = D.risks.map(r => `
+  <div class="risk-card ${riskLevel(r.impact)}">
+    <div class="risk-type">${r.type} Risk</div>
+    <div class="risk-desc">${r.desc}</div>
+    <div class="risk-meta">Impact: ${r.impact} · Probability: ${r.probability}</div>
+  </div>
+`).join('');
+
+// ===== DISCLAIMER =====
+document.getElementById('disclaimer').innerHTML = '<strong>Disclaimer:</strong> ' + D.disclaimer;
+</script>
+</body>
+</html>
