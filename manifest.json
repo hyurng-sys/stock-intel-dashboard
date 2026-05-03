@@ -3,6 +3,19 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "type": "theme",
+      "theme": "광통신·CPO",
+      "category": "upstream",
+      "isoWeek": "2026-W18",
+      "date": "20260503",
+      "file": "sector_optical_cpo_20260503.html",
+      "topPicks": [
+        "FN",
+        "5803.T",
+        "COHR"
+      ]
+    },
+    {
       "company": "한국전력",
       "ticker": "015760.KS",
       "date": "20260502",

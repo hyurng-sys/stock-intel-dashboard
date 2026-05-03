@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Theme Intel — 광통신·CPO | 2026-05-03</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --magenta: #58A6FF;
+    --pink: #79C0FF;
+    --deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --up: #3FB950;
+    --down: #F47067;
+    --jp: #BC8CFF;
+    --us: #58A6FF;
+    --macro: #56D4DD;
+    --pick1: #FFD700;
+    --pick2: #BC8CFF;
+    --pick3: #58A6FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1320px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header { text-align: center; padding: 44px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 36px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 160px; height: 2px; background: linear-gradient(90deg, transparent, var(--macro), transparent); }
+  .header-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--macro); background: rgba(86,212,221,0.1); padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(86,212,221,0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header .meta { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: var(--text-secondary); flex-wrap: wrap; }
+  .meta-tag { background: rgba(48,54,61,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 3px 10px; font-size: 12px; }
+
+  /* Macro Grid */
+  .macro-section { background: linear-gradient(135deg, rgba(86,212,221,0.05), rgba(56,139,253,0.05)); border: 1px solid rgba(86,212,221,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .macro-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--macro); margin-bottom: 20px; }
+  .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .macro-card { background: rgba(13,17,23,0.6); border: 1px solid rgba(86,212,221,0.15); border-radius: 12px; padding: 16px; }
+  .macro-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .macro-value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .macro-sub { font-size: 12px; color: var(--macro); margin-top: 4px; }
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .trigger-card { background: rgba(63,185,80,0.05); border: 1px solid rgba(63,185,80,0.15); border-radius: 10px; padding: 14px; }
+  .trigger-title { font-size: 13px; font-weight: 700; color: var(--buy); margin-bottom: 4px; }
+  .trigger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .bottleneck-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bottleneck-tag { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.2); border-radius: 8px; padding: 4px 12px; font-size: 12px; color: var(--sell); }
+
+  /* Performance Chart */
+  .chart-full { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .chart-full h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .chart-full canvas { width: 100% !important; height: 360px !important; }
+
+  /* Matrix */
+  .matrix-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; overflow-x: auto; }
+  .matrix-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .matrix-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .matrix-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); vertical-align: middle; }
+  .matrix-table tr:hover td { background: rgba(28,33,40,0.6); }
+  .ticker-cell { font-weight: 800; font-family: 'SF Mono', monospace; }
+  .ticker-cell.us { color: var(--us); }
+  .ticker-cell.jp { color: var(--jp); }
+  .pct-up { color: var(--up); font-weight: 600; }
+  .pct-down { color: var(--down); font-weight: 600; }
+  .exposure-tag { font-size: 14px; }
+  .top-pick-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 6px; vertical-align: middle; }
+  .badge-1 { background: rgba(255,215,0,0.15); color: var(--pick1); border: 1px solid rgba(255,215,0,0.3); }
+  .badge-2 { background: rgba(188,140,255,0.15); color: var(--pick2); border: 1px solid rgba(188,140,255,0.3); }
+  .badge-3 { background: rgba(88,166,255,0.15); color: var(--pick3); border: 1px solid rgba(88,166,255,0.3); }
+
+  /* Top Picks */
+  .picks-section { margin-bottom: 28px; }
+  .picks-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .picks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pick-card { border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+  .pick-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0.04; }
+  .pick-card.rank-1 { background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.25); }
+  .pick-card.rank-2 { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.25); }
+  .pick-card.rank-3 { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.25); }
+  .pick-rank { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .pick-card.rank-1 .pick-rank { color: var(--pick1); }
+  .pick-card.rank-2 .pick-rank { color: var(--pick2); }
+  .pick-card.rank-3 .pick-rank { color: var(--pick3); }
+  .pick-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .pick-name { font-size: 20px; font-weight: 800; }
+  .pick-ticker { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .pick-price { text-align: right; font-size: 22px; font-weight: 700; }
+  .pick-1y { font-size: 12px; text-align: right; font-weight: 600; }
+  .pick-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; padding: 12px; background: rgba(13,17,23,0.4); border-radius: 8px; }
+  .pick-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .pick-target { background: rgba(13,17,23,0.5); border-radius: 8px; padding: 10px; text-align: center; }
+  .pick-target-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+  .pick-target-val { font-size: 14px; font-weight: 700; }
+  .pick-target.buy-t .pick-target-val { color: var(--text-secondary); }
+  .pick-target.t1 .pick-target-val { color: var(--buy); }
+  .pick-target.sl .pick-target-val { color: var(--sell); }
+  .pick-risks { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .pick-risks span { color: var(--sell); font-weight: 600; }
+
+  /* Watchlist */
+  .watchlist-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .watchlist-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .watchlist-table { width: 100%; border-collapse: collapse; }
+  .watchlist-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .watchlist-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 13px; }
+
+  /* LG Implications */
+  .lg-section { background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.04)); border: 1px solid rgba(88,166,255,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .lg-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--magenta); margin-bottom: 16px; }
+  .lg-item { display: flex; gap: 12px; margin-bottom: 12px; padding: 14px; background: rgba(13,17,23,0.4); border-radius: 10px; border-left: 3px solid rgba(88,166,255,0.4); }
+  .lg-num { font-size: 11px; font-weight: 800; color: var(--magenta); min-width: 20px; padding-top: 2px; }
+  .lg-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Sources */
+  .sources-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+  .sources-section h2 { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .source-list { list-style: none; }
+  .source-list li { font-size: 12px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid rgba(48,54,61,0.3); }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: var(--magenta); text-decoration: none; }
+
+  /* Disclaimer */
+  .disclaimer { background: rgba(244,112,103,0.05); border: 1px solid rgba(244,112,103,0.15); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  @media (max-width: 960px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .trigger-grid { grid-template-columns: 1fr; }
+    .picks-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="header-label">⚡ SECTOR THEME INTEL</div>
+    <h1 id="header-theme"></h1>
+    <div class="meta">
+      <span class="meta-tag" id="meta-category"></span>
+      <span class="meta-tag" id="meta-week"></span>
+      <span class="meta-tag" id="meta-date"></span>
+      <span class="meta-tag" id="meta-stocks"></span>
+    </div>
+  </header>
+
+  <!-- Macro Overview -->
+  <section class="macro-section">
+    <h2>📊 Phase 1 — 매크로 분석</h2>
+    <div class="macro-grid" id="macro-grid"></div>
+    <div class="trigger-grid" id="trigger-grid"></div>
+    <div class="bottleneck-list" id="bottleneck-list"></div>
+  </section>
+
+  <!-- 1-Year Performance Chart -->
+  <div class="chart-full">
+    <h2>📈 1-Year Relative Performance (정규화 기준, 1년 전=100)</h2>
+    <canvas id="perfChart"></canvas>
+  </div>
+
+  <!-- Comparison Matrix -->
+  <div class="matrix-section">
+    <h2>📋 Phase 2 — 종목 풀 비교 매트릭스 (총 <span id="stock-count"></span>개)</h2>
+    <table class="matrix-table" id="matrix-table"></table>
+  </div>
+
+  <!-- Top 3 Picks -->
+  <section class="picks-section">
+    <h2>🏆 Phase 3 — Top 3 픽</h2>
+    <div class="picks-grid" id="picks-grid"></div>
+  </section>
+
+  <!-- Watchlist -->
+  <div class="watchlist-section">
+    <h2>👁 Phase 4 — 워치리스트</h2>
+    <table class="watchlist-table" id="watchlist-table"></table>
+  </div>
+
+  <!-- LG U+ Implications -->
+  <div class="lg-section">
+    <h2>🇰🇷 Phase 5 — 한국·LG U+ 사업 시사점</h2>
+    <div id="lg-items"></div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-section">
+    <h2>참고 소스</h2>
+    <ul class="source-list" id="source-list"></ul>
+  </div>
+
+  <div class="disclaimer">
+    <strong>⚠ 면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">
+    Stock Intel Agent — LG U+ B2B AI &nbsp;|&nbsp; Generated by Claude Sonnet 4.6 &nbsp;|&nbsp; <span id="footer-date"></span>
+  </footer>
+</div>
+
+<script>
+const THEME_DATA = {"date": "2026-05-03", "theme": "광통신·CPO", "themeEn": "Optical/CPO", "category": "upstream", "isoWeek": "2026-W18", "macro": {"tam": {"current": "$16.5B", "target": "$38.2B", "year": 2032}, "cpo_tam": {"current": "$164M", "target": "$764M~$8.1B", "year": 2031, "cagr": "36~137%"}, "cagr": "57% YoY (2026)", "triggers": [{"title": "NVIDIA $4B 포토닉스 잠금", "desc": "COHR·LITE에 각 $2B 전략 투자, 다년간 구매 약정. Quantum-X InfiniBand + Spectrum-X CPO 플랫폼 공급망 선점."}, {"title": "800G→1.6T 세대 전환 가속", "desc": "2026년 AI 광트랜시버 $26B 전망(TrendForce). 800G+ 비중 60%+, 출하량 2.6배 급증. 1.6T 볼륨 배포 2026년 말 시작."}, {"title": "전력 한계 → CPO 의무화 압력", "desc": "기존 플러그어블 대비 CPO 전기손실 4dB 억제, 포트당 9W 절감. AI 랙 밀도 MW화로 CPO 전환 사실상 강제 구조화."}], "bottlenecks": ["InP(인듐인화물) 레이저 웨이퍼 2026년 5~15% 공급 결핍, 리드타임 2027년 이후", "Si-Ph vs InP 이종 집적 고정밀 정렬 공정 양산 수율 미성숙", "CPO 패키징 스케일업 지연 — 상용 배포 2026H2~2027년 예상"], "policy": ["미국 BIS 고급 이종 패키징 장비 3B001 신규 분류", "일본 Tier 1 우대 + 중국 수출 통제 크로스오버"]}, "stocks": [{"ticker": "COHR", "name": "Coherent Corp", "market": "NYSE", "price": 329.5, "currency": "USD", "pct1y": 359.9, "fwdPe": 37, "revGrowth": 24, "aiExposure": "◎", "lgRelevance": "◎", "category": "CPO/EML 핵심 부품", "note": "NVIDIA $2B 투자, InP 6인치 내재화", "priceHistory": [{"date": "2025-05-02", "close": 71.64}, {"date": "2025-05-09", "close": 70.57}, {"date": "2025-05-16", "close": 78.6}, {"date": "2025-05-23", "close": 78.46}, {"date": "2025-06-02", "close": 76.78}, {"date": "2025-06-09", "close": 81.19}, {"date": "2025-06-16", "close": 80.76}, {"date": "2025-06-24", "close": 80.96}, {"date": "2025-07-01", "close": 86.64}, {"date": "2025-07-09", "close": 91.25}, {"date": "2025-07-16", "close": 97.82}, {"date": "2025-07-23", "close": 98.43}, {"date": "2025-07-30", "close": 107.23}, {"date": "2025-08-06", "close": 107.15}, {"date": "2025-08-13", "close": 114.01}, {"date": "2025-08-20", "close": 86.55}, {"date": "2025-08-27", "close": 90.71}, {"date": "2025-09-04", "close": 95.62}, {"date": "2025-09-11", "close": 103.51}, {"date": "2025-09-18", "close": 108.05}, {"date": "2025-09-25", "close": 106.57}, {"date": "2025-10-02", "close": 112.79}, {"date": "2025-10-09", "close": 122.35}, {"date": "2025-10-16", "close": 115.96}, {"date": "2025-10-23", "close": 121.52}, {"date": "2025-10-30", "close": 132.71}, {"date": "2025-11-06", "close": 159.3}, {"date": "2025-11-13", "close": 139.97}, {"date": "2025-11-20", "close": 135.61}, {"date": "2025-11-28", "close": 164.26}, {"date": "2025-12-05", "close": 181.79}, {"date": "2025-12-12", "close": 178.34}, {"date": "2025-12-19", "close": 185.83}, {"date": "2025-12-29", "close": 189.02}, {"date": "2026-01-06", "close": 194.11}, {"date": "2026-01-13", "close": 190.03}, {"date": "2026-01-21", "close": 201.46}, {"date": "2026-01-28", "close": 221.14}, {"date": "2026-02-04", "close": 211.0}, {"date": "2026-02-11", "close": 223.69}, {"date": "2026-02-19", "close": 232.48}, {"date": "2026-02-26", "close": 250.14}, {"date": "2026-03-05", "close": 253.87}, {"date": "2026-03-12", "close": 241.27}, {"date": "2026-03-19", "close": 275.57}, {"date": "2026-03-26", "close": 243.29}, {"date": "2026-04-02", "close": 258.16}, {"date": "2026-04-10", "close": 307.5}, {"date": "2026-04-17", "close": 345.02}, {"date": "2026-04-24", "close": 336.09}, {"date": "2026-05-01", "close": 329.5}]}, {"ticker": "LITE", "name": "Lumentum", "market": "NASDAQ", "price": 949.93, "currency": "USD", "pct1y": 1411.2, "fwdPe": 52, "revGrowth": 18, "aiExposure": "◎", "lgRelevance": "△", "category": "200G EML 독점 지위", "note": "NVIDIA $2B 투자, 부채 $2B+ 리스크", "priceHistory": [{"date": "2025-05-02", "close": 62.86}, {"date": "2025-05-09", "close": 64.87}, {"date": "2025-05-16", "close": 77.95}, {"date": "2025-05-23", "close": 75.77}, {"date": "2025-06-02", "close": 75.86}, {"date": "2025-06-09", "close": 82.11}, {"date": "2025-06-16", "close": 85.78}, {"date": "2025-06-24", "close": 91.81}, {"date": "2025-07-01", "close": 91.49}, {"date": "2025-07-09", "close": 90.44}, {"date": "2025-07-16", "close": 99.63}, {"date": "2025-07-23", "close": 102.13}, {"date": "2025-07-30", "close": 109.85}, {"date": "2025-08-06", "close": 110.01}, {"date": "2025-08-13", "close": 120.23}, {"date": "2025-08-20", "close": 115.89}, {"date": "2025-08-27", "close": 125.84}, {"date": "2025-09-04", "close": 141.91}, {"date": "2025-09-11", "close": 164.88}, {"date": "2025-09-18", "close": 171.5}, {"date": "2025-09-25", "close": 159.11}, {"date": "2025-10-02", "close": 169.75}, {"date": "2025-10-09", "close": 159.76}, {"date": "2025-10-16", "close": 163.23}, {"date": "2025-10-23", "close": 168.5}, {"date": "2025-10-30", "close": 200.13}, {"date": "2025-11-06", "close": 239.68}, {"date": "2025-11-13", "close": 226.86}, {"date": "2025-11-20", "close": 233.24}, {"date": "2025-11-28", "close": 325.16}, {"date": "2025-12-05", "close": 331.41}, {"date": "2025-12-12", "close": 324.35}, {"date": "2025-12-19", "close": 371.43}, {"date": "2025-12-29", "close": 372.61}, {"date": "2026-01-06", "close": 397.42}, {"date": "2026-01-13", "close": 361.33}, {"date": "2026-01-21", "close": 362.44}, {"date": "2026-01-28", "close": 385.0}, {"date": "2026-02-04", "close": 465.54}, {"date": "2026-02-11", "close": 574.11}, {"date": "2026-02-19", "close": 635.64}, {"date": "2026-02-26", "close": 677.0}, {"date": "2026-03-05", "close": 650.82}, {"date": "2026-03-12", "close": 616.09}, {"date": "2026-03-19", "close": 772.13}, {"date": "2026-03-26", "close": 688.8}, {"date": "2026-04-02", "close": 826.88}, {"date": "2026-04-10", "close": 897.3}, {"date": "2026-04-17", "close": 894.07}, {"date": "2026-04-24", "close": 881.64}, {"date": "2026-05-01", "close": 949.93}]}, {"ticker": "CIEN", "name": "Ciena", "market": "NYSE", "price": 535.29, "currency": "USD", "pct1y": 634.8, "fwdPe": 120, "revGrowth": 26, "aiExposure": "○", "lgRelevance": "△", "category": "장거리 광 네트워킹", "note": "밸류에이션 부담 극심, AI 백본 수혜", "priceHistory": [{"date": "2025-05-02", "close": 72.85}, {"date": "2025-05-09", "close": 74.74}, {"date": "2025-05-16", "close": 81.24}, {"date": "2025-05-23", "close": 80.22}, {"date": "2025-06-02", "close": 81.75}, {"date": "2025-06-09", "close": 72.46}, {"date": "2025-06-16", "close": 73.76}, {"date": "2025-06-24", "close": 79.35}, {"date": "2025-07-01", "close": 80.11}, {"date": "2025-07-09", "close": 79.33}, {"date": "2025-07-16", "close": 84.12}, {"date": "2025-07-23", "close": 86.75}, {"date": "2025-07-30", "close": 92.95}, {"date": "2025-08-06", "close": 94.31}, {"date": "2025-08-13", "close": 94.66}, {"date": "2025-08-20", "close": 86.64}, {"date": "2025-08-27", "close": 92.74}, {"date": "2025-09-04", "close": 116.92}, {"date": "2025-09-11", "close": 132.5}, {"date": "2025-09-18", "close": 138.04}, {"date": "2025-09-25", "close": 137.17}, {"date": "2025-10-02", "close": 152.66}, {"date": "2025-10-09", "close": 163.61}, {"date": "2025-10-16", "close": 170.78}, {"date": "2025-10-23", "close": 172.58}, {"date": "2025-10-30", "close": 188.96}, {"date": "2025-11-06", "close": 201.46}, {"date": "2025-11-13", "close": 194.21}, {"date": "2025-11-20", "close": 176.45}, {"date": "2025-11-28", "close": 204.21}, {"date": "2025-12-05", "close": 201.71}, {"date": "2025-12-12", "close": 218.44}, {"date": "2025-12-19", "close": 230.34}, {"date": "2025-12-29", "close": 239.0}, {"date": "2026-01-06", "close": 254.19}, {"date": "2026-01-13", "close": 246.42}, {"date": "2026-01-21", "close": 231.89}, {"date": "2026-01-28", "close": 257.3}, {"date": "2026-02-04", "close": 253.5}, {"date": "2026-02-11", "close": 297.25}, {"date": "2026-02-19", "close": 318.41}, {"date": "2026-02-26", "close": 341.16}, {"date": "2026-03-05", "close": 299.3}, {"date": "2026-03-12", "close": 336.83}, {"date": "2026-03-19", "close": 412.58}, {"date": "2026-03-26", "close": 387.99}, {"date": "2026-04-02", "close": 447.76}, {"date": "2026-04-10", "close": 496.02}, {"date": "2026-04-17", "close": 507.43}, {"date": "2026-04-24", "close": 520.8}, {"date": "2026-05-01", "close": 535.29}]}, {"ticker": "IPGP", "name": "IPG Photonics", "market": "NASDAQ", "price": 122.87, "currency": "USD", "pct1y": 92.6, "fwdPe": 56, "revGrowth": 8, "aiExposure": "△", "lgRelevance": "✕", "category": "산업용 파이버 레이저", "note": "AI 직접 노출 제한, 회복 단계", "priceHistory": [{"date": "2025-05-02", "close": 63.8}, {"date": "2025-05-09", "close": 60.15}, {"date": "2025-05-16", "close": 66.49}, {"date": "2025-05-23", "close": 64.6}, {"date": "2025-06-02", "close": 66.46}, {"date": "2025-06-09", "close": 69.26}, {"date": "2025-06-16", "close": 68.1}, {"date": "2025-06-24", "close": 68.48}, {"date": "2025-07-01", "close": 71.05}, {"date": "2025-07-09", "close": 73.83}, {"date": "2025-07-16", "close": 73.63}, {"date": "2025-07-23", "close": 76.88}, {"date": "2025-07-30", "close": 77.04}, {"date": "2025-08-06", "close": 72.14}, {"date": "2025-08-13", "close": 80.34}, {"date": "2025-08-20", "close": 75.72}, {"date": "2025-08-27", "close": 83.63}, {"date": "2025-09-04", "close": 82.34}, {"date": "2025-09-11", "close": 82.6}, {"date": "2025-09-18", "close": 82.68}, {"date": "2025-09-25", "close": 79.28}, {"date": "2025-10-02", "close": 81.25}, {"date": "2025-10-09", "close": 86.67}, {"date": "2025-10-16", "close": 86.42}, {"date": "2025-10-23", "close": 86.66}, {"date": "2025-10-30", "close": 84.11}, {"date": "2025-11-06", "close": 89.75}, {"date": "2025-11-13", "close": 81.67}, {"date": "2025-11-20", "close": 72.46}, {"date": "2025-11-28", "close": 79.64}, {"date": "2025-12-05", "close": 81.92}, {"date": "2025-12-12", "close": 77.12}, {"date": "2025-12-19", "close": 75.86}, {"date": "2025-12-29", "close": 72.92}, {"date": "2026-01-06", "close": 79.47}, {"date": "2026-01-13", "close": 76.77}, {"date": "2026-01-21", "close": 85.45}, {"date": "2026-01-28", "close": 92.44}, {"date": "2026-02-04", "close": 99.89}, {"date": "2026-02-11", "close": 110.9}, {"date": "2026-02-19", "close": 130.03}, {"date": "2026-02-26", "close": 129.47}, {"date": "2026-03-05", "close": 126.77}, {"date": "2026-03-12", "close": 109.62}, {"date": "2026-03-19", "close": 122.78}, {"date": "2026-03-26", "close": 118.7}, {"date": "2026-04-02", "close": 113.94}, {"date": "2026-04-10", "close": 127.32}, {"date": "2026-04-17", "close": 125.02}, {"date": "2026-04-24", "close": 124.55}, {"date": "2026-05-01", "close": 122.87}]}, {"ticker": "FN", "name": "Fabrinet", "market": "NYSE", "price": 706.53, "currency": "USD", "pct1y": 223.7, "fwdPe": 34, "revGrowth": 20, "aiExposure": "◎", "lgRelevance": "△", "category": "광통신 위탁제조", "note": "가장 합리적 밸류에이션, COHR·LITE 간접 수혜", "priceHistory": [{"date": "2025-05-02", "close": 218.26}, {"date": "2025-05-09", "close": 202.62}, {"date": "2025-05-16", "close": 229.55}, {"date": "2025-05-23", "close": 230.28}, {"date": "2025-06-02", "close": 233.37}, {"date": "2025-06-09", "close": 232.83}, {"date": "2025-06-16", "close": 258.43}, {"date": "2025-06-24", "close": 276.5}, {"date": "2025-07-01", "close": 289.11}, {"date": "2025-07-09", "close": 285.21}, {"date": "2025-07-16", "close": 297.45}, {"date": "2025-07-23", "close": 305.2}, {"date": "2025-07-30", "close": 320.66}, {"date": "2025-08-06", "close": 332.45}, {"date": "2025-08-13", "close": 337.31}, {"date": "2025-08-20", "close": 280.33}, {"date": "2025-08-27", "close": 332.34}, {"date": "2025-09-04", "close": 362.16}, {"date": "2025-09-11", "close": 362.16}, {"date": "2025-09-18", "close": 378.01}, {"date": "2025-09-25", "close": 360.95}, {"date": "2025-10-02", "close": 369.56}, {"date": "2025-10-09", "close": 382.24}, {"date": "2025-10-16", "close": 412.46}, {"date": "2025-10-23", "close": 414.99}, {"date": "2025-10-30", "close": 438.0}, {"date": "2025-11-06", "close": 461.24}, {"date": "2025-11-13", "close": 402.47}, {"date": "2025-11-20", "close": 387.22}, {"date": "2025-11-28", "close": 459.41}, {"date": "2025-12-05", "close": 478.45}, {"date": "2025-12-12", "close": 470.89}, {"date": "2025-12-19", "close": 475.47}, {"date": "2025-12-29", "close": 472.08}, {"date": "2026-01-06", "close": 479.17}, {"date": "2026-01-13", "close": 489.0}, {"date": "2026-01-21", "close": 488.36}, {"date": "2026-01-28", "close": 501.0}, {"date": "2026-02-04", "close": 423.03}, {"date": "2026-02-11", "close": 465.53}, {"date": "2026-02-19", "close": 513.83}, {"date": "2026-02-26", "close": 562.44}, {"date": "2026-03-05", "close": 544.45}, {"date": "2026-03-12", "close": 512.8}, {"date": "2026-03-19", "close": 540.75}, {"date": "2026-03-26", "close": 549.7}, {"date": "2026-04-02", "close": 557.97}, {"date": "2026-04-10", "close": 662.13}, {"date": "2026-04-17", "close": 689.89}, {"date": "2026-04-24", "close": 720.19}, {"date": "2026-05-01", "close": 706.53}]}, {"ticker": "ANET", "name": "Arista Networks", "market": "NYSE", "price": 172.7, "currency": "USD", "pct1y": 89.7, "fwdPe": 47, "revGrowth": 19, "aiExposure": "○", "lgRelevance": "○", "category": "AI 이더넷 스위칭", "note": "Spectrum-X AI DC 지배, 시총 ~$218B", "priceHistory": [{"date": "2025-05-02", "close": 91.02}, {"date": "2025-05-09", "close": 86.52}, {"date": "2025-05-16", "close": 96.42}, {"date": "2025-05-23", "close": 91.2}, {"date": "2025-06-02", "close": 89.78}, {"date": "2025-06-09", "close": 96.8}, {"date": "2025-06-16", "close": 95.09}, {"date": "2025-06-24", "close": 94.97}, {"date": "2025-07-01", "close": 98.91}, {"date": "2025-07-09", "close": 106.28}, {"date": "2025-07-16", "close": 108.3}, {"date": "2025-07-23", "close": 113.04}, {"date": "2025-07-30", "close": 122.09}, {"date": "2025-08-06", "close": 138.78}, {"date": "2025-08-13", "close": 138.01}, {"date": "2025-08-20", "close": 131.47}, {"date": "2025-08-27", "close": 133.27}, {"date": "2025-09-04", "close": 141.17}, {"date": "2025-09-11", "close": 153.04}, {"date": "2025-09-18", "close": 146.66}, {"date": "2025-09-25", "close": 143.06}, {"date": "2025-10-02", "close": 144.46}, {"date": "2025-10-09", "close": 158.23}, {"date": "2025-10-16", "close": 146.01}, {"date": "2025-10-23", "close": 152.76}, {"date": "2025-10-30", "close": 158.44}, {"date": "2025-11-06", "close": 134.02}, {"date": "2025-11-13", "close": 130.3}, {"date": "2025-11-20", "close": 119.59}, {"date": "2025-11-28", "close": 130.68}, {"date": "2025-12-05", "close": 128.59}, {"date": "2025-12-12", "close": 124.76}, {"date": "2025-12-19", "close": 131.12}, {"date": "2025-12-29", "close": 134.15}, {"date": "2026-01-06", "close": 132.58}, {"date": "2026-01-13", "close": 129.93}, {"date": "2026-01-21", "close": 127.29}, {"date": "2026-01-28", "close": 150.15}, {"date": "2026-02-04", "close": 130.28}, {"date": "2026-02-11", "close": 140.66}, {"date": "2026-02-19", "close": 137.23}, {"date": "2026-02-26", "close": 130.25}, {"date": "2026-03-05", "close": 139.4}, {"date": "2026-03-12", "close": 134.03}, {"date": "2026-03-19", "close": 136.26}, {"date": "2026-03-26", "close": 122.55}, {"date": "2026-04-02", "close": 126.68}, {"date": "2026-04-10", "close": 147.35}, {"date": "2026-04-17", "close": 164.23}, {"date": "2026-04-24", "close": 176.91}, {"date": "2026-05-01", "close": 172.7}]}, {"ticker": "5803.T", "name": "후루카와전기 (Furukawa Electric)", "market": "TSE", "price": 5808, "currency": "JPY", "pct1y": 527.2, "fwdPe": 27, "revGrowth": 7, "aiExposure": "○", "lgRelevance": "○", "category": "고밀도 광케이블 제조", "note": "13,824심 세계 최고 밀도 양산, DC 직접 타깃", "priceHistory": [{"date": "2025-05-01", "close": 926.0}, {"date": "2025-05-12", "close": 1009.33}, {"date": "2025-05-19", "close": 965.67}, {"date": "2025-05-26", "close": 1051.33}, {"date": "2025-06-02", "close": 1134.67}, {"date": "2025-06-09", "close": 1178.33}, {"date": "2025-06-16", "close": 1142.5}, {"date": "2025-06-23", "close": 1118.83}, {"date": "2025-06-30", "close": 1261.83}, {"date": "2025-07-07", "close": 1235.0}, {"date": "2025-07-14", "close": 1258.67}, {"date": "2025-07-22", "close": 1407.17}, {"date": "2025-07-29", "close": 1490.0}, {"date": "2025-08-05", "close": 1779.17}, {"date": "2025-08-13", "close": 2000.0}, {"date": "2025-08-20", "close": 1888.33}, {"date": "2025-08-27", "close": 1945.83}, {"date": "2025-09-03", "close": 2083.33}, {"date": "2025-09-10", "close": 2271.67}, {"date": "2025-09-18", "close": 2267.5}, {"date": "2025-09-26", "close": 2350.0}, {"date": "2025-10-03", "close": 2355.83}, {"date": "2025-10-10", "close": 2760.0}, {"date": "2025-10-20", "close": 2865.83}, {"date": "2025-10-27", "close": 3225.83}, {"date": "2025-11-04", "close": 3451.67}, {"date": "2025-11-11", "close": 3214.17}, {"date": "2025-11-18", "close": 2979.17}, {"date": "2025-11-26", "close": 3005.83}, {"date": "2025-12-03", "close": 2838.33}, {"date": "2025-12-10", "close": 3076.67}, {"date": "2025-12-17", "close": 2754.17}, {"date": "2025-12-24", "close": 3011.67}, {"date": "2026-01-05", "close": 3074.17}, {"date": "2026-01-13", "close": 2860.83}, {"date": "2026-01-20", "close": 2813.33}, {"date": "2026-01-27", "close": 3061.67}, {"date": "2026-02-03", "close": 3630.0}, {"date": "2026-02-10", "close": 3843.33}, {"date": "2026-02-18", "close": 3723.33}, {"date": "2026-02-26", "close": 4577.5}, {"date": "2026-03-05", "close": 4386.67}, {"date": "2026-03-12", "close": 4283.33}, {"date": "2026-03-19", "close": 4221.67}, {"date": "2026-03-27", "close": 4605.0}, {"date": "2026-04-03", "close": 4616.0}, {"date": "2026-04-10", "close": 5630.0}, {"date": "2026-04-17", "close": 5762.0}, {"date": "2026-04-24", "close": 6037.0}]}, {"ticker": "5802.T", "name": "스미토모전기 (Sumitomo Electric)", "market": "TSE", "price": 9900, "currency": "JPY", "pct1y": 321.6, "fwdPe": 22, "revGrowth": 15, "aiExposure": "○", "lgRelevance": "○", "category": "광섬유 글로벌 최대 공급사", "note": "글로벌 물량 증대, 저평가 구간", "priceHistory": [{"date": "2025-05-01", "close": 2348.0}, {"date": "2025-05-12", "close": 2462.0}, {"date": "2025-05-19", "close": 2606.0}, {"date": "2025-05-26", "close": 2827.0}, {"date": "2025-06-02", "close": 3014.0}, {"date": "2025-06-09", "close": 3017.0}, {"date": "2025-06-16", "close": 2866.0}, {"date": "2025-06-23", "close": 2818.0}, {"date": "2025-06-30", "close": 3095.0}, {"date": "2025-07-07", "close": 3025.0}, {"date": "2025-07-14", "close": 3170.0}, {"date": "2025-07-22", "close": 3361.0}, {"date": "2025-07-29", "close": 3509.0}, {"date": "2025-08-05", "close": 3918.0}, {"date": "2025-08-13", "close": 4025.0}, {"date": "2025-08-20", "close": 3877.0}, {"date": "2025-08-27", "close": 4056.0}, {"date": "2025-09-03", "close": 4085.0}, {"date": "2025-09-10", "close": 4291.0}, {"date": "2025-09-18", "close": 4210.0}, {"date": "2025-09-26", "close": 4254.0}, {"date": "2025-10-03", "close": 4200.0}, {"date": "2025-10-10", "close": 4535.0}, {"date": "2025-10-20", "close": 4577.0}, {"date": "2025-10-27", "close": 4770.0}, {"date": "2025-11-04", "close": 6062.0}, {"date": "2025-11-11", "close": 5860.0}, {"date": "2025-11-18", "close": 5941.0}, {"date": "2025-11-26", "close": 6051.0}, {"date": "2025-12-03", "close": 6839.0}, {"date": "2025-12-10", "close": 6936.0}, {"date": "2025-12-17", "close": 6321.0}, {"date": "2025-12-24", "close": 6502.0}, {"date": "2026-01-05", "close": 6710.0}, {"date": "2026-01-13", "close": 6479.0}, {"date": "2026-01-20", "close": 6597.0}, {"date": "2026-01-27", "close": 6679.0}, {"date": "2026-02-03", "close": 7655.0}, {"date": "2026-02-10", "close": 8728.0}, {"date": "2026-02-18", "close": 8826.0}, {"date": "2026-02-26", "close": 10240.0}, {"date": "2026-03-05", "close": 9975.0}, {"date": "2026-03-12", "close": 10365.0}, {"date": "2026-03-19", "close": 9948.0}, {"date": "2026-03-27", "close": 9480.0}, {"date": "2026-04-03", "close": 9400.0}, {"date": "2026-04-10", "close": 10580.0}, {"date": "2026-04-17", "close": 9976.0}, {"date": "2026-04-24", "close": 10015.0}]}, {"ticker": "6981.T", "name": "무라타제작소 (Murata Mfg)", "market": "TSE", "price": 5138, "currency": "JPY", "pct1y": 166.1, "fwdPe": 25, "revGrowth": 3, "aiExposure": "△", "lgRelevance": "△", "category": "수동 부품·모듈", "note": "광통신 간접 노출, 안정적 재무", "priceHistory": [{"date": "2025-05-01", "close": 1930.5}, {"date": "2025-05-12", "close": 2071.5}, {"date": "2025-05-19", "close": 2081.0}, {"date": "2025-05-26", "close": 2058.5}, {"date": "2025-06-02", "close": 2068.5}, {"date": "2025-06-09", "close": 2106.0}, {"date": "2025-06-16", "close": 2084.0}, {"date": "2025-06-23", "close": 2050.5}, {"date": "2025-06-30", "close": 2154.0}, {"date": "2025-07-07", "close": 2086.0}, {"date": "2025-07-14", "close": 2123.5}, {"date": "2025-07-22", "close": 2144.5}, {"date": "2025-07-29", "close": 2225.0}, {"date": "2025-08-05", "close": 2300.0}, {"date": "2025-08-13", "close": 2426.5}, {"date": "2025-08-20", "close": 2390.0}, {"date": "2025-08-27", "close": 2427.0}, {"date": "2025-09-03", "close": 2424.0}, {"date": "2025-09-10", "close": 2484.5}, {"date": "2025-09-18", "close": 2651.5}, {"date": "2025-09-26", "close": 2806.5}, {"date": "2025-10-03", "close": 2823.5}, {"date": "2025-10-10", "close": 2842.0}, {"date": "2025-10-20", "close": 2923.5}, {"date": "2025-10-27", "close": 3041.0}, {"date": "2025-11-04", "close": 3458.0}, {"date": "2025-11-11", "close": 3178.0}, {"date": "2025-11-18", "close": 2991.0}, {"date": "2025-11-26", "close": 3169.0}, {"date": "2025-12-03", "close": 3315.0}, {"date": "2025-12-10", "close": 3406.0}, {"date": "2025-12-17", "close": 3190.0}, {"date": "2025-12-24", "close": 3164.0}, {"date": "2026-01-05", "close": 3330.0}, {"date": "2026-01-13", "close": 3308.0}, {"date": "2026-01-20", "close": 3306.0}, {"date": "2026-01-27", "close": 3228.0}, {"date": "2026-02-03", "close": 3318.0}, {"date": "2026-02-10", "close": 3319.0}, {"date": "2026-02-18", "close": 3610.0}, {"date": "2026-02-26", "close": 4088.0}, {"date": "2026-03-05", "close": 3808.0}, {"date": "2026-03-12", "close": 3720.0}, {"date": "2026-03-19", "close": 3748.0}, {"date": "2026-03-27", "close": 3745.0}, {"date": "2026-04-03", "close": 3789.0}, {"date": "2026-04-10", "close": 4146.0}, {"date": "2026-04-17", "close": 4600.0}, {"date": "2026-04-24", "close": 4936.0}]}], "topPicks": [{"rank": 1, "ticker": "FN", "name": "Fabrinet", "market": "NYSE", "price": 706.53, "currency": "USD", "buyPrice": 680, "target1": 820, "target1pct": 16, "stopLoss": 638, "stopLossPct": -10, "summary": "광통신 위탁제조의 유일한 가격 합리성 — AI 포토닉스 붐의 레버리지를 Forward PE 34x에 취득 가능", "thesis": "COHR·LITE의 핵심 제조 파트너로 NVIDIA $4B 투자 수혜를 간접 향유. 직접 공급 병목 리스크 없이 광통신 성장을 밸류에이션 프리미엄 없이 접근 가능한 유일한 종목.", "risks": ["주요 고객(COHR·LITE) 생산 내재화 리스크", "태국/대만 지정학 리스크"]}, {"rank": 2, "ticker": "5803.T", "name": "후루카와전기", "market": "TSE", "price": 5808, "currency": "JPY", "buyPrice": 5500, "target1": 7200, "target1pct": 24, "stopLoss": 5000, "stopLossPct": -14, "summary": "13,824심 세계 최고 밀도 광케이블 양산 + AI DC 직접 타깃 + 일본 Tier 1 정책 수혜 + Forward PE 27x", "thesis": "미국 동종 대비 Forward PE 27x의 저평가 구간에서 AI DC 광케이블 공급 직접 타깃. 엔화 약세 지속 시 USD 기준 추가 매력.", "risks": ["엔화 급강세 전환 시 환손실", "중국 수요 감소 상쇄 우려"]}, {"rank": 3, "ticker": "COHR", "name": "Coherent Corp", "market": "NYSE", "price": 329.5, "currency": "USD", "buyPrice": 300, "target1": 390, "target1pct": 18, "stopLoss": 285, "stopLossPct": -13, "summary": "NVIDIA 전략적 잠금 + InP 수직계열화 = CPO 시대 최전선 공급망 포지션", "thesis": "Quantum-X + Spectrum-X 두 플랫폼 모두 EML·광 엔진 공급. $2B 투자·다년 약정으로 매출 가시성 확보. CPO 본격 배포(2027~) 전 포지셔닝 적기.", "risks": ["순부채 ~$3.4B 부담", "Forward PE 37x 고평가 논쟁"]}], "watchlist": [{"ticker": "LITE", "name": "Lumentum", "trigger": "FY2026 4Q 실적(EML 판가·마진) 확인 후 재진입 — 부채 해소 진행 시 STRONG BUY 검토"}, {"ticker": "CIEN", "name": "Ciena", "trigger": "AI 백본 DCI 대형 수주 공시 — Forward PE 120x+ 정당화 매출 가시성 확인 시"}, {"ticker": "ANET", "name": "Arista Networks", "trigger": "Spectrum-X 누적 수주 $10B 돌파 또는 CPO 스위치 출하 시작 공식 발표 시"}, {"ticker": "5802.T", "name": "스미토모전기", "trigger": "광섬유 ASP 반등 공시 + 미국·유럽 DC향 물량 계약 확대 공개 시"}, {"ticker": "IPGP", "name": "IPG Photonics", "trigger": "AI DC용 신규 수주 공시 — AI 직접 노출 증거 확인 후 편입 재검토"}], "lgImplications": ["AIDC 인프라 비용 재산정 필요: 파주 AIDC 내부 인터커넥트 비용 40~60% 증가 예상. 800G 트랜시버 조기 확보 및 CPO 지원 가능 스위치 아키텍처 설계를 2026Q3 내 착수 권고.", "DBO 협상에서 광통신 CAPEX 분리 명시: 부산장림(코람코)·브룩필드 DBO 설계 시 광케이블·트랜시버 비용이 전통 IDC 대비 2배+ 증가 — 공급가 인덱스 조항 삽입 필요.", "후루카와전기·스미토모전기 공급망 파트너 타깃: 5803.T·5802.T 모두 LG U+ AIDC 광케이블 직접 공급 후보. 일본 미팅 아젠다 추가 — 후루카와 13,824심 케이블은 파주 고밀도 랙에 직접 적용 가능.", "EXAONE 클러스터 확장 시 CPO 로드맵 반영: 2026H2 확장 RFP에 CPO-ready 서버·스위치 사양 명시 권고. NVIDIA Spectrum-X CPO 플랫폼(2027년) 타임라인과 AIDC 증설 일정 연동.", "KT 대비 CAPEX 우위 전략: KT는 CIEN 장거리 광망 발주 진행 중. LG U+는 국내+일본 OEM 조합으로 15~20% CAPEX 절감 가능 — DBO NOC 협상 Floor 논리 활용 가능."], "sources": [{"title": "Global AI Optical Transceiver Market to Reach $26B — TrendForce", "url": "https://www.trendforce.com/presscenter/news/20260420-13017.html", "note": "TAM·800G+ 출하 데이터"}, {"title": "Nvidia to invest $4B into Coherent and Lumentum — CNBC", "url": "https://www.cnbc.com/2026/03/02/nvidia-investment-coherent-lumentum.html", "note": "NVIDIA $2B×2 전략 투자"}, {"title": "Co-Packaged Optics Market 2031 — Mordor Intelligence", "url": "https://www.mordorintelligence.com/industry-reports/co-packaged-optics-market", "note": "CPO TAM CAGR 36%"}, {"title": "Co-Packaged Optics 2025 — Yole Group", "url": "https://www.yolegroup.com/product/report/co-packaged-optics-2025/", "note": "CPO TAM $8.1B(2030) 낙관 시나리오"}, {"title": "Scaling AI Factories with Co-Packaged Optics — NVIDIA", "url": "https://developer.nvidia.com/blog/scaling-ai-factories-with-co-packaged-optics-for-better-power-efficiency/", "note": "CPO 전력 효율, 의무화 배경"}, {"title": "Indium Phosphide: Quiet Bottleneck — Substack", "url": "https://yianisz.substack.com/p/indium-phosphide-inp-the-quiet-bottleneck", "note": "InP 공급 병목 분석"}, {"title": "OFC 2026 Summary — TSPASemiconductor", "url": "https://tspasemiconductor.substack.com/p/ofc-2026-summary-how-silicon-photonics", "note": "OFC 2026 기술 동향"}, {"title": "CPO: Inevitable but Not Imminent — Cignal AI", "url": "https://cignal.ai/2025/02/co-packaged-optics-inevitable-but-not-imminent/", "note": "CPO 타임라인 리스크"}, {"title": "Furukawa Electric FY2025 Q3 Results", "url": "https://www.furukawaelectric.com/en/ir/library/finalreport/pdf/2026/20260209_pre.pdf", "note": "5803.T 실적"}, {"title": "Coherent Q2 FY2026 Earnings", "url": "https://www.fool.com/earnings/call-transcripts/2026/02/04/coherent-cohr-q2-2026-earnings-call-transcript/", "note": "COHR 실적"}, {"title": "2026 Export Controls Update — Hantec", "url": "https://www.hantecorg.com/news/Regulations/New-policy-updates-on-export-controls--Which-electronics-components-face-tighter-restrictions-in-2026-.html", "note": "BIS 수출 통제"}, {"title": "Optical Comms Trends 2026 — ADTEK", "url": "https://adtek-fiber.com/optical-communication-industry-trends-2026-ai-800g-1-6t-and-future-data-center-connectivity/", "note": "800G→1.6T 세대 전환"}]};
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function fmtPct(v) {
+  if (v == null) return '—';
+  const sign = v >= 0 ? '+' : '';
+  return `${sign}${v.toFixed(1)}%`;
+}
+function pctClass(v) { return v >= 0 ? 'pct-up' : 'pct-down'; }
+function fmtPrice(p, cur) {
+  if (cur === 'JPY') return `¥${p.toLocaleString()}`;
+  return `$${p.toFixed(2)}`;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────
+document.getElementById('header-theme').textContent = THEME_DATA.theme;
+document.getElementById('meta-category').textContent = THEME_DATA.category === 'upstream' ? '후방 (Upstream)' : '전방 (Downstream)';
+document.getElementById('meta-week').textContent = THEME_DATA.isoWeek;
+document.getElementById('meta-date').textContent = THEME_DATA.date;
+document.getElementById('meta-stocks').textContent = `종목 ${THEME_DATA.stocks.length}개 분석`;
+document.getElementById('footer-date').textContent = THEME_DATA.date;
+document.title = `Sector Theme Intel — ${THEME_DATA.theme} | ${THEME_DATA.date}`;
+
+// ── Macro ─────────────────────────────────────────────────────────────────
+const mg = document.getElementById('macro-grid');
+const macroCards = [
+  { label: 'AI 광트랜시버 TAM', value: THEME_DATA.macro.tam.current, sub: `→ ${THEME_DATA.macro.tam.target} (${THEME_DATA.macro.tam.year})` },
+  { label: 'CPO 시장 규모', value: THEME_DATA.macro.cpo_tam.current, sub: `→ ${THEME_DATA.macro.cpo_tam.target} (${THEME_DATA.macro.cpo_tam.year})` },
+  { label: 'CAGR (광트랜시버)', value: THEME_DATA.macro.cagr, sub: 'TrendForce 2026' },
+  { label: 'CPO CAGR', value: THEME_DATA.macro.cpo_tam.cagr, sub: 'Mordor Intelligence' },
+];
+mg.innerHTML = macroCards.map(c => `
+  <div class="macro-card">
+    <div class="macro-label">${c.label}</div>
+    <div class="macro-value">${c.value}</div>
+    <div class="macro-sub">${c.sub}</div>
+  </div>`).join('');
+
+const tg = document.getElementById('trigger-grid');
+tg.innerHTML = THEME_DATA.macro.triggers.map(t => `
+  <div class="trigger-card">
+    <div class="trigger-title">⚡ ${t.title}</div>
+    <div class="trigger-desc">${t.desc}</div>
+  </div>`).join('');
+
+const bl = document.getElementById('bottleneck-list');
+bl.innerHTML = THEME_DATA.macro.bottlenecks.map(b => `<span class="bottleneck-tag">⚠ ${b}</span>`).join('');
+
+// ── Performance Chart ─────────────────────────────────────────────────────
+const topTickers = THEME_DATA.topPicks.map(p => p.ticker);
+const perfCtx = document.getElementById('perfChart').getContext('2d');
+const colorMap = {
+  'COHR': '#FFD700', 'LITE': '#FF6B9D', 'CIEN': '#56D4DD',
+  'IPGP': '#8B949E', 'FN': '#3FB950', 'ANET': '#58A6FF',
+  '5803.T': '#BC8CFF', '5802.T': '#F7AC59', '6981.T': '#79C0FF'
+};
+
+// Normalize to 100 at start
+const perfDatasets = THEME_DATA.stocks.map(s => {
+  const hist = s.priceHistory;
+  if (!hist || hist.length === 0) return null;
+  const base = hist[0].close;
+  return {
+    label: s.ticker,
+    data: hist.map(h => ({ x: h.date, y: parseFloat(((h.close / base) * 100).toFixed(2)) })),
+    borderColor: colorMap[s.ticker] || '#888',
+    backgroundColor: 'transparent',
+    borderWidth: topTickers.includes(s.ticker) ? 2.5 : 1.2,
+    borderDash: topTickers.includes(s.ticker) ? [] : [4, 3],
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}).filter(Boolean);
+
+new Chart(perfCtx, {
+  type: 'line',
+  data: { datasets: perfDatasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, position: 'top', labels: { color: '#8B949E', font: { size: 11 }, usePointStyle: true, boxWidth: 10 } },
+      tooltip: { backgroundColor: '#1C2128', borderColor: '#30363D', borderWidth: 1, titleColor: '#E6EDF3', bodyColor: '#8B949E', callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}` } }
+    },
+    scales: {
+      x: { type: 'time', time: { unit: 'month', displayFormats: { month: 'YY/MM' } }, grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', maxTicksLimit: 12 } },
+      y: { grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', callback: v => `${v}` }, title: { display: true, text: '상대 수익률 (기준=100)', color: '#6E7681', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Matrix Table ──────────────────────────────────────────────────────────
+document.getElementById('stock-count').textContent = THEME_DATA.stocks.length;
+const mt = document.getElementById('matrix-table');
+const pickRanks = {};
+THEME_DATA.topPicks.forEach((p, i) => { pickRanks[p.ticker] = i + 1; });
+
+mt.innerHTML = `
+  <thead><tr>
+    <th>티커</th><th>종목명</th><th>시장</th>
+    <th>현재가</th><th>1년 수익률</th><th>Forward PE</th>
+    <th>매출 성장률</th><th>AI 익스포저</th><th>LG U+ 관련성</th><th>특징</th>
+  </tr></thead>
+  <tbody>${THEME_DATA.stocks.map(s => {
+    const rank = pickRanks[s.ticker];
+    const badge = rank ? `<span class="top-pick-badge badge-${rank}">TOP${rank}</span>` : '';
+    const mktClass = ['NYSE','NASDAQ'].includes(s.market) ? 'us' : 'jp';
+    return `<tr>
+      <td class="ticker-cell ${mktClass}">${s.ticker}${badge}</td>
+      <td>${s.name}</td>
+      <td><span class="meta-tag">${s.market}</span></td>
+      <td>${fmtPrice(s.price, s.currency)}</td>
+      <td class="${pctClass(s.pct1y)}">${fmtPct(s.pct1y)}</td>
+      <td>${s.fwdPe ? s.fwdPe + 'x' : '—'}</td>
+      <td class="${pctClass(s.revGrowth)}">${fmtPct(s.revGrowth)}</td>
+      <td class="exposure-tag">${s.aiExposure}</td>
+      <td class="exposure-tag">${s.lgRelevance}</td>
+      <td style="color:#8B949E;font-size:12px">${s.note}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── Top Picks ─────────────────────────────────────────────────────────────
+const pg = document.getElementById('picks-grid');
+pg.innerHTML = THEME_DATA.topPicks.map(p => `
+  <div class="pick-card rank-${p.rank}">
+    <div class="pick-rank">PICK ${p.rank}</div>
+    <div class="pick-header">
+      <div>
+        <div class="pick-name">${p.name}</div>
+        <div class="pick-ticker">${p.ticker} · ${p.market}</div>
+      </div>
+      <div>
+        <div class="pick-price">${fmtPrice(p.price, p.currency)}</div>
+        <div class="pick-1y pct-up">${fmtPct(THEME_DATA.stocks.find(s=>s.ticker===p.ticker)?.pct1y)} (1Y)</div>
+      </div>
+    </div>
+    <div class="pick-summary">${p.summary}</div>
+    <div class="pick-targets">
+      <div class="pick-target buy-t">
+        <div class="pick-target-label">매수가</div>
+        <div class="pick-target-val">${fmtPrice(p.buyPrice, p.currency)}</div>
+      </div>
+      <div class="pick-target t1">
+        <div class="pick-target-label">1차 목표가</div>
+        <div class="pick-target-val">${fmtPrice(p.target1, p.currency)} <small>(${fmtPct(p.target1pct)})</small></div>
+      </div>
+      <div class="pick-target sl">
+        <div class="pick-target-label">손절가</div>
+        <div class="pick-target-val">${fmtPrice(p.stopLoss, p.currency)} <small>(${fmtPct(p.stopLossPct)})</small></div>
+      </div>
+    </div>
+    <div class="pick-risks"><span>⚠ 리스크:</span> ${p.risks.join(' / ')}</div>
+  </div>`).join('');
+
+// ── Watchlist ─────────────────────────────────────────────────────────────
+const wt = document.getElementById('watchlist-table');
+wt.innerHTML = `
+  <thead><tr><th>#</th><th>티커</th><th>종목명</th><th>현재가</th><th>1Y</th><th>다음 분기 트리거</th></tr></thead>
+  <tbody>${THEME_DATA.watchlist.map((w, i) => {
+    const s = THEME_DATA.stocks.find(x => x.ticker === w.ticker);
+    return `<tr>
+      <td style="color:#6E7681">${i+1}</td>
+      <td class="ticker-cell ${['NYSE','NASDAQ'].includes(s?.market) ? 'us' : 'jp'}">${w.ticker}</td>
+      <td>${w.name}</td>
+      <td>${s ? fmtPrice(s.price, s.currency) : '—'}</td>
+      <td class="${pctClass(s?.pct1y || 0)}">${fmtPct(s?.pct1y)}</td>
+      <td style="font-size:12px;color:#8B949E">${w.trigger}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── LG Implications ───────────────────────────────────────────────────────
+const li = document.getElementById('lg-items');
+li.innerHTML = THEME_DATA.lgImplications.map((t, i) => `
+  <div class="lg-item">
+    <div class="lg-num">${i+1}</div>
+    <div class="lg-text">${t}</div>
+  </div>`).join('');
+
+// ── Sources ───────────────────────────────────────────────────────────────
+if (THEME_DATA.sources) {
+  const sl = document.getElementById('source-list');
+  sl.innerHTML = THEME_DATA.sources.map((s, i) => `
+    <li>${i+1}. <a href="${s.url}" target="_blank">${s.title}</a> — ${s.note}</li>`).join('');
+}
+</script>
+</body>
+</html>

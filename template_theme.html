@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Theme Intel — {{THEME}} | {{DATE}}</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --magenta: #58A6FF;
+    --pink: #79C0FF;
+    --deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --up: #3FB950;
+    --down: #F47067;
+    --jp: #BC8CFF;
+    --us: #58A6FF;
+    --macro: #56D4DD;
+    --pick1: #FFD700;
+    --pick2: #BC8CFF;
+    --pick3: #58A6FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1320px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header { text-align: center; padding: 44px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 36px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 160px; height: 2px; background: linear-gradient(90deg, transparent, var(--macro), transparent); }
+  .header-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--macro); background: rgba(86,212,221,0.1); padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(86,212,221,0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header .meta { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: var(--text-secondary); flex-wrap: wrap; }
+  .meta-tag { background: rgba(48,54,61,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 3px 10px; font-size: 12px; }
+
+  /* Macro Grid */
+  .macro-section { background: linear-gradient(135deg, rgba(86,212,221,0.05), rgba(56,139,253,0.05)); border: 1px solid rgba(86,212,221,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .macro-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--macro); margin-bottom: 20px; }
+  .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .macro-card { background: rgba(13,17,23,0.6); border: 1px solid rgba(86,212,221,0.15); border-radius: 12px; padding: 16px; }
+  .macro-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .macro-value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .macro-sub { font-size: 12px; color: var(--macro); margin-top: 4px; }
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .trigger-card { background: rgba(63,185,80,0.05); border: 1px solid rgba(63,185,80,0.15); border-radius: 10px; padding: 14px; }
+  .trigger-title { font-size: 13px; font-weight: 700; color: var(--buy); margin-bottom: 4px; }
+  .trigger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .bottleneck-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bottleneck-tag { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.2); border-radius: 8px; padding: 4px 12px; font-size: 12px; color: var(--sell); }
+
+  /* Performance Chart */
+  .chart-full { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .chart-full h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .chart-full canvas { width: 100% !important; height: 360px !important; }
+
+  /* Matrix */
+  .matrix-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; overflow-x: auto; }
+  .matrix-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .matrix-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .matrix-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); vertical-align: middle; }
+  .matrix-table tr:hover td { background: rgba(28,33,40,0.6); }
+  .ticker-cell { font-weight: 800; font-family: 'SF Mono', monospace; }
+  .ticker-cell.us { color: var(--us); }
+  .ticker-cell.jp { color: var(--jp); }
+  .pct-up { color: var(--up); font-weight: 600; }
+  .pct-down { color: var(--down); font-weight: 600; }
+  .exposure-tag { font-size: 14px; }
+  .top-pick-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 6px; vertical-align: middle; }
+  .badge-1 { background: rgba(255,215,0,0.15); color: var(--pick1); border: 1px solid rgba(255,215,0,0.3); }
+  .badge-2 { background: rgba(188,140,255,0.15); color: var(--pick2); border: 1px solid rgba(188,140,255,0.3); }
+  .badge-3 { background: rgba(88,166,255,0.15); color: var(--pick3); border: 1px solid rgba(88,166,255,0.3); }
+
+  /* Top Picks */
+  .picks-section { margin-bottom: 28px; }
+  .picks-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .picks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pick-card { border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+  .pick-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0.04; }
+  .pick-card.rank-1 { background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.25); }
+  .pick-card.rank-2 { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.25); }
+  .pick-card.rank-3 { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.25); }
+  .pick-rank { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .pick-card.rank-1 .pick-rank { color: var(--pick1); }
+  .pick-card.rank-2 .pick-rank { color: var(--pick2); }
+  .pick-card.rank-3 .pick-rank { color: var(--pick3); }
+  .pick-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .pick-name { font-size: 20px; font-weight: 800; }
+  .pick-ticker { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .pick-price { text-align: right; font-size: 22px; font-weight: 700; }
+  .pick-1y { font-size: 12px; text-align: right; font-weight: 600; }
+  .pick-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; padding: 12px; background: rgba(13,17,23,0.4); border-radius: 8px; }
+  .pick-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .pick-target { background: rgba(13,17,23,0.5); border-radius: 8px; padding: 10px; text-align: center; }
+  .pick-target-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+  .pick-target-val { font-size: 14px; font-weight: 700; }
+  .pick-target.buy-t .pick-target-val { color: var(--text-secondary); }
+  .pick-target.t1 .pick-target-val { color: var(--buy); }
+  .pick-target.sl .pick-target-val { color: var(--sell); }
+  .pick-risks { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .pick-risks span { color: var(--sell); font-weight: 600; }
+
+  /* Watchlist */
+  .watchlist-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .watchlist-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .watchlist-table { width: 100%; border-collapse: collapse; }
+  .watchlist-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .watchlist-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 13px; }
+
+  /* LG Implications */
+  .lg-section { background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.04)); border: 1px solid rgba(88,166,255,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .lg-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--magenta); margin-bottom: 16px; }
+  .lg-item { display: flex; gap: 12px; margin-bottom: 12px; padding: 14px; background: rgba(13,17,23,0.4); border-radius: 10px; border-left: 3px solid rgba(88,166,255,0.4); }
+  .lg-num { font-size: 11px; font-weight: 800; color: var(--magenta); min-width: 20px; padding-top: 2px; }
+  .lg-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Sources */
+  .sources-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+  .sources-section h2 { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .source-list { list-style: none; }
+  .source-list li { font-size: 12px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid rgba(48,54,61,0.3); }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: var(--magenta); text-decoration: none; }
+
+  /* Disclaimer */
+  .disclaimer { background: rgba(244,112,103,0.05); border: 1px solid rgba(244,112,103,0.15); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  @media (max-width: 960px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .trigger-grid { grid-template-columns: 1fr; }
+    .picks-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="header-label">⚡ SECTOR THEME INTEL</div>
+    <h1 id="header-theme"></h1>
+    <div class="meta">
+      <span class="meta-tag" id="meta-category"></span>
+      <span class="meta-tag" id="meta-week"></span>
+      <span class="meta-tag" id="meta-date"></span>
+      <span class="meta-tag" id="meta-stocks"></span>
+    </div>
+  </header>
+
+  <!-- Macro Overview -->
+  <section class="macro-section">
+    <h2>📊 Phase 1 — 매크로 분석</h2>
+    <div class="macro-grid" id="macro-grid"></div>
+    <div class="trigger-grid" id="trigger-grid"></div>
+    <div class="bottleneck-list" id="bottleneck-list"></div>
+  </section>
+
+  <!-- 1-Year Performance Chart -->
+  <div class="chart-full">
+    <h2>📈 1-Year Relative Performance (정규화 기준, 1년 전=100)</h2>
+    <canvas id="perfChart"></canvas>
+  </div>
+
+  <!-- Comparison Matrix -->
+  <div class="matrix-section">
+    <h2>📋 Phase 2 — 종목 풀 비교 매트릭스 (총 <span id="stock-count"></span>개)</h2>
+    <table class="matrix-table" id="matrix-table"></table>
+  </div>
+
+  <!-- Top 3 Picks -->
+  <section class="picks-section">
+    <h2>🏆 Phase 3 — Top 3 픽</h2>
+    <div class="picks-grid" id="picks-grid"></div>
+  </section>
+
+  <!-- Watchlist -->
+  <div class="watchlist-section">
+    <h2>👁 Phase 4 — 워치리스트</h2>
+    <table class="watchlist-table" id="watchlist-table"></table>
+  </div>
+
+  <!-- LG U+ Implications -->
+  <div class="lg-section">
+    <h2>🇰🇷 Phase 5 — 한국·LG U+ 사업 시사점</h2>
+    <div id="lg-items"></div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-section">
+    <h2>참고 소스</h2>
+    <ul class="source-list" id="source-list"></ul>
+  </div>
+
+  <div class="disclaimer">
+    <strong>⚠ 면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">
+    Stock Intel Agent — LG U+ B2B AI &nbsp;|&nbsp; Generated by Claude Sonnet 4.6 &nbsp;|&nbsp; <span id="footer-date"></span>
+  </footer>
+</div>
+
+<script>
+const THEME_DATA = {{DATA_JSON}};
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function fmtPct(v) {
+  if (v == null) return '—';
+  const sign = v >= 0 ? '+' : '';
+  return `${sign}${v.toFixed(1)}%`;
+}
+function pctClass(v) { return v >= 0 ? 'pct-up' : 'pct-down'; }
+function fmtPrice(p, cur) {
+  if (cur === 'JPY') return `¥${p.toLocaleString()}`;
+  return `$${p.toFixed(2)}`;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────
+document.getElementById('header-theme').textContent = THEME_DATA.theme;
+document.getElementById('meta-category').textContent = THEME_DATA.category === 'upstream' ? '후방 (Upstream)' : '전방 (Downstream)';
+document.getElementById('meta-week').textContent = THEME_DATA.isoWeek;
+document.getElementById('meta-date').textContent = THEME_DATA.date;
+document.getElementById('meta-stocks').textContent = `종목 ${THEME_DATA.stocks.length}개 분석`;
+document.getElementById('footer-date').textContent = THEME_DATA.date;
+document.title = `Sector Theme Intel — ${THEME_DATA.theme} | ${THEME_DATA.date}`;
+
+// ── Macro ─────────────────────────────────────────────────────────────────
+const mg = document.getElementById('macro-grid');
+const macroCards = [
+  { label: 'AI 광트랜시버 TAM', value: THEME_DATA.macro.tam.current, sub: `→ ${THEME_DATA.macro.tam.target} (${THEME_DATA.macro.tam.year})` },
+  { label: 'CPO 시장 규모', value: THEME_DATA.macro.cpo_tam.current, sub: `→ ${THEME_DATA.macro.cpo_tam.target} (${THEME_DATA.macro.cpo_tam.year})` },
+  { label: 'CAGR (광트랜시버)', value: THEME_DATA.macro.cagr, sub: 'TrendForce 2026' },
+  { label: 'CPO CAGR', value: THEME_DATA.macro.cpo_tam.cagr, sub: 'Mordor Intelligence' },
+];
+mg.innerHTML = macroCards.map(c => `
+  <div class="macro-card">
+    <div class="macro-label">${c.label}</div>
+    <div class="macro-value">${c.value}</div>
+    <div class="macro-sub">${c.sub}</div>
+  </div>`).join('');
+
+const tg = document.getElementById('trigger-grid');
+tg.innerHTML = THEME_DATA.macro.triggers.map(t => `
+  <div class="trigger-card">
+    <div class="trigger-title">⚡ ${t.title}</div>
+    <div class="trigger-desc">${t.desc}</div>
+  </div>`).join('');
+
+const bl = document.getElementById('bottleneck-list');
+bl.innerHTML = THEME_DATA.macro.bottlenecks.map(b => `<span class="bottleneck-tag">⚠ ${b}</span>`).join('');
+
+// ── Performance Chart ─────────────────────────────────────────────────────
+const topTickers = THEME_DATA.topPicks.map(p => p.ticker);
+const perfCtx = document.getElementById('perfChart').getContext('2d');
+const colorMap = {
+  'COHR': '#FFD700', 'LITE': '#FF6B9D', 'CIEN': '#56D4DD',
+  'IPGP': '#8B949E', 'FN': '#3FB950', 'ANET': '#58A6FF',
+  '5803.T': '#BC8CFF', '5802.T': '#F7AC59', '6981.T': '#79C0FF'
+};
+
+// Normalize to 100 at start
+const perfDatasets = THEME_DATA.stocks.map(s => {
+  const hist = s.priceHistory;
+  if (!hist || hist.length === 0) return null;
+  const base = hist[0].close;
+  return {
+    label: s.ticker,
+    data: hist.map(h => ({ x: h.date, y: parseFloat(((h.close / base) * 100).toFixed(2)) })),
+    borderColor: colorMap[s.ticker] || '#888',
+    backgroundColor: 'transparent',
+    borderWidth: topTickers.includes(s.ticker) ? 2.5 : 1.2,
+    borderDash: topTickers.includes(s.ticker) ? [] : [4, 3],
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}).filter(Boolean);
+
+new Chart(perfCtx, {
+  type: 'line',
+  data: { datasets: perfDatasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, position: 'top', labels: { color: '#8B949E', font: { size: 11 }, usePointStyle: true, boxWidth: 10 } },
+      tooltip: { backgroundColor: '#1C2128', borderColor: '#30363D', borderWidth: 1, titleColor: '#E6EDF3', bodyColor: '#8B949E', callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}` } }
+    },
+    scales: {
+      x: { type: 'time', time: { unit: 'month', displayFormats: { month: 'YY/MM' } }, grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', maxTicksLimit: 12 } },
+      y: { grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', callback: v => `${v}` }, title: { display: true, text: '상대 수익률 (기준=100)', color: '#6E7681', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Matrix Table ──────────────────────────────────────────────────────────
+document.getElementById('stock-count').textContent = THEME_DATA.stocks.length;
+const mt = document.getElementById('matrix-table');
+const pickRanks = {};
+THEME_DATA.topPicks.forEach((p, i) => { pickRanks[p.ticker] = i + 1; });
+
+mt.innerHTML = `
+  <thead><tr>
+    <th>티커</th><th>종목명</th><th>시장</th>
+    <th>현재가</th><th>1년 수익률</th><th>Forward PE</th>
+    <th>매출 성장률</th><th>AI 익스포저</th><th>LG U+ 관련성</th><th>특징</th>
+  </tr></thead>
+  <tbody>${THEME_DATA.stocks.map(s => {
+    const rank = pickRanks[s.ticker];
+    const badge = rank ? `<span class="top-pick-badge badge-${rank}">TOP${rank}</span>` : '';
+    const mktClass = ['NYSE','NASDAQ'].includes(s.market) ? 'us' : 'jp';
+    return `<tr>
+      <td class="ticker-cell ${mktClass}">${s.ticker}${badge}</td>
+      <td>${s.name}</td>
+      <td><span class="meta-tag">${s.market}</span></td>
+      <td>${fmtPrice(s.price, s.currency)}</td>
+      <td class="${pctClass(s.pct1y)}">${fmtPct(s.pct1y)}</td>
+      <td>${s.fwdPe ? s.fwdPe + 'x' : '—'}</td>
+      <td class="${pctClass(s.revGrowth)}">${fmtPct(s.revGrowth)}</td>
+      <td class="exposure-tag">${s.aiExposure}</td>
+      <td class="exposure-tag">${s.lgRelevance}</td>
+      <td style="color:#8B949E;font-size:12px">${s.note}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── Top Picks ─────────────────────────────────────────────────────────────
+const pg = document.getElementById('picks-grid');
+pg.innerHTML = THEME_DATA.topPicks.map(p => `
+  <div class="pick-card rank-${p.rank}">
+    <div class="pick-rank">PICK ${p.rank}</div>
+    <div class="pick-header">
+      <div>
+        <div class="pick-name">${p.name}</div>
+        <div class="pick-ticker">${p.ticker} · ${p.market}</div>
+      </div>
+      <div>
+        <div class="pick-price">${fmtPrice(p.price, p.currency)}</div>
+        <div class="pick-1y pct-up">${fmtPct(THEME_DATA.stocks.find(s=>s.ticker===p.ticker)?.pct1y)} (1Y)</div>
+      </div>
+    </div>
+    <div class="pick-summary">${p.summary}</div>
+    <div class="pick-targets">
+      <div class="pick-target buy-t">
+        <div class="pick-target-label">매수가</div>
+        <div class="pick-target-val">${fmtPrice(p.buyPrice, p.currency)}</div>
+      </div>
+      <div class="pick-target t1">
+        <div class="pick-target-label">1차 목표가</div>
+        <div class="pick-target-val">${fmtPrice(p.target1, p.currency)} <small>(${fmtPct(p.target1pct)})</small></div>
+      </div>
+      <div class="pick-target sl">
+        <div class="pick-target-label">손절가</div>
+        <div class="pick-target-val">${fmtPrice(p.stopLoss, p.currency)} <small>(${fmtPct(p.stopLossPct)})</small></div>
+      </div>
+    </div>
+    <div class="pick-risks"><span>⚠ 리스크:</span> ${p.risks.join(' / ')}</div>
+  </div>`).join('');
+
+// ── Watchlist ─────────────────────────────────────────────────────────────
+const wt = document.getElementById('watchlist-table');
+wt.innerHTML = `
+  <thead><tr><th>#</th><th>티커</th><th>종목명</th><th>현재가</th><th>1Y</th><th>다음 분기 트리거</th></tr></thead>
+  <tbody>${THEME_DATA.watchlist.map((w, i) => {
+    const s = THEME_DATA.stocks.find(x => x.ticker === w.ticker);
+    return `<tr>
+      <td style="color:#6E7681">${i+1}</td>
+      <td class="ticker-cell ${['NYSE','NASDAQ'].includes(s?.market) ? 'us' : 'jp'}">${w.ticker}</td>
+      <td>${w.name}</td>
+      <td>${s ? fmtPrice(s.price, s.currency) : '—'}</td>
+      <td class="${pctClass(s?.pct1y || 0)}">${fmtPct(s?.pct1y)}</td>
+      <td style="font-size:12px;color:#8B949E">${w.trigger}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── LG Implications ───────────────────────────────────────────────────────
+const li = document.getElementById('lg-items');
+li.innerHTML = THEME_DATA.lgImplications.map((t, i) => `
+  <div class="lg-item">
+    <div class="lg-num">${i+1}</div>
+    <div class="lg-text">${t}</div>
+  </div>`).join('');
+
+// ── Sources ───────────────────────────────────────────────────────────────
+if (THEME_DATA.sources) {
+  const sl = document.getElementById('source-list');
+  sl.innerHTML = THEME_DATA.sources.map((s, i) => `
+    <li>${i+1}. <a href="${s.url}" target="_blank">${s.title}</a> — ${s.note}</li>`).join('');
+}
+</script>
+</body>
+</html>
