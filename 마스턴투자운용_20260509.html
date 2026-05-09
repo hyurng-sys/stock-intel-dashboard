@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Intelligence — 마스턴투자운용 | IPO Monitor | 2026-05-09</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --uplus-magenta: #58A6FF;
+    --uplus-pink: #79C0FF;
+    --uplus-deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --ipo: #BC8CFF;
+    --axis-fund: #58A6FF;
+    --axis-val: #79C0FF;
+    --axis-tech: #BC8CFF;
+    --axis-ai: #56D4DD;
+    --axis-risk: #F47067;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard Variable', -apple-system, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--ipo), transparent);
+  }
+  .header-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ipo);
+    background: rgba(188, 140, 255, 0.1);
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(188, 140, 255, 0.25);
+    margin-bottom: 16px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header .date { font-size: 16px; color: var(--text-secondary); font-weight: 400; }
+
+  .ipo-banner {
+    text-align: center;
+    padding: 28px;
+    border-radius: 16px;
+    margin-bottom: 28px;
+    background: rgba(188, 140, 255, 0.08);
+    border: 1px solid rgba(188, 140, 255, 0.3);
+  }
+  .ipo-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-text { font-size: 36px; font-weight: 800; letter-spacing: 2px; color: var(--ipo); margin-bottom: 8px; }
+  .ipo-sub { font-size: 14px; color: var(--text-secondary); }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .card h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .overview-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .overview-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .overview-value { font-size: 24px; font-weight: 800; color: var(--uplus-magenta); }
+  .overview-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  .tbl { width: 100%; border-collapse: collapse; }
+  .tbl th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px; border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid rgba(48,54,61,0.4); }
+  .tbl td:first-child { font-weight: 600; color: var(--text-primary); }
+
+  .chip { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; }
+  .chip.good { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .chip.neutral { background: rgba(210,153,34,0.12); color: var(--hold); }
+  .chip.bad { background: rgba(244,112,103,0.12); color: var(--sell); }
+  .chip.ipo { background: rgba(188,140,255,0.12); color: var(--ipo); }
+
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .pipeline-card {
+    background: rgba(48,54,61,0.3);
+    border-radius: 12px;
+    padding: 18px;
+    border-left: 3px solid var(--uplus-magenta);
+  }
+  .pipeline-name { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .pipeline-detail { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .pipeline-status { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; margin-top: 8px; }
+  .pipeline-status.active { background: rgba(63,185,80,0.12); color: var(--buy); }
+  .pipeline-status.dev { background: rgba(88,166,255,0.12); color: var(--uplus-magenta); }
+  .pipeline-status.plan { background: rgba(210,153,34,0.12); color: var(--hold); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .chart-card h3 { font-size: 13px; font-weight: 600; color: var(--text-secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .chart-wrap { display: flex; justify-content: center; align-items: center; height: 260px; }
+  .chart-wrap canvas { max-height: 260px; }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(86,212,221,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(86,212,221,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .ai-section h3 { font-size: 13px; font-weight: 600; color: var(--axis-ai); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .ai-axes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .ai-axis-card { background: rgba(13,17,23,0.5); border-radius: 10px; padding: 14px; text-align: center; }
+  .ai-axis-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .ai-axis-score { font-size: 20px; margin-bottom: 4px; }
+  .ai-axis-note { font-size: 11px; color: var(--text-muted); }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .risk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .risk-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; border-left: 3px solid; }
+  .risk-card.high { border-left-color: var(--sell); }
+  .risk-card.mid { border-left-color: var(--hold); }
+  .risk-card.low { border-left-color: var(--buy); }
+  .risk-type { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .risk-card.high .risk-type { color: var(--sell); }
+  .risk-card.mid .risk-type { color: var(--hold); }
+  .risk-card.low .risk-type { color: var(--buy); }
+  .risk-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+  .risk-meta { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+
+  .disclaimer {
+    background: rgba(244,112,103,0.05);
+    border: 1px solid rgba(244,112,103,0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .disclaimer strong { color: var(--sell); }
+
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  .meeting-context {
+    background: linear-gradient(135deg, rgba(188,140,255,0.06), rgba(88,166,255,0.06));
+    border: 1px solid rgba(188,140,255,0.2);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+  }
+  .meeting-context h3 { font-size: 13px; font-weight: 600; color: var(--ipo); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+  .meeting-info { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+  .meeting-info strong { color: var(--text-primary); }
+
+  .valuation-bar {
+    position: relative;
+    height: 50px;
+    background: rgba(48,54,61,0.5);
+    border-radius: 8px;
+    margin: 24px 0 50px;
+    overflow: visible;
+  }
+  .val-marker {
+    position: absolute;
+    top: -6px;
+    width: 3px;
+    height: 62px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+  .val-marker-label {
+    position: absolute;
+    top: 62px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .val-range {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: 8px;
+    opacity: 0.15;
+  }
+
+  .alert-banner {
+    background: rgba(244,112,103,0.08);
+    border: 1px solid rgba(244,112,103,0.3);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--sell);
+  }
+  .alert-banner strong { font-weight: 700; }
+
+  @media (max-width: 900px) {
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .pipeline-grid { grid-template-columns: 1fr; }
+    .ai-axes { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+    .ipo-text { font-size: 28px; }
+    .overview-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-label">IPO Monitor Mode</div>
+    <h1>마스턴투자운용</h1>
+    <p class="date">2026-05-09 · 비상장 (독립계 대체투자 운용사 · 국내 2위 부동산 AUM)</p>
+  </header>
+
+  <!-- Alert: 금감원 제재 -->
+  <div class="alert-banner">
+    <strong>⚠ 리스크 경고 (2025.07):</strong> 금융감독원 기관경고 조치 — 전임 김대형 대표 직무정지 의견. 박형석 신임 대표 2025년 12월 취임, 조직 안정화 과정 중.
+  </div>
+
+  <!-- IPO Monitor Banner -->
+  <div class="ipo-banner">
+    <div class="ipo-label">COMPREHENSIVE VERDICT</div>
+    <div class="ipo-text">IPO MONITOR</div>
+    <div class="ipo-sub">비상장사 — IPO 추진 계획 없음 · 전략적 2대주주 유치 협상 중 · IPO 시 재검토 · DBO 파트너 관점 우선</div>
+  </div>
+
+  <!-- Meeting Context -->
+  <div class="meeting-context">
+    <h3>Meeting Context</h3>
+    <div class="meeting-info">
+      <strong>미팅 상대:</strong> 박형석 대표이사 — 2026.05.11<br>
+      <strong>주요 경력:</strong> 삼성물산 → CBRE 코리아 자산관리부문 → 오라이언파트너스코리아 부동산투자 대표 → 코람코자산운용 합류(2013) → 코람코자산운용 대표이사(2017~2025, 약 8년) → 마스턴투자운용 대표이사(2025.12~). 고려대 건축공학 학석사·코넬대 부동산학 석사. ULI 한국 회장(2024~)<br>
+      <strong>핵심 어젠다:</strong> 금감원 제재 후 "신뢰 회복·턴어라운드" — 2대주주 유치·데이터센터 개발 가속화<br>
+      <strong>배경 주목:</strong> 코람코 전임 대표 → LG U+ DBO 파트너(부산장림) 직접 운영 경험. U+ AIDC 전략 맥락 정통
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+  <div class="overview-grid">
+    <div class="overview-item">
+      <div class="overview-label">AUM</div>
+      <div class="overview-value">30.6조</div>
+      <div class="overview-note">국내 2위 (2025년 최신)</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">누적 AUM</div>
+      <div class="overview-value">36조</div>
+      <div class="overview-note">설립 이후 누적</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">DC 사업비</div>
+      <div class="overview-value">1.8조</div>
+      <div class="overview-note">가평 1.6조 + 영등포 0.2조</div>
+    </div>
+    <div class="overview-item">
+      <div class="overview-label">DC 파이프라인</div>
+      <div class="overview-value">130MW</div>
+      <div class="overview-note">가평 120MW + 영등포 10MW</div>
+    </div>
+  </div>
+
+  <!-- Company Overview -->
+  <div class="card">
+    <h3>Company Overview</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>내용</th><th>비고</th></tr>
+      <tr><td>회사명</td><td>마스턴투자운용 주식회사</td><td>2009년 2월 설립</td></tr>
+      <tr><td>포지션</td><td>독립계 대체투자 부동산 자산운용사</td><td>"이마코" 3대 독립계 중 1사</td></tr>
+      <tr><td>주요 사업</td><td>부동산 사모펀드(REF), 리츠(REITs), PF 기반 부동산 개발</td><td></td></tr>
+      <tr><td>상장 리츠</td><td>마스턴프리미어리츠 (KOSPI, 2022.05~)</td><td>운용사 법인 자체는 비상장</td></tr>
+      <tr><td>글로벌 순위</td><td>IPE Real Assets 선정 국내 2위 부동산 운용사</td><td>2024년 기준</td></tr>
+      <tr><td>상장 여부</td><td><span class="chip ipo">비상장</span></td><td>IPO 추진 계획 없음</td></tr>
+      <tr><td>지분 구조</td><td>전략적 2대주주 유치 협상 중 (RCPS 250~300억원 검토)</td><td>싱가포르 CCGI 등 후보</td></tr>
+      <tr><td>규제 이슈</td><td>금감원 기관경고 (2025.07), 전임 대표 직무정지 의견</td><td><span class="chip bad">리스크</span></td></tr>
+    </table>
+  </div>
+
+  <!-- Estimated Valuation -->
+  <div class="card">
+    <h3>Estimated Valuation (추정)</h3>
+    <table class="tbl">
+      <tr><th>시나리오</th><th>추정 가치</th><th>산출 근거</th><th>비고</th></tr>
+      <tr><td style="color:var(--sell)">매수자 기준</td><td style="font-weight:800">2,333~2,800억원</td><td>에이치PE 협상 — 지분 25~30%에 700억원 제시 (결렬)</td><td>매수자 보수 기준, 실제보다 낮을 것</td></tr>
+      <tr><td style="color:var(--sell)">보수적</td><td style="font-weight:800">3,060억원</td><td>AUM 30.6조 × 1.0% (제재 리스크 할인)</td><td>금감원 제재 디스카운트 반영</td></tr>
+      <tr><td style="color:var(--hold)">기본</td><td style="font-weight:800">4,590억원</td><td>AUM 30.6조 × 1.5% (글로벌 대체투자 운용사 평균)</td><td>DC 파이프라인 일부 반영</td></tr>
+      <tr><td style="color:var(--buy)">낙관적</td><td style="font-weight:800">7,000억원+</td><td>AUM 30.6조 × 2.0% + 가평 DC 개발이익 프리미엄 (1.6조 사업비)</td><td>DC 디벨로퍼 가치 Full 반영</td></tr>
+    </table>
+    <div class="valuation-bar">
+      <div class="val-range" style="left:8%;width:65%;background:var(--ipo)"></div>
+      <div class="val-marker" style="left:10%;background:var(--sell)"><div class="val-marker-label" style="color:var(--sell)">에이치PE 2,333억</div></div>
+      <div class="val-marker" style="left:22%;background:var(--sell)"><div class="val-marker-label" style="color:var(--sell)">보수 3,060억</div></div>
+      <div class="val-marker" style="left:48%;background:var(--hold)"><div class="val-marker-label" style="color:var(--hold)">기본 4,590억</div></div>
+      <div class="val-marker" style="left:75%;background:var(--buy)"><div class="val-marker-label" style="color:var(--buy)">낙관 7,000억+</div></div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px">
+      * 글로벌 대체투자 운용사(Brookfield, KKR 등) AUM 대비 시가총액 비율(1~3%)과 국내 부동산 운용사 M&A 사례 기반 추정. 에이치PE 협상(2025.11 결렬)은 매수자 관점의 하한선. 금감원 제재로 인한 디스카운트 20~30% 반영.
+    </p>
+  </div>
+
+  <!-- IPO Prospect -->
+  <div class="card">
+    <h3>IPO / Listing Prospect</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>상세</th><th>판정</th></tr>
+      <tr><td>자체 IPO</td><td>공식 추진 계획 없음 — 전략적 2대주주 유치 우선 (파트너십 구축 목표)</td><td><span class="chip neutral">계획 없음</span></td></tr>
+      <tr><td>2대주주 유치</td><td>RCPS 250~300억원 발행 검토, 싱가포르 CCGI 포함 복수 후보. 경영권 매각 아닌 전략적 협력</td><td><span class="chip good">진행 중</span></td></tr>
+      <tr><td>리츠 상장 가능성</td><td>마스턴프리미어리츠 이미 상장(2022). 신규 DC 리츠 상장 가능성 배제 불가</td><td><span class="chip neutral">가능성 있음</span></td></tr>
+      <tr><td>예상 시기</td><td>자체 IPO: 불투명 / DC 리츠: 가평·영등포 완공(2028) 후 검토 가능</td><td><span class="chip ipo">2028년 이후</span></td></tr>
+      <tr><td>에이치PE 협상</td><td>지분 25~30% / 700억원 인수 협상 — 가격 이견으로 결렬(2025.11)</td><td><span class="chip bad">결렬</span></td></tr>
+    </table>
+  </div>
+
+  <!-- Data Center Pipeline -->
+  <div class="card">
+    <h3>Data Center Pipeline — 가평 + 영등포 2트랙</h3>
+    <div class="pipeline-grid">
+      <div class="pipeline-card">
+        <div class="pipeline-name">가평 하이퍼스케일 DC</div>
+        <div class="pipeline-detail">
+          경기도 가평군 · <strong>120MW</strong> · 연면적 13.3만㎡ (축구장 18개)<br>
+          사업비 <strong>1조 6,000억원</strong> · 파트너: 가평군 + 엔필드(시행사)<br>
+          MOU 체결: 2023년 / 완공 목표: 2028년<br>
+          준공 시 국내 최대 규모 데이터센터 전망
+        </div>
+        <span class="pipeline-status plan">개발 추진</span>
+      </div>
+      <div class="pipeline-card">
+        <div class="pipeline-name">영등포 엣지 DC (국내 최초)</div>
+        <div class="pipeline-detail">
+          서울 영등포구 · <strong>10MW</strong> · 연면적 9,733㎡<br>
+          사업비 약 <strong>2,000억원</strong> (본PF 전환 완료)<br>
+          시공: 한화 건설부문 · 임차: 미래에셋증권(전량 확약)<br>
+          주관: 한국투자증권·미래에셋증권 / 완공 목표: 2028년 하반기<br>
+          <em>국내 자산운용사 최초 도심형 엣지 DC 개발</em>
+        </div>
+        <span class="pipeline-status dev">본PF 전환</span>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:16px;text-align:center">
+      총 파이프라인: 가평 120MW + 영등포 10MW = <strong style="color:var(--uplus-magenta)">130MW (개발 중)</strong> — 사업비 합계 약 1.8조원
+    </p>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Business Portfolio (사업 구성 추정)</h3>
+      <div class="chart-wrap"><canvas id="portfolioChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h3>DC Pipeline Capacity (MW)</h3>
+      <div class="chart-wrap"><canvas id="dcChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- AI Business Relevance -->
+  <div class="ai-section">
+    <h3>AI Business Relevance — U+ 시너지 평가</h3>
+    <div style="font-size:20px;font-weight:700;margin-bottom:16px">얼라이언스 평가: 미등록 (신규 평가 필요) — DBO 파트너 잠재 후보군</div>
+    <div class="ai-axes">
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AIDC 인프라</div>
+        <div class="ai-axis-score" style="color:var(--buy)">◎</div>
+        <div class="ai-axis-note">130MW DC 개발 직접 연관<br>U+ DBO 파트너 후보</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AICC SaaS</div>
+        <div class="ai-axis-score" style="color:var(--text-muted)">✕</div>
+        <div class="ai-axis-note">해당 없음</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">Sovereign AI</div>
+        <div class="ai-axis-score" style="color:var(--hold)">○</div>
+        <div class="ai-axis-note">IDC 인프라 제공 →<br>소버린클라우드 연계 가능</div>
+      </div>
+      <div class="ai-axis-card">
+        <div class="ai-axis-name">AX 사업화</div>
+        <div class="ai-axis-score" style="color:var(--text-muted)">△</div>
+        <div class="ai-axis-note">간접 연관<br>(DC 임차사 통한 AX)</div>
+      </div>
+    </div>
+    <div style="margin-top:20px;font-size:13px;color:var(--text-secondary);line-height:1.7">
+      <strong style="color:var(--axis-ai)">U+ 시너지 포인트:</strong>
+      마스턴투자운용은 독립계 최대 규모 부동산 자산운용사이자 국내 데이터센터 개발에서 빠르게 존재감을 높이는 플레이어.
+      가평 120MW 하이퍼스케일 DC는 글로벌 CSP·AI 기업의 장기 앵커 임차가 관건으로, U+ 네트워크 연결·공동 유치 시너지가 높음.
+      박형석 신임 대표가 코람코 시절 U+ DBO(부산장림) 파트너십의 상대방이었다는 점에서 협상 맥락과 언어가 공유됨.
+      단, 마스턴은 DC 운용보다 개발·금융 조달 전문이므로 U+의 직접 운영 모델(NOC 포함)과 역할 분리가 필요.
+    </div>
+  </div>
+
+  <!-- Comparable Companies -->
+  <div class="card">
+    <h3>Comparable Companies & Listed REITs</h3>
+    <table class="tbl">
+      <tr><th>기업/리츠</th><th>유형</th><th>시장</th><th>주요 지표</th><th>마스턴 시사점</th></tr>
+      <tr><td>마스턴프리미어리츠</td><td>오피스·물류 리츠</td><td>KOSPI</td><td>배당수익률 ~6.5%, 분기배당, AUM ~2.3조</td><td>마스턴 리츠 운용 트랙레코드</td></tr>
+      <tr><td>코람코자산운용</td><td>독립계 부동산 운용</td><td>비상장</td><td>AUM ~17조, DC 1.4GW 목표, 의정부 100MW 등</td><td>직접 경쟁사, DBO 모델 공유</td></tr>
+      <tr><td>이지스자산운용</td><td>독립계 부동산 운용</td><td>비상장</td><td>AUM ~45조, 국내 1위 독립계</td><td>벤치마크 경쟁사</td></tr>
+      <tr><td>이퀴닉스(EQIX)</td><td>DC 리츠</td><td>NASDAQ</td><td>시총 ~$85B, 260+ DC, P/FFO ~30x</td><td>글로벌 DC 리츠 밸류에이션 기준</td></tr>
+      <tr><td>맥쿼리인프라</td><td>인프라 펀드</td><td>KOSPI</td><td>시총 ~7조, 배당수익률 ~5%, AUM ~13조</td><td>국내 대체투자 상장 참고</td></tr>
+    </table>
+  </div>
+
+  <!-- Risk Assessment -->
+  <h2 class="section-title">Risk Assessment</h2>
+  <div class="risk-grid">
+    <div class="risk-card high">
+      <div class="risk-type">금감원 제재 리스크</div>
+      <div class="risk-desc">2025.07 기관경고 조치, 전임 대표 직무정지 의견. 신임 대표 체제 안정화 전 투자 불확실성 높음. 제재 원인 미공개</div>
+      <div class="risk-meta">Impact: 높음 · Probability: 진행 중</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-type">가평 DC 자금조달</div>
+      <div class="risk-desc">사업비 1.6조원 규모 대형 개발. 전력 인프라(120MW 수전) 확보·인허가·PF 조달이 모두 리스크 포인트. 단일 프로젝트 집중 위험</div>
+      <div class="risk-meta">Impact: 높음 · Probability: 중간</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">경영진 교체 후유증</div>
+      <div class="risk-desc">박형석 대표 취임(2025.12) 후 조직 안정화 과정. 기존 팀 이탈·운용 연속성 리스크. 2대주주 유치 협상 병행 부담</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 중간</div>
+    </div>
+    <div class="risk-card mid">
+      <div class="risk-type">2대주주 유치 협상</div>
+      <div class="risk-desc">에이치PE 협상 결렬(2025.11), 싱가포르 CCGI 검토 중. 협상 장기화 시 투자자 신뢰 약화. 조건 불리 시 희석 위험</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 중간</div>
+    </div>
+    <div class="risk-card low">
+      <div class="risk-type">경쟁 및 시장 리스크</div>
+      <div class="risk-desc">코람코·이지스·SK에코플랜트·한화 등 DC 개발 경쟁 심화. 대형 건설사의 자금력 열위. 부동산 펀드 시장 금리 민감성</div>
+      <div class="risk-meta">Impact: 중간 · Probability: 높음</div>
+    </div>
+  </div>
+
+  <!-- IPO Verdict -->
+  <div class="card" style="border-color:rgba(188,140,255,0.3)">
+    <h3 style="color:var(--ipo)">IPO Monitoring Verdict</h3>
+    <table class="tbl">
+      <tr><th>항목</th><th>판정</th><th>근거</th></tr>
+      <tr><td>자체 IPO 가능성</td><td><span class="chip bad">낮음 (단기)</span></td><td>IPO보다 전략적 2대주주 유치 선택. 금감원 제재 후 당분간 내부 안정화 우선</td></tr>
+      <tr><td>DC 리츠 상장 가능성</td><td><span class="chip neutral">중간 (중장기)</span></td><td>마스턴프리미어리츠 운용 경험 있으나, 신규 DC 리츠는 완공(2028) 후 검토</td></tr>
+      <tr><td>투자 매력도 (현재)</td><td><span class="chip neutral">대기</span></td><td>비상장·제재 이슈로 직접 투자 불가. 향후 DC 리츠 공모 참여 검토 가치</td></tr>
+      <tr><td>미팅 시사점</td><td><span class="chip ipo">DBO 전략 파트너</span></td><td>주식 투자보다 U+ AIDC DBO 파트너십이 핵심. 박형석 대표 코람코 경험 활용</td></tr>
+    </table>
+    <div style="margin-top:16px;padding:16px;background:rgba(188,140,255,0.06);border-radius:10px;font-size:13px;color:var(--text-secondary);line-height:1.7">
+      <strong style="color:var(--ipo)">종합 판정:</strong> 마스턴투자운용은 비상장사로 현재 직접 주식 투자가 불가하며, IPO 추진 계획도 없음.
+      <strong>단기 투자 관점보다 DBO 전략 파트너십 관점</strong>이 우선. 가평 120MW 하이퍼스케일 DC는 U+의 Borrow 모델(코로케이션 캐파 확보·상면 영업권)과 정합성이 높음.
+      박형석 대표는 코람코 시절 U+ DBO 파트너십을 직접 경험한 인물로, <strong>미팅에서는 NOC 협상 논리(25% + Conversion Clause)와 Borrow 3중 매출 구조</strong>를 적극 활용할 것.
+      DC 리츠 상장(2028년 이후 가능) 시에는 공모 앵커 투자 검토 가치 있음.
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다.
+    비상장사 추정 밸류에이션은 공개 정보와 업계 평균 멀티플을 기반으로 한 가정이며, 실제 가치와 상이할 수 있습니다.
+    모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Stock Intelligence Report — IPO Monitor Mode — Generated by Claude Code · 2026-05-09
+  </footer>
+
+</div>
+
+<script>
+// Portfolio Chart
+new Chart(document.getElementById('portfolioChart').getContext('2d'), {
+  type: 'doughnut',
+  data: {
+    labels: ['부동산 사모펀드', '데이터센터 개발', '리츠 운용', 'PF/기타'],
+    datasets: [{
+      data: [55, 25, 15, 5],
+      backgroundColor: ['#58A6FF', '#BC8CFF', '#56D4DD', '#8B949E'],
+      borderColor: '#161B22',
+      borderWidth: 3,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '55%',
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#B0B0C0', padding: 12, font: { size: 11, family: 'Pretendard Variable' }, usePointStyle: true, pointStyle: 'circle' }
+      }
+    }
+  }
+});
+
+// DC Pipeline Chart
+new Chart(document.getElementById('dcChart').getContext('2d'), {
+  type: 'bar',
+  data: {
+    labels: ['가평 (2028년 목표)', '영등포 (2028H2)'],
+    datasets: [{
+      label: 'MW',
+      data: [120, 10],
+      backgroundColor: ['#BC8CFF', '#58A6FF'],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#161B22',
+        borderColor: '#30363D',
+        borderWidth: 1,
+        titleColor: '#E6EDF3',
+        bodyColor: '#8B949E',
+        callbacks: { label: ctx => ctx.parsed.x + ' MW · 사업비: ' + (ctx.dataIndex === 0 ? '1.6조원' : '~2,000억원') }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(48,54,61,0.4)', drawBorder: false },
+        ticks: { color: '#6E7681', font: { size: 10 }, callback: v => v + ' MW' }
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#B0B0C0', font: { size: 12, weight: '600', family: 'Pretendard Variable' } }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
