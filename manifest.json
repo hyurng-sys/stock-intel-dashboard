@@ -377,6 +377,14 @@
       "date": "20260509",
       "file": "마스턴투자운용_20260509.html",
       "verdict": "IPO MONITOR"
+    },
+    {
+      "company": "삼일씨티에스(주)",
+      "ticker": "비상장",
+      "date": "20260509",
+      "file": "삼일씨티에스_20260509.html",
+      "verdict": "IPO MONITOR",
+      "market": "코스닥 미상장"
     }
   ]
 }
