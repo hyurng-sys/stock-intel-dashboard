@@ -3,6 +3,16 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "GS건설",
+      "ticker": "006360.KS",
+      "date": "20260509",
+      "file": "GS건설_20260509.html",
+      "verdict": "HOLD",
+      "currentPrice": 37350,
+      "market": "KOSPI",
+      "meetingCounterpart": "박남태 상무 건축영업부문장"
+    },
+    {
       "type": "theme",
       "theme": "광통신·CPO",
       "category": "upstream",
