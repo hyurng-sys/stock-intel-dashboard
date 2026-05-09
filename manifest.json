@@ -3,6 +3,14 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "채널톡",
+      "ticker": "비상장",
+      "date": "20260509",
+      "file": "채널톡_20260509.html",
+      "verdict": "IPO 모니터링",
+      "mode": "ipo_monitoring"
+    },
+    {
       "company": "GS건설",
       "ticker": "006360.KS",
       "date": "20260509",
