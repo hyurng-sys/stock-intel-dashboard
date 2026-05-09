@@ -393,6 +393,13 @@
       "file": "삼일씨티에스_20260509.html",
       "verdict": "IPO MONITOR",
       "market": "코스닥 미상장"
+    },
+    {
+      "company": "코람코자산운용",
+      "ticker": "비상장",
+      "date": "20260509",
+      "file": "코람코자산운용_20260509.html",
+      "verdict": "IPO MONITOR"
     }
   ]
 }
