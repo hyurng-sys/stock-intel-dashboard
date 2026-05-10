@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Theme Intel — AI 헬스케어 | 2026-05-10</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --magenta: #58A6FF;
+    --pink: #79C0FF;
+    --deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --up: #3FB950;
+    --down: #F47067;
+    --jp: #BC8CFF;
+    --us: #58A6FF;
+    --macro: #56D4DD;
+    --pick1: #FFD700;
+    --pick2: #BC8CFF;
+    --pick3: #58A6FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1320px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header { text-align: center; padding: 44px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 36px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 160px; height: 2px; background: linear-gradient(90deg, transparent, var(--macro), transparent); }
+  .header-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--macro); background: rgba(86,212,221,0.1); padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(86,212,221,0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header .meta { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: var(--text-secondary); flex-wrap: wrap; }
+  .meta-tag { background: rgba(48,54,61,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 3px 10px; font-size: 12px; }
+
+  /* Macro Grid */
+  .macro-section { background: linear-gradient(135deg, rgba(86,212,221,0.05), rgba(56,139,253,0.05)); border: 1px solid rgba(86,212,221,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .macro-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--macro); margin-bottom: 20px; }
+  .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .macro-card { background: rgba(13,17,23,0.6); border: 1px solid rgba(86,212,221,0.15); border-radius: 12px; padding: 16px; }
+  .macro-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .macro-value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .macro-sub { font-size: 12px; color: var(--macro); margin-top: 4px; }
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .trigger-card { background: rgba(63,185,80,0.05); border: 1px solid rgba(63,185,80,0.15); border-radius: 10px; padding: 14px; }
+  .trigger-title { font-size: 13px; font-weight: 700; color: var(--buy); margin-bottom: 4px; }
+  .trigger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .bottleneck-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bottleneck-tag { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.2); border-radius: 8px; padding: 4px 12px; font-size: 12px; color: var(--sell); }
+
+  /* Performance Chart */
+  .chart-full { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .chart-full h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .chart-full canvas { width: 100% !important; height: 360px !important; }
+
+  /* Matrix */
+  .matrix-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; overflow-x: auto; }
+  .matrix-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .matrix-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .matrix-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); vertical-align: middle; }
+  .matrix-table tr:hover td { background: rgba(28,33,40,0.6); }
+  .ticker-cell { font-weight: 800; font-family: 'SF Mono', monospace; }
+  .ticker-cell.us { color: var(--us); }
+  .ticker-cell.jp { color: var(--jp); }
+  .pct-up { color: var(--up); font-weight: 600; }
+  .pct-down { color: var(--down); font-weight: 600; }
+  .exposure-tag { font-size: 14px; }
+  .top-pick-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 6px; vertical-align: middle; }
+  .badge-1 { background: rgba(255,215,0,0.15); color: var(--pick1); border: 1px solid rgba(255,215,0,0.3); }
+  .badge-2 { background: rgba(188,140,255,0.15); color: var(--pick2); border: 1px solid rgba(188,140,255,0.3); }
+  .badge-3 { background: rgba(88,166,255,0.15); color: var(--pick3); border: 1px solid rgba(88,166,255,0.3); }
+
+  /* Top Picks */
+  .picks-section { margin-bottom: 28px; }
+  .picks-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .picks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pick-card { border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+  .pick-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0.04; }
+  .pick-card.rank-1 { background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.25); }
+  .pick-card.rank-2 { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.25); }
+  .pick-card.rank-3 { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.25); }
+  .pick-rank { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .pick-card.rank-1 .pick-rank { color: var(--pick1); }
+  .pick-card.rank-2 .pick-rank { color: var(--pick2); }
+  .pick-card.rank-3 .pick-rank { color: var(--pick3); }
+  .pick-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .pick-name { font-size: 20px; font-weight: 800; }
+  .pick-ticker { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .pick-price { text-align: right; font-size: 22px; font-weight: 700; }
+  .pick-1y { font-size: 12px; text-align: right; font-weight: 600; }
+  .pick-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; padding: 12px; background: rgba(13,17,23,0.4); border-radius: 8px; }
+  .pick-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .pick-target { background: rgba(13,17,23,0.5); border-radius: 8px; padding: 10px; text-align: center; }
+  .pick-target-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+  .pick-target-val { font-size: 14px; font-weight: 700; }
+  .pick-target.buy-t .pick-target-val { color: var(--text-secondary); }
+  .pick-target.t1 .pick-target-val { color: var(--buy); }
+  .pick-target.sl .pick-target-val { color: var(--sell); }
+  .pick-risks { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .pick-risks span { color: var(--sell); font-weight: 600; }
+
+  /* Watchlist */
+  .watchlist-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .watchlist-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .watchlist-table { width: 100%; border-collapse: collapse; }
+  .watchlist-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .watchlist-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 13px; }
+
+  /* LG Implications */
+  .lg-section { background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.04)); border: 1px solid rgba(88,166,255,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .lg-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--magenta); margin-bottom: 16px; }
+  .lg-item { display: flex; gap: 12px; margin-bottom: 12px; padding: 14px; background: rgba(13,17,23,0.4); border-radius: 10px; border-left: 3px solid rgba(88,166,255,0.4); }
+  .lg-num { font-size: 11px; font-weight: 800; color: var(--magenta); min-width: 20px; padding-top: 2px; }
+  .lg-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Sources */
+  .sources-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+  .sources-section h2 { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .source-list { list-style: none; }
+  .source-list li { font-size: 12px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid rgba(48,54,61,0.3); }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: var(--magenta); text-decoration: none; }
+
+  /* Disclaimer */
+  .disclaimer { background: rgba(244,112,103,0.05); border: 1px solid rgba(244,112,103,0.15); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  @media (max-width: 960px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .trigger-grid { grid-template-columns: 1fr; }
+    .picks-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="header-label">⚡ SECTOR THEME INTEL</div>
+    <h1 id="header-theme"></h1>
+    <div class="meta">
+      <span class="meta-tag" id="meta-category"></span>
+      <span class="meta-tag" id="meta-week"></span>
+      <span class="meta-tag" id="meta-date"></span>
+      <span class="meta-tag" id="meta-stocks"></span>
+    </div>
+  </header>
+
+  <!-- Macro Overview -->
+  <section class="macro-section">
+    <h2>📊 Phase 1 — 매크로 분석</h2>
+    <div class="macro-grid" id="macro-grid"></div>
+    <div class="trigger-grid" id="trigger-grid"></div>
+    <div class="bottleneck-list" id="bottleneck-list"></div>
+  </section>
+
+  <!-- 1-Year Performance Chart -->
+  <div class="chart-full">
+    <h2>📈 1-Year Relative Performance (정규화 기준, 1년 전=100)</h2>
+    <canvas id="perfChart"></canvas>
+  </div>
+
+  <!-- Comparison Matrix -->
+  <div class="matrix-section">
+    <h2>📋 Phase 2 — 종목 풀 비교 매트릭스 (총 <span id="stock-count"></span>개)</h2>
+    <table class="matrix-table" id="matrix-table"></table>
+  </div>
+
+  <!-- Top 3 Picks -->
+  <section class="picks-section">
+    <h2>🏆 Phase 3 — Top 3 픽</h2>
+    <div class="picks-grid" id="picks-grid"></div>
+  </section>
+
+  <!-- Watchlist -->
+  <div class="watchlist-section">
+    <h2>👁 Phase 4 — 워치리스트</h2>
+    <table class="watchlist-table" id="watchlist-table"></table>
+  </div>
+
+  <!-- LG U+ Implications -->
+  <div class="lg-section">
+    <h2>🇰🇷 Phase 5 — 한국·LG U+ 사업 시사점</h2>
+    <div id="lg-items"></div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-section">
+    <h2>참고 소스</h2>
+    <ul class="source-list" id="source-list"></ul>
+  </div>
+
+  <div class="disclaimer">
+    <strong>⚠ 면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">
+    Stock Intel Agent — LG U+ B2B AI &nbsp;|&nbsp; Generated by Claude Sonnet 4.6 &nbsp;|&nbsp; <span id="footer-date"></span>
+  </footer>
+</div>
+
+<script>
+const THEME_DATA = {"theme":"AI 헬스케어","category":"downstream","isoWeek":"2026-W19","date":"2026-05-10","macro":{"tam":{"current":"$21.7B","target":"$110~188B","year":"2030"},"surgical_tam":{"current":"$9.9B","target":"$22.9B","year":"2030","cagr":"17.5%"},"cagr":"38~39%","triggers":[{"title":"진단 AI / 의료영상","desc":"CT·MRI 자동판독 AI 도입 가속. FDA 허가 AI 의료기기 1,250+건 (2025). 의료영상 AI TAM 2030년 $8.2B 예상."},{"title":"AI 신약개발","desc":"후보물질 탐색 AI가 임상 비용 40% 절감 추정. Recursion·Exscientia 등 플랫폼 NVIDIA와 협력. TAM 2030년 ~$9.1B."},{"title":"수술 로봇 AI화","desc":"ISRG da Vinci 5세대 AI 보조 기능 확대. 시장 2026 $9.9B → 2030 $22.9B (CAGR 17.5%). J&J·Medtronic 경쟁 진입."},{"title":"액체생검 / 유전체","desc":"Natera Signatera MRD 검사량 +54% YoY(Q1 2026). 온콜로지 정밀의학 확산, 비침습 암 조기진단 급성장."},{"title":"병원 운영 AI화","desc":"AI 에이전트 기반 원무·예약·상담 자동화 확산. AICC 적용 의료기관 증가. 국내 바른세상병원 EXAONE 사례."},{"title":"AI 내시경 / 시술 보조","desc":"Olympus OLYSENSE CAD/AI (CADDIE·CADU·SMARTIBD) FDA 클리어런스. 2031년 설치베이스 25% AI 연결 목표."}],"bottlenecks":["의료데이터 프라이버시 (HIPAA·GDPR·일본 개인정보보호법)","FDA 임상 검증 장기화 (6~18개월)","AI 진단 급여화 미확립","GPU·AI 인재 병목","EU AI Act 이중 규제 (2026~2027)"]},"stocks":[{"ticker":"ISRG","name":"Intuitive Surgical","market":"NASDAQ","price":450.06,"currency":"USD","pct1y":-16.1,"fwdPe":43.6,"revGrowth":20.5,"marketCap":"$163B","aiExposure":"◎","lgRelevance":"△","note":"수술로봇 독점 (점유율 83.5%). 영업이익률 39%. Q1 2026 +23% YoY.","priceHistory":[{"date":"2025-05-09","close":536.51},{"date":"2025-05-16","close":563.6},{"date":"2025-05-23","close":539.54},{"date":"2025-06-02","close":553.29},{"date":"2025-06-09","close":526.15},{"date":"2025-06-16","close":519.04},{"date":"2025-06-24","close":523.08},{"date":"2025-07-01","close":537.99},{"date":"2025-07-09","close":528.13},{"date":"2025-07-16","close":512.64},{"date":"2025-07-23","close":501.95},{"date":"2025-07-30","close":500.51},{"date":"2025-08-06","close":474.06},{"date":"2025-08-13","close":482.35},{"date":"2025-08-20","close":480.45},{"date":"2025-08-27","close":471.15},{"date":"2025-09-04","close":454.52},{"date":"2025-09-11","close":455.85},{"date":"2025-09-18","close":435.83},{"date":"2025-09-25","close":438.12},{"date":"2025-10-02","close":443.01},{"date":"2025-10-09","close":443.76},{"date":"2025-10-16","close":434.62},{"date":"2025-10-23","close":551.3},{"date":"2025-10-30","close":530.02},{"date":"2025-11-06","close":547.78},{"date":"2025-11-13","close":565.51},{"date":"2025-11-20","close":552.23},{"date":"2025-11-28","close":573.48},{"date":"2025-12-05","close":575.34},{"date":"2025-12-12","close":542.32},{"date":"2025-12-19","close":572.47},{"date":"2025-12-29","close":575.4},{"date":"2026-01-06","close":592.85},{"date":"2026-01-13","close":561.82},{"date":"2026-01-21","close":523.69},{"date":"2026-01-28","close":522.04},{"date":"2026-02-04","close":478.49},{"date":"2026-02-11","close":496.12},{"date":"2026-02-19","close":499.53},{"date":"2026-02-26","close":506.88},{"date":"2026-03-05","close":496.7},{"date":"2026-03-12","close":479.27},{"date":"2026-03-19","close":479.93},{"date":"2026-03-26","close":468.55},{"date":"2026-04-02","close":452.07},{"date":"2026-04-10","close":450.62},{"date":"2026-04-17","close":469.21},{"date":"2026-04-24","close":482.22},{"date":"2026-05-01","close":457.78},{"date":"2026-05-08","close":450.06}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,496.11,495.26,496.08,496.04,496.92,499.03,500.71,501.83,503.6,505.94,508.72,510.38,512.27,513.05,513.47,514.29,515.88,517.42,519.54,521.06,522.38,522.78,523.62,522.59,519.68,516.29,511.4]},{"ticker":"NTRA","name":"Natera","market":"NASDAQ","price":194.24,"currency":"USD","pct1y":27.8,"fwdPe":null,"revGrowth":39.0,"marketCap":"$29.3B","aiExposure":"○","lgRelevance":"△","note":"액체생검 온콜로지. 검사량 +54% YoY. 현금 $1.1B. 흑자 전환 임박.","priceHistory":[{"date":"2025-05-09","close":151.95},{"date":"2025-05-16","close":152.59},{"date":"2025-05-23","close":153.32},{"date":"2025-06-02","close":160.69},{"date":"2025-06-09","close":164.19},{"date":"2025-06-16","close":168.25},{"date":"2025-06-24","close":171.87},{"date":"2025-07-01","close":160.72},{"date":"2025-07-09","close":161.75},{"date":"2025-07-16","close":148.4},{"date":"2025-07-23","close":137.82},{"date":"2025-07-30","close":140.96},{"date":"2025-08-06","close":138.13},{"date":"2025-08-13","close":157.7},{"date":"2025-08-20","close":160.64},{"date":"2025-08-27","close":163.04},{"date":"2025-09-04","close":166.56},{"date":"2025-09-11","close":173.81},{"date":"2025-09-18","close":179.86},{"date":"2025-09-25","close":163.66},{"date":"2025-10-02","close":160.21},{"date":"2025-10-09","close":173.05},{"date":"2025-10-16","close":180.54},{"date":"2025-10-23","close":195.0},{"date":"2025-10-30","close":193.22},{"date":"2025-11-06","close":198.48},{"date":"2025-11-13","close":200.67},{"date":"2025-11-20","close":225.55},{"date":"2025-11-28","close":238.81},{"date":"2025-12-05","close":244.55},{"date":"2025-12-12","close":231.95},{"date":"2025-12-19","close":231.96},{"date":"2025-12-29","close":231.3},{"date":"2026-01-06","close":248.74},{"date":"2026-01-13","close":237.89},{"date":"2026-01-21","close":242.78},{"date":"2026-01-28","close":235.93},{"date":"2026-02-04","close":205.61},{"date":"2026-02-11","close":212.46},{"date":"2026-02-19","close":216.36},{"date":"2026-02-26","close":216.1},{"date":"2026-03-05","close":197.14},{"date":"2026-03-12","close":190.31},{"date":"2026-03-19","close":202.73},{"date":"2026-03-26","close":196.15},{"date":"2026-04-02","close":207.98},{"date":"2026-04-10","close":193.03},{"date":"2026-04-17","close":208.4},{"date":"2026-04-24","close":203.75},{"date":"2026-05-01","close":207.28},{"date":"2026-05-08","close":194.24}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,163.08,164.99,167.15,169.42,172.43,175.48,178.13,180.69,183.77,187.05,191.23,195.34,199.67,202.66,204.59,206.58,208.41,209.74,210.73,211.76,213.21,214.29,215.5,216.23,216.78,216.95,217.15]},{"ticker":"7733.T","name":"Olympus","market":"TSE","price":1571.5,"currency":"JPY","pct1y":-19.1,"fwdPe":22.0,"revGrowth":6.5,"marketCap":"$9.9B","aiExposure":"○","lgRelevance":"△","note":"AI 내시경 OLYSENSE FDA 클리어런스. 2031년 설치베이스 25% AI 목표.","priceHistory":[{"date":"2025-05-08","close":1942.0},{"date":"2025-05-15","close":1904.0},{"date":"2025-05-22","close":1828.5},{"date":"2025-05-29","close":1856.0},{"date":"2025-06-05","close":1920.0},{"date":"2025-06-12","close":1914.5},{"date":"2025-06-19","close":1882.0},{"date":"2025-06-26","close":1661.0},{"date":"2025-07-03","close":1688.5},{"date":"2025-07-10","close":1676.0},{"date":"2025-07-17","close":1719.0},{"date":"2025-07-25","close":1787.5},{"date":"2025-08-01","close":1824.5},{"date":"2025-08-08","close":1824.5},{"date":"2025-08-18","close":1761.5},{"date":"2025-08-25","close":1751.5},{"date":"2025-09-01","close":1802.5},{"date":"2025-09-08","close":1875.5},{"date":"2025-09-16","close":1870.5},{"date":"2025-09-24","close":1890.5},{"date":"2025-10-01","close":1850.0},{"date":"2025-10-08","close":1877.5},{"date":"2025-10-16","close":1841.0},{"date":"2025-10-23","close":1957.0},{"date":"2025-10-30","close":1907.0},{"date":"2025-11-07","close":1871.5},{"date":"2025-11-14","close":2106.0},{"date":"2025-11-21","close":2071.5},{"date":"2025-12-01","close":2065.0},{"date":"2025-12-08","close":2078.5},{"date":"2025-12-15","close":2034.0},{"date":"2025-12-22","close":1993.5},{"date":"2025-12-29","close":1987.0},{"date":"2026-01-08","close":2087.5},{"date":"2026-01-16","close":2043.0},{"date":"2026-01-23","close":1901.0},{"date":"2026-01-30","close":1841.0},{"date":"2026-02-06","close":1885.5},{"date":"2026-02-16","close":1614.0},{"date":"2026-02-24","close":1441.0},{"date":"2026-03-03","close":1411.5},{"date":"2026-03-10","close":1419.5},{"date":"2026-03-17","close":1348.0},{"date":"2026-03-25","close":1435.5},{"date":"2026-04-01","close":1565.0},{"date":"2026-04-08","close":1602.0},{"date":"2026-04-15","close":1614.5},{"date":"2026-04-22","close":1559.0},{"date":"2026-04-30","close":1546.5}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1824.78,1820.66,1830.28,1839.12,1848.17,1852.69,1858.17,1866.29,1878.69,1894.79,1911.0,1917.65,1918.68,1921.5,1926.34,1916.35,1904.71,1885.64,1865.14,1845.86,1830.56,1817.1,1806.22,1792.06,1775.8]},{"ticker":"TEM","name":"Tempus AI","market":"NASDAQ","price":49.86,"currency":"USD","pct1y":-18.8,"fwdPe":null,"revGrowth":83.0,"marketCap":"$7.7B","aiExposure":"◎","lgRelevance":"○","note":"온콜로지 AI 플랫폼. 매출 +83% YoY. 적자이나 EBITDA 개선 중.","priceHistory":[{"date":"2025-05-09","close":61.37},{"date":"2025-05-16","close":65.49},{"date":"2025-05-23","close":62.56},{"date":"2025-06-02","close":63.47},{"date":"2025-06-09","close":66.94},{"date":"2025-06-16","close":72.0},{"date":"2025-06-24","close":68.28},{"date":"2025-07-01","close":59.44},{"date":"2025-07-09","close":58.41},{"date":"2025-07-16","close":59.97},{"date":"2025-07-23","close":64.86},{"date":"2025-07-30","close":57.81},{"date":"2025-08-06","close":55.53},{"date":"2025-08-13","close":69.63},{"date":"2025-08-20","close":73.28},{"date":"2025-08-27","close":73.23},{"date":"2025-09-04","close":78.12},{"date":"2025-09-11","close":88.78},{"date":"2025-09-18","close":87.07},{"date":"2025-09-25","close":77.33},{"date":"2025-10-02","close":89.3},{"date":"2025-10-09","close":99.28},{"date":"2025-10-16","close":91.02},{"date":"2025-10-23","close":87.04},{"date":"2025-10-30","close":86.27},{"date":"2025-11-06","close":72.09},{"date":"2025-11-13","close":67.94},{"date":"2025-11-20","close":65.69},{"date":"2025-11-28","close":77.93},{"date":"2025-12-05","close":76.66},{"date":"2025-12-12","close":70.61},{"date":"2025-12-19","close":64.46},{"date":"2025-12-29","close":61.47},{"date":"2026-01-06","close":69.54},{"date":"2026-01-13","close":67.15},{"date":"2026-01-21","close":65.32},{"date":"2026-01-28","close":64.57},{"date":"2026-02-04","close":53.55},{"date":"2026-02-11","close":53.61},{"date":"2026-02-19","close":59.96},{"date":"2026-02-26","close":55.41},{"date":"2026-03-05","close":53.05},{"date":"2026-03-12","close":49.53},{"date":"2026-03-19","close":48.74},{"date":"2026-03-26","close":45.53},{"date":"2026-04-02","close":47.39},{"date":"2026-04-10","close":42.94},{"date":"2026-04-17","close":55.87},{"date":"2026-04-24","close":52.12},{"date":"2026-05-01","close":55.0},{"date":"2026-05-08","close":49.86}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,72.36,73.13,73.53,73.9,74.45,74.63,74.88,74.92,75.12,75.34,75.63,75.92,76.34,76.13,75.33,74.41,73.58,72.36,70.91,69.53,68.05,65.92,63.96,62.46,61.03,59.76,59.0]},{"ticker":"VEEV","name":"Veeva Systems","market":"NYSE","price":166.34,"currency":"USD","pct1y":-29.8,"fwdPe":21.5,"revGrowth":16.0,"marketCap":"$28.4B","aiExposure":"○","lgRelevance":"△","note":"제약·바이오 특화 SaaS. Vault CRM Salesforce 대체 진행. 흑자 안정.","priceHistory":[{"date":"2025-05-09","close":237.05},{"date":"2025-05-16","close":242.78},{"date":"2025-05-23","close":233.0},{"date":"2025-06-02","close":278.63},{"date":"2025-06-09","close":283.33},{"date":"2025-06-16","close":284.58},{"date":"2025-06-24","close":281.63},{"date":"2025-07-01","close":282.9},{"date":"2025-07-09","close":284.36},{"date":"2025-07-16","close":282.47},{"date":"2025-07-23","close":286.01},{"date":"2025-07-30","close":286.9},{"date":"2025-08-06","close":282.65},{"date":"2025-08-13","close":279.18},{"date":"2025-08-20","close":284.02},{"date":"2025-08-27","close":293.59},{"date":"2025-09-04","close":270.06},{"date":"2025-09-11","close":279.47},{"date":"2025-09-18","close":279.08},{"date":"2025-09-25","close":279.93},{"date":"2025-10-02","close":300.79},{"date":"2025-10-09","close":298.47},{"date":"2025-10-16","close":292.73},{"date":"2025-10-23","close":291.5},{"date":"2025-10-30","close":285.03},{"date":"2025-11-06","close":291.21},{"date":"2025-11-13","close":291.7},{"date":"2025-11-20","close":270.5},{"date":"2025-11-28","close":240.29},{"date":"2025-12-05","close":242.0},{"date":"2025-12-12","close":223.26},{"date":"2025-12-19","close":221.86},{"date":"2025-12-29","close":225.02},{"date":"2026-01-06","close":237.87},{"date":"2026-01-13","close":228.49},{"date":"2026-01-21","close":219.73},{"date":"2026-01-28","close":217.99},{"date":"2026-02-04","close":190.69},{"date":"2026-02-11","close":177.04},{"date":"2026-02-19","close":182.57},{"date":"2026-02-26","close":182.86},{"date":"2026-03-05","close":196.06},{"date":"2026-03-12","close":180.79},{"date":"2026-03-19","close":185.59},{"date":"2026-03-26","close":178.28},{"date":"2026-04-02","close":173.98},{"date":"2026-04-10","close":151.43},{"date":"2026-04-17","close":167.95},{"date":"2026-04-24","close":161.13},{"date":"2026-05-01","close":171.6},{"date":"2026-05-08","close":166.34}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,279.41,281.55,284.0,284.65,282.76,280.96,278.86,276.19,273.75,271.46,269.56,266.62,264.06,260.77,256.68,252.09,248.21,244.39,240.79,236.84,232.08,226.82,221.67,216.5,211.21,205.72,200.43]},{"ticker":"4543.T","name":"Terumo","market":"TSE","price":1972.5,"currency":"JPY","pct1y":-28.4,"fwdPe":27.0,"revGrowth":12.0,"marketCap":"$19B","aiExposure":"△","lgRelevance":"✕","note":"심혈관 인터벤션·혈액처리. 매출 1조엔 첫 돌파. AI 노출 낮음.","priceHistory":[{"date":"2025-05-08","close":2756.0},{"date":"2025-05-15","close":2677.5},{"date":"2025-05-22","close":2707.5},{"date":"2025-05-29","close":2740.5},{"date":"2025-06-05","close":2598.0},{"date":"2025-06-12","close":2649.0},{"date":"2025-06-19","close":2618.0},{"date":"2025-06-26","close":2681.5},{"date":"2025-07-03","close":2466.0},{"date":"2025-07-10","close":2448.5},{"date":"2025-07-17","close":2447.0},{"date":"2025-07-25","close":2588.0},{"date":"2025-08-01","close":2563.5},{"date":"2025-08-08","close":2735.5},{"date":"2025-08-18","close":2788.5},{"date":"2025-08-25","close":2628.0},{"date":"2025-09-01","close":2683.0},{"date":"2025-09-08","close":2657.5},{"date":"2025-09-16","close":2520.5},{"date":"2025-09-24","close":2455.5},{"date":"2025-10-01","close":2442.5},{"date":"2025-10-08","close":2543.5},{"date":"2025-10-16","close":2492.5},{"date":"2025-10-23","close":2560.0},{"date":"2025-10-30","close":2475.0},{"date":"2025-11-07","close":2495.5},{"date":"2025-11-14","close":2374.0},{"date":"2025-11-21","close":2460.0},{"date":"2025-12-01","close":2390.5},{"date":"2025-12-08","close":2369.5},{"date":"2025-12-15","close":2290.0},{"date":"2025-12-22","close":2297.0},{"date":"2025-12-29","close":2282.0},{"date":"2026-01-08","close":2281.5},{"date":"2026-01-16","close":2202.0},{"date":"2026-01-23","close":2159.5},{"date":"2026-01-30","close":2017.5},{"date":"2026-02-06","close":2045.0},{"date":"2026-02-16","close":1909.0},{"date":"2026-02-24","close":1969.5},{"date":"2026-03-03","close":2013.5},{"date":"2026-03-10","close":2043.0},{"date":"2026-03-17","close":2091.0},{"date":"2026-03-25","close":2094.5},{"date":"2026-04-01","close":2169.5},{"date":"2026-04-08","close":2209.0},{"date":"2026-04-15","close":2187.0},{"date":"2026-04-22","close":2112.5},{"date":"2026-04-30","close":1997.0}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,2591.24,2580.9,2571.09,2557.23,2549.36,2539.16,2527.03,2512.56,2500.35,2492.39,2484.26,2470.62,2448.96,2426.25,2396.02,2364.26,2338.6,2312.25,2291.05,2274.06,2261.21,2248.38,2234.62,2218.77,2198.61]},{"ticker":"RXRX","name":"Recursion Pharma","market":"NASDAQ","price":3.32,"currency":"USD","pct1y":-23.3,"fwdPe":null,"revGrowth":null,"marketCap":"$1.7B","aiExposure":"◎","lgRelevance":"✕","note":"AI 신약 탐색 플랫폼. NVIDIA 전략 파트너. 임상단계 적자, 투기적.","priceHistory":[{"date":"2025-05-09","close":4.33},{"date":"2025-05-16","close":4.56},{"date":"2025-05-23","close":4.08},{"date":"2025-06-02","close":4.37},{"date":"2025-06-09","close":5.37},{"date":"2025-06-16","close":5.0},{"date":"2025-06-24","close":5.22},{"date":"2025-07-01","close":5.13},{"date":"2025-07-09","close":5.59},{"date":"2025-07-16","close":5.39},{"date":"2025-07-23","close":6.43},{"date":"2025-07-30","close":5.81},{"date":"2025-08-06","close":5.48},{"date":"2025-08-13","close":5.7},{"date":"2025-08-20","close":4.77},{"date":"2025-08-27","close":4.89},{"date":"2025-09-04","close":4.52},{"date":"2025-09-11","close":4.85},{"date":"2025-09-18","close":4.93},{"date":"2025-09-25","close":4.63},{"date":"2025-10-02","close":5.52},{"date":"2025-10-09","close":5.91},{"date":"2025-10-16","close":6.36},{"date":"2025-10-23","close":5.73},{"date":"2025-10-30","close":5.65},{"date":"2025-11-06","close":4.62},{"date":"2025-11-13","close":4.33},{"date":"2025-11-20","close":3.85},{"date":"2025-11-28","close":4.63},{"date":"2025-12-05","close":4.71},{"date":"2025-12-12","close":4.33},{"date":"2025-12-19","close":4.26},{"date":"2025-12-29","close":4.13},{"date":"2026-01-06","close":4.55},{"date":"2026-01-13","close":4.69},{"date":"2026-01-21","close":4.61},{"date":"2026-01-28","close":4.47},{"date":"2026-02-04","close":3.9},{"date":"2026-02-11","close":3.71},{"date":"2026-02-19","close":3.72},{"date":"2026-02-26","close":3.77},{"date":"2026-03-05","close":3.54},{"date":"2026-03-12","close":3.29},{"date":"2026-03-19","close":3.37},{"date":"2026-03-26","close":3.15},{"date":"2026-04-02","close":3.11},{"date":"2026-04-10","close":3.28},{"date":"2026-04-17","close":3.78},{"date":"2026-04-24","close":3.51},{"date":"2026-05-01","close":3.39},{"date":"2026-05-08","close":3.32}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,5.22,5.25,5.26,5.25,5.22,5.2,5.19,5.15,5.11,5.07,5.01,4.94,4.9,4.85,4.78,4.73,4.68,4.64,4.58,4.52,4.44,4.33,4.22,4.12,4.02,3.95,3.9]},{"ticker":"6849.T","name":"Nihon Kohden","market":"TSE","price":1431.5,"currency":"JPY","pct1y":-16.8,"fwdPe":16.0,"revGrowth":1.5,"marketCap":"$1.9B","aiExposure":"△","lgRelevance":"△","note":"환자 모니터링 의료기기. AI 기능 개발 중이나 성장성 저조.","priceHistory":[{"date":"2025-05-08","close":1720.0},{"date":"2025-05-15","close":1804.0},{"date":"2025-05-22","close":1662.0},{"date":"2025-05-29","close":1684.0},{"date":"2025-06-05","close":1722.0},{"date":"2025-06-12","close":1716.0},{"date":"2025-06-19","close":1703.0},{"date":"2025-06-26","close":1716.5},{"date":"2025-07-03","close":1692.0},{"date":"2025-07-10","close":1637.5},{"date":"2025-07-17","close":1677.5},{"date":"2025-07-25","close":1691.0},{"date":"2025-08-01","close":1672.0},{"date":"2025-08-08","close":1715.5},{"date":"2025-08-18","close":1660.0},{"date":"2025-08-25","close":1655.0},{"date":"2025-09-01","close":1665.5},{"date":"2025-09-08","close":1728.5},{"date":"2025-09-16","close":1738.0},{"date":"2025-09-24","close":1708.0},{"date":"2025-10-01","close":1671.5},{"date":"2025-10-08","close":1820.0},{"date":"2025-10-16","close":1739.5},{"date":"2025-10-23","close":1807.0},{"date":"2025-10-30","close":1756.0},{"date":"2025-11-07","close":1697.5},{"date":"2025-11-14","close":1607.5},{"date":"2025-11-21","close":1550.0},{"date":"2025-12-01","close":1557.0},{"date":"2025-12-08","close":1602.5},{"date":"2025-12-15","close":1637.5},{"date":"2025-12-22","close":1657.5},{"date":"2025-12-29","close":1705.5},{"date":"2026-01-08","close":1777.0},{"date":"2026-01-16","close":1813.0},{"date":"2026-01-23","close":1832.0},{"date":"2026-01-30","close":1713.0},{"date":"2026-02-06","close":1653.5},{"date":"2026-02-16","close":1699.5},{"date":"2026-02-24","close":1668.0},{"date":"2026-03-03","close":1632.0},{"date":"2026-03-10","close":1543.0},{"date":"2026-03-17","close":1496.0},{"date":"2026-03-25","close":1510.5},{"date":"2026-04-01","close":1503.0},{"date":"2026-04-08","close":1563.0},{"date":"2026-04-15","close":1560.5},{"date":"2026-04-22","close":1468.0},{"date":"2026-04-30","close":1444.5}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1708.78,1707.51,1701.58,1696.62,1691.39,1685.52,1682.53,1679.58,1678.24,1681.52,1687.63,1693.11,1695.51,1696.74,1698.86,1700.11,1701.91,1695.45,1685.89,1676.8,1667.88,1658.65,1649.08,1638.0,1624.27]},{"ticker":"RGTI","name":"Rigetti Computing","market":"NASDAQ","price":18.94,"currency":"USD","pct1y":79.0,"fwdPe":null,"revGrowth":-34.0,"marketCap":"$6.3B","aiExposure":"○","lgRelevance":"✕","note":"양자컴퓨팅+AI. 매출 $7M 실질 전무. 헬스케어 직접 연관 없음. 투기적.","priceHistory":[{"date":"2025-05-09","close":10.58},{"date":"2025-05-16","close":11.85},{"date":"2025-05-23","close":14.02},{"date":"2025-06-02","close":12.26},{"date":"2025-06-09","close":11.32},{"date":"2025-06-16","close":12.16},{"date":"2025-06-24","close":11.5},{"date":"2025-07-01","close":11.33},{"date":"2025-07-09","close":13.51},{"date":"2025-07-16","close":16.56},{"date":"2025-07-23","close":16.14},{"date":"2025-07-30","close":14.17},{"date":"2025-08-06","close":15.99},{"date":"2025-08-13","close":17.24},{"date":"2025-08-20","close":14.76},{"date":"2025-08-27","close":15.39},{"date":"2025-09-04","close":15.12},{"date":"2025-09-11","close":16.69},{"date":"2025-09-18","close":24.74},{"date":"2025-09-25","close":32.1},{"date":"2025-10-02","close":35.4},{"date":"2025-10-09","close":47.11},{"date":"2025-10-16","close":47.97},{"date":"2025-10-23","close":39.6},{"date":"2025-10-30","close":42.52},{"date":"2025-11-06","close":34.36},{"date":"2025-11-13","close":25.2},{"date":"2025-11-20","close":22.8},{"date":"2025-11-28","close":25.57},{"date":"2025-12-05","close":28.11},{"date":"2025-12-12","close":25.84},{"date":"2025-12-19","close":23.76},{"date":"2025-12-29","close":22.27},{"date":"2026-01-06","close":25.38},{"date":"2026-01-13","close":24.47},{"date":"2026-01-21","close":23.67},{"date":"2026-01-28","close":22.01},{"date":"2026-02-04","close":17.19},{"date":"2026-02-11","close":16.43},{"date":"2026-02-19","close":16.6},{"date":"2026-02-26","close":18.64},{"date":"2026-03-05","close":16.97},{"date":"2026-03-12","close":16.07},{"date":"2026-03-19","close":15.41},{"date":"2026-03-26","close":14.41},{"date":"2026-04-02","close":14.19},{"date":"2026-04-10","close":14.68},{"date":"2026-04-17","close":19.81},{"date":"2026-04-24","close":16.61},{"date":"2026-05-01","close":17.5},{"date":"2026-05-08","close":18.94}],"priceMA120":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,20.58,21.69,22.43,22.92,23.5,24.1,24.76,25.26,25.71,26.14,26.5,26.91,27.22,27.31,27.33,27.38,27.43,27.49,27.32,26.71,26.05,24.81,23.25,22.29,21.39,20.5,20.02]}],"topPicks":[{"rank":1,"ticker":"ISRG","name":"Intuitive Surgical","market":"NASDAQ","price":450.06,"currency":"USD","summary":"수술 로봇 시장 독점(점유율 83.5%) + 영업이익률 39%로 헬스케어 섹터 최우량 현금창출. da Vinci 5세대 AI 기능 탑재로 AI 전환 수혜 직접 포착. Q1 2026 +23% YoY 서프라이즈. J&J·Medtronic 경쟁 진입 있으나 전환비용 高. 1년 -16% 조정으로 밸류에이션 매력 부상.","buyPrice":430.0,"target1":510.0,"target1pct":18.6,"stopLoss":387.0,"stopLossPct":-10.0,"risks":["경쟁사 수술로봇 진입 가속 (OTTAVA·Hugo)","Forward PE 43배 — 경기 둔화 시 멀티플 수축"]},{"rank":2,"ticker":"NTRA","name":"Natera","market":"NASDAQ","price":194.24,"currency":"USD","summary":"유일하게 1년 양(+27.8%) 수익률 달성. 온콜로지 검사량 분기 +54%, 매출 +39% 가속. Signatera MRD가 암 재발 표준검사로 자리매김. 현금 $1.1B로 런웨이 충분. 2026~2027 영업이익 흑자 전환 기대. 정밀의학 규제 명확화가 추가 모멘텀.","buyPrice":180.0,"target1":225.0,"target1pct":25.0,"stopLoss":162.0,"stopLossPct":-10.0,"risks":["흑자 전환 지연 시 주가 변동성 高","52주 고점($254) 대비 23% 할인 — 추가 하락 리스크"]},{"rank":3,"ticker":"7733.T","name":"Olympus","market":"TSE","price":1571.5,"currency":"JPY","summary":"내시경 AI 전환의 일본 대표주. OLYSENSE CAD/AI (CADDIE·CADU·SMARTIBD) FDA·CE 인증 완료, 상업화 진입. 2031년 설치베이스 25% AI 연결 목표(현재 5%). 매출 60% 내시경 → AI 구독 전환 시 마진 구조 개선 기대. 1년 -19% 조정으로 진입 매력 형성. 지역 다변화(일본 픽).","buyPrice":1500.0,"target1":1820.0,"target1pct":21.3,"stopLoss":1350.0,"stopLossPct":-10.0,"risks":["OLYSENSE AI 수익화 속도 불확실","엔화 변동성 리스크 (글로벌 투자자 관점)"]}],"watchlist":[{"ticker":"TEM","name":"Tempus AI","trigger":"2026 Q2 실적 — 매출 $400M+ 달성 & EBITDA 흑자 전환 여부"},{"ticker":"VEEV","name":"Veeva Systems","trigger":"Vault CRM 전환 완료 고객 수 — 상위 20개 바이오파마 전체 전환 시점"},{"ticker":"4543.T","name":"Terumo","trigger":"2026 FY Q1 실적 — 심혈관 AI 보조 기기 출시 발표 여부"},{"ticker":"RXRX","name":"Recursion Pharma","trigger":"NVIDIA-협력 파이프라인 임상 Phase 2 데이터 발표 (2026 H2 예정)"},{"ticker":"6849.T","name":"Nihon Kohden","trigger":"AI 환자 모니터링 제품 일본 규제 승인 및 수출 전략 발표"}],"lgImplications":["AICC 의료 버티컬 확대 기회: LG U+는 바른세상병원 EXAONE 기반 의료 AICC (예약·원무·제증명 자동화) 레퍼런스 보유. AI 헬스케어 섹터 성장(CAGR 38~39%)은 병원 AICC 도입 수요를 견인 — 상급종합병원·의원급까지 확장 타깃 명확.","수술 로봇 5G/원격 모니터링 연계: ISRG da Vinci·신규 수술로봇 도입 병원에 5G 초저지연 네트워크 + 원격 모니터링 솔루션 번들링 가능. 국내 스마트병원 구축 사업과 직결.","Olympus·ISRG 데이터 플랫폼과 의료 데이터 커머스: 내시경 AI(Olympus OLYSENSE) 및 수술 로봇 데이터는 의료기관 클라우드 저장·분석 수요 창출. LG U+ IDC-Sovereign Cloud 연계 B2B 의료 데이터 플랫폼 기회.","경쟁사 동향: KT는 보라매병원 AI 의료 협약, SKT는 서울대병원 디지털헬스 MOU — 국내 통신사 의료 AI 경쟁 격화. LG U+는 EXAONE 기반 AICC 차별화 강조 필요.","다음 분기 모니터링: ISRG Q2 2026 설치 대수 (1만2천대 돌파 여부), Natera MRD 검사 급여화 발표 (미국 CMS 결정 2026 H2), 국내 의료 AI 수가 시범사업 확대 여부."],"sources":[{"title":"AI in Healthcare Market Size — MarketsandMarkets 2025","url":"https://www.marketsandmarkets.com/PressReleases/artificial-intelligence-healthcare.asp","note":"AI 헬스케어 TAM $21.7B→$110B, CAGR 38.9%"},{"title":"AI in Healthcare Market — Grand View Research","url":"https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-ai-healthcare-market","note":"2030 TAM $187.7B, CAGR 38.8%"},{"title":"AI Surgical Robots Market — Grand View Research","url":"https://www.grandviewresearch.com/industry-analysis/artificial-intelligence-based-surgical-robots-market","note":"수술로봇 AI TAM 2026→2030 $9.9B→$22.9B"},{"title":"FDA AI-Enabled Medical Devices — FDA.gov","url":"https://www.fda.gov/medical-devices/software-medical-device-samd/artificial-intelligence-enabled-medical-devices","note":"2025년 기준 1,250+ AI 의료기기 허가"},{"title":"Intuitive Surgical Q1 2026 Earnings","url":"https://isrg.intuitive.com/news-releases/news-release-details/intuitive-announces-first-quarter-earnings-7/","note":"Q1 2026 매출 $2.77B, +23% YoY"},{"title":"Tempus AI 2025 Revenue +83% — StockTitan","url":"https://www.stocktitan.net/news/TEM/tempus-ai-posts-83-revenue-growth-in-2025.html","note":"2025 FY 매출 $1.27B, +83% YoY"},{"title":"Natera Q1 2026 Revenue +39% — StockTitan","url":"https://www.stocktitan.net/news/NTRA/natera-reports-first-quarter-2026-financial-jdrzq3afnvgm.html","note":"Q1 2026 검사량 +54%, 가이던스 $2.74~2.82B"},{"title":"Olympus OLYSENSE CAD/AI Launch","url":"https://www.olympus-global.com/news/2025/nr02907.html","note":"AI 내시경 CADDIE·CADU·SMARTIBD FDA·CE 인증"},{"title":"EU AI Act & Medical Devices — ReedSmith","url":"https://www.reedsmith.com/our-insights/blogs/viewpoints/102kq35/the-eu-ai-act-and-medical-devices-navigating-high-risk-compliance/","note":"2026~2027 고위험 AI 시스템 강제 준수"},{"title":"LG U+ 바른세상병원 의료 AICC — 뉴스1","url":"https://www.news1.kr/it-science/general-it/5760527","note":"EXAONE 기반 병원 AICC 상용화 레퍼런스"}]};
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function fmtPct(v) {
+  if (v == null) return '—';
+  const sign = v >= 0 ? '+' : '';
+  return `${sign}${v.toFixed(1)}%`;
+}
+function pctClass(v) { return v >= 0 ? 'pct-up' : 'pct-down'; }
+function fmtPrice(p, cur) {
+  if (cur === 'JPY') return `¥${p.toLocaleString()}`;
+  return `$${p.toFixed(2)}`;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────
+document.getElementById('header-theme').textContent = THEME_DATA.theme;
+document.getElementById('meta-category').textContent = THEME_DATA.category === 'upstream' ? '후방 (Upstream)' : '전방 (Downstream)';
+document.getElementById('meta-week').textContent = THEME_DATA.isoWeek;
+document.getElementById('meta-date').textContent = THEME_DATA.date;
+document.getElementById('meta-stocks').textContent = `종목 ${THEME_DATA.stocks.length}개 분석`;
+document.getElementById('footer-date').textContent = THEME_DATA.date;
+document.title = `Sector Theme Intel — ${THEME_DATA.theme} | ${THEME_DATA.date}`;
+
+// ── Macro ─────────────────────────────────────────────────────────────────
+const mg = document.getElementById('macro-grid');
+const macroCards = [
+  { label: 'AI 헬스케어 TAM', value: THEME_DATA.macro.tam.current, sub: `→ ${THEME_DATA.macro.tam.target} (${THEME_DATA.macro.tam.year})` },
+  { label: '수술 로봇 AI TAM', value: THEME_DATA.macro.surgical_tam.current, sub: `→ ${THEME_DATA.macro.surgical_tam.target} (${THEME_DATA.macro.surgical_tam.year})` },
+  { label: 'AI 헬스케어 CAGR', value: THEME_DATA.macro.cagr, sub: 'MarketsandMarkets / GVR 2026' },
+  { label: '수술로봇 CAGR', value: THEME_DATA.macro.surgical_tam.cagr, sub: 'Grand View Research 2026' },
+];
+mg.innerHTML = macroCards.map(c => `
+  <div class="macro-card">
+    <div class="macro-label">${c.label}</div>
+    <div class="macro-value">${c.value}</div>
+    <div class="macro-sub">${c.sub}</div>
+  </div>`).join('');
+
+const tg = document.getElementById('trigger-grid');
+tg.innerHTML = THEME_DATA.macro.triggers.map(t => `
+  <div class="trigger-card">
+    <div class="trigger-title">⚡ ${t.title}</div>
+    <div class="trigger-desc">${t.desc}</div>
+  </div>`).join('');
+
+const bl = document.getElementById('bottleneck-list');
+bl.innerHTML = THEME_DATA.macro.bottlenecks.map(b => `<span class="bottleneck-tag">⚠ ${b}</span>`).join('');
+
+// ── Performance Chart ─────────────────────────────────────────────────────
+const topTickers = THEME_DATA.topPicks.map(p => p.ticker);
+const perfCtx = document.getElementById('perfChart').getContext('2d');
+const colorMap = {
+  'ISRG': '#FFD700', 'NTRA': '#BC8CFF', '7733.T': '#58A6FF',
+  'TEM': '#3FB950', 'VEEV': '#56D4DD', '4543.T': '#F7AC59',
+  'RXRX': '#FF6B9D', '6849.T': '#8B949E', 'RGTI': '#79C0FF'
+};
+
+// Normalize to 100 at start
+const perfDatasets = THEME_DATA.stocks.map(s => {
+  const hist = s.priceHistory;
+  if (!hist || hist.length === 0) return null;
+  const base = hist[0].close;
+  return {
+    label: s.ticker,
+    data: hist.map(h => ({ x: h.date, y: parseFloat(((h.close / base) * 100).toFixed(2)) })),
+    borderColor: colorMap[s.ticker] || '#888',
+    backgroundColor: 'transparent',
+    borderWidth: topTickers.includes(s.ticker) ? 2.5 : 1.2,
+    borderDash: topTickers.includes(s.ticker) ? [] : [4, 3],
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}).filter(Boolean);
+
+new Chart(perfCtx, {
+  type: 'line',
+  data: { datasets: perfDatasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, position: 'top', labels: { color: '#8B949E', font: { size: 11 }, usePointStyle: true, boxWidth: 10 } },
+      tooltip: { backgroundColor: '#1C2128', borderColor: '#30363D', borderWidth: 1, titleColor: '#E6EDF3', bodyColor: '#8B949E', callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}` } }
+    },
+    scales: {
+      x: { type: 'time', time: { unit: 'month', displayFormats: { month: 'YY/MM' } }, grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', maxTicksLimit: 12 } },
+      y: { grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', callback: v => `${v}` }, title: { display: true, text: '상대 수익률 (기준=100)', color: '#6E7681', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Matrix Table ──────────────────────────────────────────────────────────
+document.getElementById('stock-count').textContent = THEME_DATA.stocks.length;
+const mt = document.getElementById('matrix-table');
+const pickRanks = {};
+THEME_DATA.topPicks.forEach((p, i) => { pickRanks[p.ticker] = i + 1; });
+
+mt.innerHTML = `
+  <thead><tr>
+    <th>티커</th><th>종목명</th><th>시장</th>
+    <th>현재가</th><th>1년 수익률</th><th>Forward PE</th>
+    <th>매출 성장률</th><th>AI 익스포저</th><th>LG U+ 관련성</th><th>특징</th>
+  </tr></thead>
+  <tbody>${THEME_DATA.stocks.map(s => {
+    const rank = pickRanks[s.ticker];
+    const badge = rank ? `<span class="top-pick-badge badge-${rank}">TOP${rank}</span>` : '';
+    const mktClass = ['NYSE','NASDAQ'].includes(s.market) ? 'us' : 'jp';
+    return `<tr>
+      <td class="ticker-cell ${mktClass}">${s.ticker}${badge}</td>
+      <td>${s.name}</td>
+      <td><span class="meta-tag">${s.market}</span></td>
+      <td>${fmtPrice(s.price, s.currency)}</td>
+      <td class="${pctClass(s.pct1y)}">${fmtPct(s.pct1y)}</td>
+      <td>${s.fwdPe ? s.fwdPe + 'x' : '—'}</td>
+      <td class="${pctClass(s.revGrowth)}">${fmtPct(s.revGrowth)}</td>
+      <td class="exposure-tag">${s.aiExposure}</td>
+      <td class="exposure-tag">${s.lgRelevance}</td>
+      <td style="color:#8B949E;font-size:12px">${s.note}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── Top Picks ─────────────────────────────────────────────────────────────
+const pg = document.getElementById('picks-grid');
+pg.innerHTML = THEME_DATA.topPicks.map(p => `
+  <div class="pick-card rank-${p.rank}">
+    <div class="pick-rank">PICK ${p.rank}</div>
+    <div class="pick-header">
+      <div>
+        <div class="pick-name">${p.name}</div>
+        <div class="pick-ticker">${p.ticker} · ${p.market}</div>
+      </div>
+      <div>
+        <div class="pick-price">${fmtPrice(p.price, p.currency)}</div>
+        <div class="pick-1y pct-up">${fmtPct(THEME_DATA.stocks.find(s=>s.ticker===p.ticker)?.pct1y)} (1Y)</div>
+      </div>
+    </div>
+    <div class="pick-summary">${p.summary}</div>
+    <div class="pick-targets">
+      <div class="pick-target buy-t">
+        <div class="pick-target-label">매수가</div>
+        <div class="pick-target-val">${fmtPrice(p.buyPrice, p.currency)}</div>
+      </div>
+      <div class="pick-target t1">
+        <div class="pick-target-label">1차 목표가</div>
+        <div class="pick-target-val">${fmtPrice(p.target1, p.currency)} <small>(${fmtPct(p.target1pct)})</small></div>
+      </div>
+      <div class="pick-target sl">
+        <div class="pick-target-label">손절가</div>
+        <div class="pick-target-val">${fmtPrice(p.stopLoss, p.currency)} <small>(${fmtPct(p.stopLossPct)})</small></div>
+      </div>
+    </div>
+    <div class="pick-risks"><span>⚠ 리스크:</span> ${p.risks.join(' / ')}</div>
+  </div>`).join('');
+
+// ── Watchlist ─────────────────────────────────────────────────────────────
+const wt = document.getElementById('watchlist-table');
+wt.innerHTML = `
+  <thead><tr><th>#</th><th>티커</th><th>종목명</th><th>현재가</th><th>1Y</th><th>다음 분기 트리거</th></tr></thead>
+  <tbody>${THEME_DATA.watchlist.map((w, i) => {
+    const s = THEME_DATA.stocks.find(x => x.ticker === w.ticker);
+    return `<tr>
+      <td style="color:#6E7681">${i+1}</td>
+      <td class="ticker-cell ${['NYSE','NASDAQ'].includes(s?.market) ? 'us' : 'jp'}">${w.ticker}</td>
+      <td>${w.name}</td>
+      <td>${s ? fmtPrice(s.price, s.currency) : '—'}</td>
+      <td class="${pctClass(s?.pct1y || 0)}">${fmtPct(s?.pct1y)}</td>
+      <td style="font-size:12px;color:#8B949E">${w.trigger}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── LG Implications ───────────────────────────────────────────────────────
+const li = document.getElementById('lg-items');
+li.innerHTML = THEME_DATA.lgImplications.map((t, i) => `
+  <div class="lg-item">
+    <div class="lg-num">${i+1}</div>
+    <div class="lg-text">${t}</div>
+  </div>`).join('');
+
+// ── Sources ───────────────────────────────────────────────────────────────
+if (THEME_DATA.sources) {
+  const sl = document.getElementById('source-list');
+  sl.innerHTML = THEME_DATA.sources.map((s, i) => `
+    <li>${i+1}. <a href="${s.url}" target="_blank">${s.title}</a> — ${s.note}</li>`).join('');
+}
+</script>
+</body>
+</html>

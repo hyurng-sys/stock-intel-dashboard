@@ -3,6 +3,19 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "type": "theme",
+      "theme": "AI 헬스케어",
+      "category": "downstream",
+      "isoWeek": "2026-W19",
+      "date": "20260510",
+      "file": "sector_ai_healthcare_20260510.html",
+      "topPicks": [
+        "ISRG",
+        "NTRA",
+        "7733.T"
+      ]
+    },
+    {
       "company": "채널톡",
       "ticker": "비상장",
       "date": "20260509",
