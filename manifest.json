@@ -3,6 +3,16 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "에스피소프트",
+      "ticker": "443670",
+      "date": "20260516",
+      "file": "에스피소프트_20260516.html",
+      "verdict": "LEAN BUY",
+      "currentPrice": 5040,
+      "market": "KOSDAQ",
+      "meetingCounterpart": "이은재 대표 (20260523)"
+    },
+    {
       "type": "theme",
       "theme": "AI 헬스케어",
       "category": "downstream",
