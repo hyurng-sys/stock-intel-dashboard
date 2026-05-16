@@ -3,6 +3,13 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "브룩필드 (BAM)",
+      "date": "20260516",
+      "file": "브룩필드_BAM_20260516.html",
+      "verdict": "HOLD",
+      "note": "브룩필드코리아 비상장 → 모회사 NYSE:BAM 분석. DBO 부산 200MW 파트너"
+    },
+    {
       "company": "에스피소프트",
       "ticker": "443670",
       "date": "20260516",
