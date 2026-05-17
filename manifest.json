@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "삼성전자",
+      "date": "20260517",
+      "file": "삼성전자_20260517.html",
+      "verdict": "BUY"
+    },
+    {
       "company": "브룩필드 (BAM)",
       "date": "20260516",
       "file": "브룩필드_BAM_20260516.html",
