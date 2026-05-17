@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "Tesla",
+      "date": "20260517",
+      "file": "Tesla_20260517.html",
+      "verdict": "LEAN BUY"
+    },
+    {
       "company": "NVIDIA",
       "date": "20260517",
       "file": "NVIDIA_20260517.html",
