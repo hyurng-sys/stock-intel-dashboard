@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "NVIDIA",
+      "date": "20260517",
+      "file": "NVIDIA_20260517.html",
+      "verdict": "STRONG BUY"
+    },
+    {
       "company": "에스피지",
       "date": "20260517",
       "file": "에스피지_20260517.html",
