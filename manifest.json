@@ -3,6 +3,12 @@
   "description": "Stock Intelligence Dashboard — LG U+ B2B AI",
   "reports": [
     {
+      "company": "에스피지",
+      "date": "20260517",
+      "file": "에스피지_20260517.html",
+      "verdict": "BUY"
+    },
+    {
       "company": "두산로보틱스",
       "date": "20260517",
       "file": "두산로보틱스_20260517.html",
