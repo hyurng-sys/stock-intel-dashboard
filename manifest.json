@@ -430,6 +430,19 @@
       "date": "20260509",
       "file": "코람코자산운용_20260509.html",
       "verdict": "IPO MONITOR"
+    },
+    {
+      "type": "theme",
+      "theme": "반도체 소재·장비",
+      "category": "upstream",
+      "date": "20260517",
+      "file": "sector_semi_materials_20260517.html",
+      "topPicks": [
+        "KLAC",
+        "6857.T",
+        "LRCX"
+      ],
+      "isoWeek": "2026-W20"
     }
   ]
 }

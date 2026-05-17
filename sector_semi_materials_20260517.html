@@ -1,0 +1,2911 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Theme Intel — 반도체 소재·장비 | 2026-05-17</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --magenta: #58A6FF;
+    --pink: #79C0FF;
+    --deep: #388BFD;
+    --bg-primary: #0D1117;
+    --bg-card: #161B22;
+    --bg-card-hover: #1C2128;
+    --text-primary: #E6EDF3;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --border: #30363D;
+    --buy: #3FB950;
+    --sell: #F47067;
+    --hold: #D29922;
+    --up: #3FB950;
+    --down: #F47067;
+    --jp: #BC8CFF;
+    --us: #58A6FF;
+    --macro: #56D4DD;
+    --pick1: #FFD700;
+    --pick2: #BC8CFF;
+    --pick3: #58A6FF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Pretendard Variable', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; min-height: 100vh; }
+  .container { max-width: 1320px; margin: 0 auto; padding: 24px 20px; }
+
+  /* Header */
+  .header { text-align: center; padding: 44px 0 36px; border-bottom: 1px solid var(--border); margin-bottom: 36px; position: relative; }
+  .header::before { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 160px; height: 2px; background: linear-gradient(90deg, transparent, var(--macro), transparent); }
+  .header-label { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--macro); background: rgba(86,212,221,0.1); padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(86,212,221,0.25); margin-bottom: 16px; }
+  .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .header .meta { display: flex; justify-content: center; gap: 20px; font-size: 14px; color: var(--text-secondary); flex-wrap: wrap; }
+  .meta-tag { background: rgba(48,54,61,0.8); border: 1px solid var(--border); border-radius: 8px; padding: 3px 10px; font-size: 12px; }
+
+  /* Macro Grid */
+  .macro-section { background: linear-gradient(135deg, rgba(86,212,221,0.05), rgba(56,139,253,0.05)); border: 1px solid rgba(86,212,221,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .macro-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--macro); margin-bottom: 20px; }
+  .macro-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+  .macro-card { background: rgba(13,17,23,0.6); border: 1px solid rgba(86,212,221,0.15); border-radius: 12px; padding: 16px; }
+  .macro-label { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 6px; }
+  .macro-value { font-size: 22px; font-weight: 800; color: var(--text-primary); }
+  .macro-sub { font-size: 12px; color: var(--macro); margin-top: 4px; }
+  .trigger-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .trigger-card { background: rgba(63,185,80,0.05); border: 1px solid rgba(63,185,80,0.15); border-radius: 10px; padding: 14px; }
+  .trigger-title { font-size: 13px; font-weight: 700; color: var(--buy); margin-bottom: 4px; }
+  .trigger-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+  .bottleneck-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .bottleneck-tag { background: rgba(244,112,103,0.08); border: 1px solid rgba(244,112,103,0.2); border-radius: 8px; padding: 4px 12px; font-size: 12px; color: var(--sell); }
+
+  /* Performance Chart */
+  .chart-full { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .chart-full h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .chart-full canvas { width: 100% !important; height: 360px !important; }
+
+  /* Matrix */
+  .matrix-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; overflow-x: auto; }
+  .matrix-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .matrix-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .matrix-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); vertical-align: middle; }
+  .matrix-table tr:hover td { background: rgba(28,33,40,0.6); }
+  .ticker-cell { font-weight: 800; font-family: 'SF Mono', monospace; }
+  .ticker-cell.us { color: var(--us); }
+  .ticker-cell.jp { color: var(--jp); }
+  .pct-up { color: var(--up); font-weight: 600; }
+  .pct-down { color: var(--down); font-weight: 600; }
+  .exposure-tag { font-size: 14px; }
+  .top-pick-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 6px; vertical-align: middle; }
+  .badge-1 { background: rgba(255,215,0,0.15); color: var(--pick1); border: 1px solid rgba(255,215,0,0.3); }
+  .badge-2 { background: rgba(188,140,255,0.15); color: var(--pick2); border: 1px solid rgba(188,140,255,0.3); }
+  .badge-3 { background: rgba(88,166,255,0.15); color: var(--pick3); border: 1px solid rgba(88,166,255,0.3); }
+
+  /* Top Picks */
+  .picks-section { margin-bottom: 28px; }
+  .picks-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .picks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pick-card { border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+  .pick-card::before { content: ''; position: absolute; inset: 0; border-radius: 16px; opacity: 0.04; }
+  .pick-card.rank-1 { background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.25); }
+  .pick-card.rank-2 { background: rgba(188,140,255,0.06); border: 1px solid rgba(188,140,255,0.25); }
+  .pick-card.rank-3 { background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.25); }
+  .pick-rank { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .pick-card.rank-1 .pick-rank { color: var(--pick1); }
+  .pick-card.rank-2 .pick-rank { color: var(--pick2); }
+  .pick-card.rank-3 .pick-rank { color: var(--pick3); }
+  .pick-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .pick-name { font-size: 20px; font-weight: 800; }
+  .pick-ticker { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .pick-price { text-align: right; font-size: 22px; font-weight: 700; }
+  .pick-1y { font-size: 12px; text-align: right; font-weight: 600; }
+  .pick-summary { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; padding: 12px; background: rgba(13,17,23,0.4); border-radius: 8px; }
+  .pick-targets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .pick-target { background: rgba(13,17,23,0.5); border-radius: 8px; padding: 10px; text-align: center; }
+  .pick-target-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 4px; }
+  .pick-target-val { font-size: 14px; font-weight: 700; }
+  .pick-target.buy-t .pick-target-val { color: var(--text-secondary); }
+  .pick-target.t1 .pick-target-val { color: var(--buy); }
+  .pick-target.sl .pick-target-val { color: var(--sell); }
+  .pick-risks { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .pick-risks span { color: var(--sell); font-weight: 600; }
+
+  /* Watchlist */
+  .watchlist-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 28px; }
+  .watchlist-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; }
+  .watchlist-table { width: 100%; border-collapse: collapse; }
+  .watchlist-table th { text-align: left; font-size: 11px; color: var(--text-muted); font-weight: 600; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .watchlist-table td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,0.4); font-size: 13px; }
+
+  /* LG Implications */
+  .lg-section { background: linear-gradient(135deg, rgba(88,166,255,0.06), rgba(63,185,80,0.04)); border: 1px solid rgba(88,166,255,0.2); border-radius: 16px; padding: 28px; margin-bottom: 28px; }
+  .lg-section h2 { font-size: 13px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--magenta); margin-bottom: 16px; }
+  .lg-item { display: flex; gap: 12px; margin-bottom: 12px; padding: 14px; background: rgba(13,17,23,0.4); border-radius: 10px; border-left: 3px solid rgba(88,166,255,0.4); }
+  .lg-num { font-size: 11px; font-weight: 800; color: var(--magenta); min-width: 20px; padding-top: 2px; }
+  .lg-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Sources */
+  .sources-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 28px; }
+  .sources-section h2 { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+  .source-list { list-style: none; }
+  .source-list li { font-size: 12px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid rgba(48,54,61,0.3); }
+  .source-list li:last-child { border-bottom: none; }
+  .source-list a { color: var(--magenta); text-decoration: none; }
+
+  /* Disclaimer */
+  .disclaimer { background: rgba(244,112,103,0.05); border: 1px solid rgba(244,112,103,0.15); border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+
+  @media (max-width: 960px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .trigger-grid { grid-template-columns: 1fr; }
+    .picks-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .macro-grid { grid-template-columns: 1fr 1fr; }
+    .container { padding: 16px 12px; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="header-label">⚡ SECTOR THEME INTEL</div>
+    <h1 id="header-theme"></h1>
+    <div class="meta">
+      <span class="meta-tag" id="meta-category"></span>
+      <span class="meta-tag" id="meta-week"></span>
+      <span class="meta-tag" id="meta-date"></span>
+      <span class="meta-tag" id="meta-stocks"></span>
+    </div>
+  </header>
+
+  <!-- Macro Overview -->
+  <section class="macro-section">
+    <h2>📊 Phase 1 — 매크로 분석</h2>
+    <div class="macro-grid" id="macro-grid"></div>
+    <div class="trigger-grid" id="trigger-grid"></div>
+    <div class="bottleneck-list" id="bottleneck-list"></div>
+  </section>
+
+  <!-- 1-Year Performance Chart -->
+  <div class="chart-full">
+    <h2>📈 1-Year Relative Performance (정규화 기준, 1년 전=100)</h2>
+    <canvas id="perfChart"></canvas>
+  </div>
+
+  <!-- Comparison Matrix -->
+  <div class="matrix-section">
+    <h2>📋 Phase 2 — 종목 풀 비교 매트릭스 (총 <span id="stock-count"></span>개)</h2>
+    <table class="matrix-table" id="matrix-table"></table>
+  </div>
+
+  <!-- Top 3 Picks -->
+  <section class="picks-section">
+    <h2>🏆 Phase 3 — Top 3 픽</h2>
+    <div class="picks-grid" id="picks-grid"></div>
+  </section>
+
+  <!-- Watchlist -->
+  <div class="watchlist-section">
+    <h2>👁 Phase 4 — 워치리스트</h2>
+    <table class="watchlist-table" id="watchlist-table"></table>
+  </div>
+
+  <!-- LG U+ Implications -->
+  <div class="lg-section">
+    <h2>🇰🇷 Phase 5 — 한국·LG U+ 사업 시사점</h2>
+    <div id="lg-items"></div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-section">
+    <h2>참고 소스</h2>
+    <ul class="source-list" id="source-list"></ul>
+  </div>
+
+  <div class="disclaimer">
+    <strong>⚠ 면책 고지:</strong> 본 분석은 AI 에이전트가 공개 정보를 기반으로 생성한 참고 자료이며, 투자 자문이 아닙니다. 모든 투자 결정은 투자자 본인의 판단과 책임 하에 이루어져야 합니다.
+  </div>
+
+  <footer class="footer">
+    Stock Intel Agent — LG U+ B2B AI &nbsp;|&nbsp; Generated by Claude Sonnet 4.6 &nbsp;|&nbsp; <span id="footer-date"></span>
+  </footer>
+</div>
+
+<script>
+const THEME_DATA = {
+  "date": "2026-05-17",
+  "theme": "반도체 소재·장비",
+  "category": "upstream",
+  "isoWeek": "2026-W20",
+  "macro": {
+    "tam": {
+      "current": "$134B",
+      "target": "$231B",
+      "year": "2033"
+    },
+    "cpo_tam": {
+      "current": "$74B",
+      "target": "$104B",
+      "year": "2034",
+      "cagr": "4.2%"
+    },
+    "cagr": "8.2%",
+    "triggers": [
+      {
+        "title": "HBM·AI 칩 수요 폭발",
+        "desc": "HBM 시장 +50% YoY, AI 서버 CapEx 하이퍼스케일러 급증. 고급 노드 장비 수요 직접 견인"
+      },
+      {
+        "title": "첨단 패키징 장비 급증",
+        "desc": "2.5D/3D IC, CoWoS, HBM 패키징 공정 — KLA 어드밴스드 패키징 매출 $635M→$1B 가시적"
+      },
+      {
+        "title": "글로벌 신규 Fab 투자",
+        "desc": "TSMC 구마모토·애리조나, 삼성 텍사스, 인텔 오하이오 장비 발주 사이클 2026~2027 집중"
+      }
+    ],
+    "bottlenecks": [
+      "EUV→중국 수출 차단(ASML)",
+      "DUV 추가 제재 위험(MATCH Act)",
+      "부품 리드타임 12~18개월",
+      "포토레지스트 공급 과점"
+    ]
+  },
+  "stocks": [
+    {
+      "ticker": "KLAC",
+      "name": "KLA Corporation",
+      "market": "NASDAQ",
+      "price": 1804.32,
+      "currency": "USD",
+      "pct1y": 128.1,
+      "fwdPe": 39.8,
+      "revGrowth": 11.5,
+      "aiExposure": "◎",
+      "lgRelevance": "△",
+      "note": "공정제어 독과점·순이익률 33.4% 그룹 최고",
+      "priceHistory": [
+        {
+          "date": "2025-05-12",
+          "close": 791.17
+        },
+        {
+          "date": "2025-05-19",
+          "close": 757.17
+        },
+        {
+          "date": "2025-05-26",
+          "close": 756.88
+        },
+        {
+          "date": "2025-06-02",
+          "close": 808.0
+        },
+        {
+          "date": "2025-06-09",
+          "close": 867.67
+        },
+        {
+          "date": "2025-06-16",
+          "close": 850.0
+        },
+        {
+          "date": "2025-06-23",
+          "close": 889.87
+        },
+        {
+          "date": "2025-06-30",
+          "close": 924.58
+        },
+        {
+          "date": "2025-07-07",
+          "close": 924.58
+        },
+        {
+          "date": "2025-07-14",
+          "close": 931.12
+        },
+        {
+          "date": "2025-07-21",
+          "close": 902.09
+        },
+        {
+          "date": "2025-07-28",
+          "close": 886.64
+        },
+        {
+          "date": "2025-08-04",
+          "close": 914.8
+        },
+        {
+          "date": "2025-08-11",
+          "close": 874.94
+        },
+        {
+          "date": "2025-08-18",
+          "close": 870.28
+        },
+        {
+          "date": "2025-08-25",
+          "close": 872.0
+        },
+        {
+          "date": "2025-09-01",
+          "close": 905.09
+        },
+        {
+          "date": "2025-09-08",
+          "close": 964.02
+        },
+        {
+          "date": "2025-09-15",
+          "close": 1044.81
+        },
+        {
+          "date": "2025-09-22",
+          "close": 1064.29
+        },
+        {
+          "date": "2025-09-29",
+          "close": 1101.55
+        },
+        {
+          "date": "2025-10-06",
+          "close": 982.75
+        },
+        {
+          "date": "2025-10-13",
+          "close": 1106.66
+        },
+        {
+          "date": "2025-10-20",
+          "close": 1182.82
+        },
+        {
+          "date": "2025-10-27",
+          "close": 1208.74
+        },
+        {
+          "date": "2025-11-03",
+          "close": 1193.37
+        },
+        {
+          "date": "2025-11-10",
+          "close": 1134.32
+        },
+        {
+          "date": "2025-11-17",
+          "close": 1097.12
+        },
+        {
+          "date": "2025-11-24",
+          "close": 1175.47
+        },
+        {
+          "date": "2025-12-01",
+          "close": 1214.46
+        },
+        {
+          "date": "2025-12-08",
+          "close": 1193.92
+        },
+        {
+          "date": "2025-12-15",
+          "close": 1245.67
+        },
+        {
+          "date": "2025-12-22",
+          "close": 1279.6
+        },
+        {
+          "date": "2025-12-29",
+          "close": 1274.47
+        },
+        {
+          "date": "2026-01-05",
+          "close": 1400.0
+        },
+        {
+          "date": "2026-01-12",
+          "close": 1567.82
+        },
+        {
+          "date": "2026-01-19",
+          "close": 1512.78
+        },
+        {
+          "date": "2026-01-26",
+          "close": 1427.94
+        },
+        {
+          "date": "2026-02-02",
+          "close": 1442.95
+        },
+        {
+          "date": "2026-02-09",
+          "close": 1464.13
+        },
+        {
+          "date": "2026-02-16",
+          "close": 1496.0
+        },
+        {
+          "date": "2026-02-23",
+          "close": 1524.55
+        },
+        {
+          "date": "2026-03-02",
+          "close": 1344.55
+        },
+        {
+          "date": "2026-03-09",
+          "close": 1418.64
+        },
+        {
+          "date": "2026-03-16",
+          "close": 1498.67
+        },
+        {
+          "date": "2026-03-23",
+          "close": 1443.21
+        },
+        {
+          "date": "2026-03-30",
+          "close": 1516.84
+        },
+        {
+          "date": "2026-04-06",
+          "close": 1737.28
+        },
+        {
+          "date": "2026-04-13",
+          "close": 1791.44
+        },
+        {
+          "date": "2026-04-20",
+          "close": 1935.0
+        },
+        {
+          "date": "2026-04-27",
+          "close": 1726.26
+        },
+        {
+          "date": "2026-05-04",
+          "close": 1869.19
+        },
+        {
+          "date": "2026-05-11",
+          "close": 1804.32
+        },
+        {
+          "date": "2026-05-15",
+          "close": 1804.32
+        }
+      ]
+    },
+    {
+      "ticker": "LRCX",
+      "name": "Lam Research",
+      "market": "NASDAQ",
+      "price": 284.72,
+      "currency": "USD",
+      "pct1y": 237.2,
+      "fwdPe": 36.5,
+      "revGrowth": 23.8,
+      "aiExposure": "◎",
+      "lgRelevance": "△",
+      "note": "Etch·Deposition 1위, HBM CapEx 직수혜",
+      "priceHistory": [
+        {
+          "date": "2025-05-12",
+          "close": 84.43
+        },
+        {
+          "date": "2025-05-19",
+          "close": 81.06
+        },
+        {
+          "date": "2025-05-26",
+          "close": 80.79
+        },
+        {
+          "date": "2025-06-02",
+          "close": 86.35
+        },
+        {
+          "date": "2025-06-09",
+          "close": 89.52
+        },
+        {
+          "date": "2025-06-16",
+          "close": 90.49
+        },
+        {
+          "date": "2025-06-23",
+          "close": 97.2
+        },
+        {
+          "date": "2025-06-30",
+          "close": 98.81
+        },
+        {
+          "date": "2025-07-07",
+          "close": 101.73
+        },
+        {
+          "date": "2025-07-14",
+          "close": 100.66
+        },
+        {
+          "date": "2025-07-21",
+          "close": 96.96
+        },
+        {
+          "date": "2025-07-28",
+          "close": 96.37
+        },
+        {
+          "date": "2025-08-04",
+          "close": 101.75
+        },
+        {
+          "date": "2025-08-11",
+          "close": 99.51
+        },
+        {
+          "date": "2025-08-18",
+          "close": 100.08
+        },
+        {
+          "date": "2025-08-25",
+          "close": 100.15
+        },
+        {
+          "date": "2025-09-01",
+          "close": 102.95
+        },
+        {
+          "date": "2025-09-08",
+          "close": 116.96
+        },
+        {
+          "date": "2025-09-15",
+          "close": 126.92
+        },
+        {
+          "date": "2025-09-22",
+          "close": 128.33
+        },
+        {
+          "date": "2025-09-29",
+          "close": 145.81
+        },
+        {
+          "date": "2025-10-06",
+          "close": 131.37
+        },
+        {
+          "date": "2025-10-13",
+          "close": 141.51
+        },
+        {
+          "date": "2025-10-20",
+          "close": 151.68
+        },
+        {
+          "date": "2025-10-27",
+          "close": 157.46
+        },
+        {
+          "date": "2025-11-03",
+          "close": 159.35
+        },
+        {
+          "date": "2025-11-10",
+          "close": 148.26
+        },
+        {
+          "date": "2025-11-17",
+          "close": 142.65
+        },
+        {
+          "date": "2025-11-24",
+          "close": 156.0
+        },
+        {
+          "date": "2025-12-01",
+          "close": 158.7
+        },
+        {
+          "date": "2025-12-08",
+          "close": 160.52
+        },
+        {
+          "date": "2025-12-15",
+          "close": 172.27
+        },
+        {
+          "date": "2025-12-22",
+          "close": 178.07
+        },
+        {
+          "date": "2025-12-29",
+          "close": 185.06
+        },
+        {
+          "date": "2026-01-05",
+          "close": 218.36
+        },
+        {
+          "date": "2026-01-12",
+          "close": 222.96
+        },
+        {
+          "date": "2026-01-19",
+          "close": 217.94
+        },
+        {
+          "date": "2026-01-26",
+          "close": 233.46
+        },
+        {
+          "date": "2026-02-02",
+          "close": 231.01
+        },
+        {
+          "date": "2026-02-09",
+          "close": 235.53
+        },
+        {
+          "date": "2026-02-16",
+          "close": 244.92
+        },
+        {
+          "date": "2026-02-23",
+          "close": 233.89
+        },
+        {
+          "date": "2026-03-02",
+          "close": 199.33
+        },
+        {
+          "date": "2026-03-09",
+          "close": 212.2
+        },
+        {
+          "date": "2026-03-16",
+          "close": 228.36
+        },
+        {
+          "date": "2026-03-23",
+          "close": 211.41
+        },
+        {
+          "date": "2026-03-30",
+          "close": 218.44
+        },
+        {
+          "date": "2026-04-06",
+          "close": 263.66
+        },
+        {
+          "date": "2026-04-13",
+          "close": 267.6
+        },
+        {
+          "date": "2026-04-20",
+          "close": 267.78
+        },
+        {
+          "date": "2026-04-27",
+          "close": 256.72
+        },
+        {
+          "date": "2026-05-04",
+          "close": 294.05
+        },
+        {
+          "date": "2026-05-11",
+          "close": 284.72
+        },
+        {
+          "date": "2026-05-15",
+          "close": 284.72
+        }
+      ]
+    },
+    {
+      "ticker": "AMAT",
+      "name": "Applied Materials",
+      "market": "NASDAQ",
+      "price": 436.62,
+      "currency": "USD",
+      "pct1y": 163.7,
+      "fwdPe": 40.0,
+      "revGrowth": 11.4,
+      "aiExposure": "◎",
+      "lgRelevance": "△",
+      "note": "최광범위 포트폴리오, ICAPS·어드밴스드 패키징",
+      "priceHistory": [
+        {
+          "date": "2025-05-12",
+          "close": 165.57
+        },
+        {
+          "date": "2025-05-19",
+          "close": 157.51
+        },
+        {
+          "date": "2025-05-26",
+          "close": 156.75
+        },
+        {
+          "date": "2025-06-02",
+          "close": 166.74
+        },
+        {
+          "date": "2025-06-09",
+          "close": 170.59
+        },
+        {
+          "date": "2025-06-16",
+          "close": 169.46
+        },
+        {
+          "date": "2025-06-23",
+          "close": 183.21
+        },
+        {
+          "date": "2025-06-30",
+          "close": 191.05
+        },
+        {
+          "date": "2025-07-07",
+          "close": 197.93
+        },
+        {
+          "date": "2025-07-14",
+          "close": 190.44
+        },
+        {
+          "date": "2025-07-21",
+          "close": 185.69
+        },
+        {
+          "date": "2025-07-28",
+          "close": 179.99
+        },
+        {
+          "date": "2025-08-04",
+          "close": 184.87
+        },
+        {
+          "date": "2025-08-11",
+          "close": 161.76
+        },
+        {
+          "date": "2025-08-18",
+          "close": 162.49
+        },
+        {
+          "date": "2025-08-25",
+          "close": 160.76
+        },
+        {
+          "date": "2025-09-01",
+          "close": 162.75
+        },
+        {
+          "date": "2025-09-08",
+          "close": 167.8
+        },
+        {
+          "date": "2025-09-15",
+          "close": 190.1
+        },
+        {
+          "date": "2025-09-22",
+          "close": 203.92
+        },
+        {
+          "date": "2025-09-29",
+          "close": 217.53
+        },
+        {
+          "date": "2025-10-06",
+          "close": 209.95
+        },
+        {
+          "date": "2025-10-13",
+          "close": 224.99
+        },
+        {
+          "date": "2025-10-20",
+          "close": 228.75
+        },
+        {
+          "date": "2025-10-27",
+          "close": 233.1
+        },
+        {
+          "date": "2025-11-03",
+          "close": 230.07
+        },
+        {
+          "date": "2025-11-10",
+          "close": 226.01
+        },
+        {
+          "date": "2025-11-17",
+          "close": 224.01
+        },
+        {
+          "date": "2025-11-24",
+          "close": 252.25
+        },
+        {
+          "date": "2025-12-01",
+          "close": 268.0
+        },
+        {
+          "date": "2025-12-08",
+          "close": 259.21
+        },
+        {
+          "date": "2025-12-15",
+          "close": 256.41
+        },
+        {
+          "date": "2025-12-22",
+          "close": 261.9
+        },
+        {
+          "date": "2025-12-29",
+          "close": 268.87
+        },
+        {
+          "date": "2026-01-05",
+          "close": 301.18
+        },
+        {
+          "date": "2026-01-12",
+          "close": 327.01
+        },
+        {
+          "date": "2026-01-19",
+          "close": 322.38
+        },
+        {
+          "date": "2026-01-26",
+          "close": 322.32
+        },
+        {
+          "date": "2026-02-02",
+          "close": 322.51
+        },
+        {
+          "date": "2026-02-09",
+          "close": 354.91
+        },
+        {
+          "date": "2026-02-16",
+          "close": 375.38
+        },
+        {
+          "date": "2026-02-23",
+          "close": 372.3
+        },
+        {
+          "date": "2026-03-02",
+          "close": 324.74
+        },
+        {
+          "date": "2026-03-09",
+          "close": 341.53
+        },
+        {
+          "date": "2026-03-16",
+          "close": 357.06
+        },
+        {
+          "date": "2026-03-23",
+          "close": 337.17
+        },
+        {
+          "date": "2026-03-30",
+          "close": 348.47
+        },
+        {
+          "date": "2026-04-06",
+          "close": 399.49
+        },
+        {
+          "date": "2026-04-13",
+          "close": 396.94
+        },
+        {
+          "date": "2026-04-20",
+          "close": 417.04
+        },
+        {
+          "date": "2026-04-27",
+          "close": 389.08
+        },
+        {
+          "date": "2026-05-04",
+          "close": 435.44
+        },
+        {
+          "date": "2026-05-11",
+          "close": 436.62
+        },
+        {
+          "date": "2026-05-15",
+          "close": 436.62
+        }
+      ]
+    },
+    {
+      "ticker": "ENTG",
+      "name": "Entegris",
+      "market": "NASDAQ",
+      "price": 133.07,
+      "currency": "USD",
+      "pct1y": 70.1,
+      "fwdPe": 30.0,
+      "revGrowth": 5.0,
+      "aiExposure": "○",
+      "lgRelevance": "△",
+      "note": "초순수 공정소재 1위, 안정 성장",
+      "priceHistory": [
+        {
+          "date": "2025-05-12",
+          "close": 78.24
+        },
+        {
+          "date": "2025-05-19",
+          "close": 72.34
+        },
+        {
+          "date": "2025-05-26",
+          "close": 68.74
+        },
+        {
+          "date": "2025-06-02",
+          "close": 72.92
+        },
+        {
+          "date": "2025-06-09",
+          "close": 75.34
+        },
+        {
+          "date": "2025-06-16",
+          "close": 75.42
+        },
+        {
+          "date": "2025-06-23",
+          "close": 82.38
+        },
+        {
+          "date": "2025-06-30",
+          "close": 86.64
+        },
+        {
+          "date": "2025-07-07",
+          "close": 87.58
+        },
+        {
+          "date": "2025-07-14",
+          "close": 90.75
+        },
+        {
+          "date": "2025-07-21",
+          "close": 91.85
+        },
+        {
+          "date": "2025-07-28",
+          "close": 75.66
+        },
+        {
+          "date": "2025-08-04",
+          "close": 73.14
+        },
+        {
+          "date": "2025-08-11",
+          "close": 77.12
+        },
+        {
+          "date": "2025-08-18",
+          "close": 87.76
+        },
+        {
+          "date": "2025-08-25",
+          "close": 83.74
+        },
+        {
+          "date": "2025-09-01",
+          "close": 81.98
+        },
+        {
+          "date": "2025-09-08",
+          "close": 87.25
+        },
+        {
+          "date": "2025-09-15",
+          "close": 93.32
+        },
+        {
+          "date": "2025-09-22",
+          "close": 93.09
+        },
+        {
+          "date": "2025-09-29",
+          "close": 98.61
+        },
+        {
+          "date": "2025-10-06",
+          "close": 83.64
+        },
+        {
+          "date": "2025-10-13",
+          "close": 90.94
+        },
+        {
+          "date": "2025-10-20",
+          "close": 91.52
+        },
+        {
+          "date": "2025-10-27",
+          "close": 91.57
+        },
+        {
+          "date": "2025-11-03",
+          "close": 86.67
+        },
+        {
+          "date": "2025-11-10",
+          "close": 78.28
+        },
+        {
+          "date": "2025-11-17",
+          "close": 73.66
+        },
+        {
+          "date": "2025-11-24",
+          "close": 77.14
+        },
+        {
+          "date": "2025-12-01",
+          "close": 89.15
+        },
+        {
+          "date": "2025-12-08",
+          "close": 92.55
+        },
+        {
+          "date": "2025-12-15",
+          "close": 84.06
+        },
+        {
+          "date": "2025-12-22",
+          "close": 86.27
+        },
+        {
+          "date": "2025-12-29",
+          "close": 89.56
+        },
+        {
+          "date": "2026-01-05",
+          "close": 102.99
+        },
+        {
+          "date": "2026-01-12",
+          "close": 117.35
+        },
+        {
+          "date": "2026-01-19",
+          "close": 114.71
+        },
+        {
+          "date": "2026-01-26",
+          "close": 118.07
+        },
+        {
+          "date": "2026-02-02",
+          "close": 122.37
+        },
+        {
+          "date": "2026-02-09",
+          "close": 131.43
+        },
+        {
+          "date": "2026-02-16",
+          "close": 134.49
+        },
+        {
+          "date": "2026-02-23",
+          "close": 132.45
+        },
+        {
+          "date": "2026-03-02",
+          "close": 112.44
+        },
+        {
+          "date": "2026-03-09",
+          "close": 108.28
+        },
+        {
+          "date": "2026-03-16",
+          "close": 114.66
+        },
+        {
+          "date": "2026-03-23",
+          "close": 113.59
+        },
+        {
+          "date": "2026-03-30",
+          "close": 116.4
+        },
+        {
+          "date": "2026-04-06",
+          "close": 135.32
+        },
+        {
+          "date": "2026-04-13",
+          "close": 146.06
+        },
+        {
+          "date": "2026-04-20",
+          "close": 155.98
+        },
+        {
+          "date": "2026-04-27",
+          "close": 142.29
+        },
+        {
+          "date": "2026-05-04",
+          "close": 149.11
+        },
+        {
+          "date": "2026-05-11",
+          "close": 133.07
+        },
+        {
+          "date": "2026-05-15",
+          "close": 133.07
+        }
+      ]
+    },
+    {
+      "ticker": "MKSI",
+      "name": "MKS Instruments",
+      "market": "NASDAQ",
+      "price": 303.17,
+      "currency": "USD",
+      "pct1y": 234.4,
+      "fwdPe": 25.0,
+      "revGrowth": 15.0,
+      "aiExposure": "○",
+      "lgRelevance": "△",
+      "note": "플라즈마·진공 부품, 레버리지 회복 중",
+      "priceHistory": [
+        {
+          "date": "2025-05-12",
+          "close": 90.66
+        },
+        {
+          "date": "2025-05-19",
+          "close": 83.82
+        },
+        {
+          "date": "2025-05-26",
+          "close": 82.19
+        },
+        {
+          "date": "2025-06-02",
+          "close": 88.64
+        },
+        {
+          "date": "2025-06-09",
+          "close": 89.37
+        },
+        {
+          "date": "2025-06-16",
+          "close": 90.71
+        },
+        {
+          "date": "2025-06-23",
+          "close": 100.21
+        },
+        {
+          "date": "2025-06-30",
+          "close": 104.56
+        },
+        {
+          "date": "2025-07-07",
+          "close": 106.45
+        },
+        {
+          "date": "2025-07-14",
+          "close": 104.71
+        },
+        {
+          "date": "2025-07-21",
+          "close": 99.5
+        },
+        {
+          "date": "2025-07-28",
+          "close": 92.75
+        },
+        {
+          "date": "2025-08-04",
+          "close": 99.37
+        },
+        {
+          "date": "2025-08-11",
+          "close": 100.22
+        },
+        {
+          "date": "2025-08-18",
+          "close": 105.25
+        },
+        {
+          "date": "2025-08-25",
+          "close": 103.34
+        },
+        {
+          "date": "2025-09-01",
+          "close": 104.49
+        },
+        {
+          "date": "2025-09-08",
+          "close": 115.1
+        },
+        {
+          "date": "2025-09-15",
+          "close": 128.62
+        },
+        {
+          "date": "2025-09-22",
+          "close": 121.81
+        },
+        {
+          "date": "2025-09-29",
+          "close": 137.86
+        },
+        {
+          "date": "2025-10-06",
+          "close": 121.26
+        },
+        {
+          "date": "2025-10-13",
+          "close": 136.52
+        },
+        {
+          "date": "2025-10-20",
+          "close": 142.94
+        },
+        {
+          "date": "2025-10-27",
+          "close": 143.71
+        },
+        {
+          "date": "2025-11-03",
+          "close": 154.8
+        },
+        {
+          "date": "2025-11-10",
+          "close": 142.74
+        },
+        {
+          "date": "2025-11-17",
+          "close": 144.0
+        },
+        {
+          "date": "2025-11-24",
+          "close": 156.39
+        },
+        {
+          "date": "2025-12-01",
+          "close": 162.94
+        },
+        {
+          "date": "2025-12-08",
+          "close": 155.77
+        },
+        {
+          "date": "2025-12-15",
+          "close": 159.56
+        },
+        {
+          "date": "2025-12-22",
+          "close": 164.19
+        },
+        {
+          "date": "2025-12-29",
+          "close": 168.36
+        },
+        {
+          "date": "2026-01-05",
+          "close": 186.08
+        },
+        {
+          "date": "2026-01-12",
+          "close": 203.99
+        },
+        {
+          "date": "2026-01-19",
+          "close": 217.06
+        },
+        {
+          "date": "2026-01-26",
+          "close": 235.41
+        },
+        {
+          "date": "2026-02-02",
+          "close": 242.96
+        },
+        {
+          "date": "2026-02-09",
+          "close": 260.74
+        },
+        {
+          "date": "2026-02-16",
+          "close": 259.27
+        },
+        {
+          "date": "2026-02-23",
+          "close": 244.46
+        },
+        {
+          "date": "2026-03-02",
+          "close": 210.0
+        },
+        {
+          "date": "2026-03-09",
+          "close": 213.45
+        },
+        {
+          "date": "2026-03-16",
+          "close": 227.13
+        },
+        {
+          "date": "2026-03-23",
+          "close": 223.18
+        },
+        {
+          "date": "2026-03-30",
+          "close": 234.66
+        },
+        {
+          "date": "2026-04-06",
+          "close": 268.77
+        },
+        {
+          "date": "2026-04-13",
+          "close": 278.59
+        },
+        {
+          "date": "2026-04-20",
+          "close": 280.98
+        },
+        {
+          "date": "2026-04-27",
+          "close": 279.38
+        },
+        {
+          "date": "2026-05-04",
+          "close": 313.21
+        },
+        {
+          "date": "2026-05-11",
+          "close": 303.17
+        },
+        {
+          "date": "2026-05-15",
+          "close": 303.17
+        }
+      ]
+    },
+    {
+      "ticker": "8035.T",
+      "name": "Tokyo Electron (TEL)",
+      "market": "TSE",
+      "price": 50290.0,
+      "currency": "JPY",
+      "pct1y": 114.3,
+      "fwdPe": 40.2,
+      "revGrowth": 6.9,
+      "aiExposure": "◎",
+      "lgRelevance": "△",
+      "note": "글로벌 장비 2위, 식각·증착·코팅 전방위",
+      "priceHistory": [
+        {
+          "date": "2025-05-11",
+          "close": 23465.0
+        },
+        {
+          "date": "2025-05-18",
+          "close": 22755.0
+        },
+        {
+          "date": "2025-05-25",
+          "close": 23000.0
+        },
+        {
+          "date": "2025-06-01",
+          "close": 23650.0
+        },
+        {
+          "date": "2025-06-08",
+          "close": 23800.0
+        },
+        {
+          "date": "2025-06-15",
+          "close": 23985.0
+        },
+        {
+          "date": "2025-06-22",
+          "close": 27515.0
+        },
+        {
+          "date": "2025-06-29",
+          "close": 27175.0
+        },
+        {
+          "date": "2025-07-06",
+          "close": 27000.0
+        },
+        {
+          "date": "2025-07-13",
+          "close": 27850.0
+        },
+        {
+          "date": "2025-07-20",
+          "close": 27960.0
+        },
+        {
+          "date": "2025-07-27",
+          "close": 22405.0
+        },
+        {
+          "date": "2025-08-03",
+          "close": 21290.0
+        },
+        {
+          "date": "2025-08-10",
+          "close": 21505.0
+        },
+        {
+          "date": "2025-08-17",
+          "close": 20095.0
+        },
+        {
+          "date": "2025-08-24",
+          "close": 20665.0
+        },
+        {
+          "date": "2025-08-31",
+          "close": 20240.0
+        },
+        {
+          "date": "2025-09-07",
+          "close": 22585.0
+        },
+        {
+          "date": "2025-09-14",
+          "close": 25610.0
+        },
+        {
+          "date": "2025-09-21",
+          "close": 26545.0
+        },
+        {
+          "date": "2025-09-28",
+          "close": 28490.0
+        },
+        {
+          "date": "2025-10-05",
+          "close": 29280.0
+        },
+        {
+          "date": "2025-10-12",
+          "close": 30080.0
+        },
+        {
+          "date": "2025-10-19",
+          "close": 30270.0
+        },
+        {
+          "date": "2025-10-26",
+          "close": 34180.0
+        },
+        {
+          "date": "2025-11-02",
+          "close": 32800.0
+        },
+        {
+          "date": "2025-11-09",
+          "close": 31850.0
+        },
+        {
+          "date": "2025-11-16",
+          "close": 30180.0
+        },
+        {
+          "date": "2025-11-23",
+          "close": 31800.0
+        },
+        {
+          "date": "2025-11-30",
+          "close": 33140.0
+        },
+        {
+          "date": "2025-12-07",
+          "close": 31500.0
+        },
+        {
+          "date": "2025-12-14",
+          "close": 31200.0
+        },
+        {
+          "date": "2025-12-21",
+          "close": 34330.0
+        },
+        {
+          "date": "2025-12-28",
+          "close": 34320.0
+        },
+        {
+          "date": "2026-01-04",
+          "close": 37910.0
+        },
+        {
+          "date": "2026-01-11",
+          "close": 42150.0
+        },
+        {
+          "date": "2026-01-18",
+          "close": 41720.0
+        },
+        {
+          "date": "2026-01-25",
+          "close": 41310.0
+        },
+        {
+          "date": "2026-02-01",
+          "close": 41030.0
+        },
+        {
+          "date": "2026-02-08",
+          "close": 41990.0
+        },
+        {
+          "date": "2026-02-15",
+          "close": 43960.0
+        },
+        {
+          "date": "2026-02-22",
+          "close": 44010.0
+        },
+        {
+          "date": "2026-03-01",
+          "close": 41790.0
+        },
+        {
+          "date": "2026-03-08",
+          "close": 38340.0
+        },
+        {
+          "date": "2026-03-15",
+          "close": 39330.0
+        },
+        {
+          "date": "2026-03-22",
+          "close": 39290.0
+        },
+        {
+          "date": "2026-03-29",
+          "close": 38420.0
+        },
+        {
+          "date": "2026-04-05",
+          "close": 44040.0
+        },
+        {
+          "date": "2026-04-12",
+          "close": 44010.0
+        },
+        {
+          "date": "2026-04-19",
+          "close": 45850.0
+        },
+        {
+          "date": "2026-04-26",
+          "close": 47450.0
+        },
+        {
+          "date": "2026-05-03",
+          "close": 52450.0
+        },
+        {
+          "date": "2026-05-10",
+          "close": 50290.0
+        },
+        {
+          "date": "2026-05-15",
+          "close": 50290.0
+        }
+      ]
+    },
+    {
+      "ticker": "6857.T",
+      "name": "Advantest",
+      "market": "TSE",
+      "price": 26360.0,
+      "currency": "JPY",
+      "pct1y": 262.4,
+      "fwdPe": 30.0,
+      "revGrowth": 26.0,
+      "aiExposure": "◎",
+      "lgRelevance": "○",
+      "note": "AI SoC 테스터 글로벌 1위, 삼성·NVIDIA 공급망",
+      "priceHistory": [
+        {
+          "date": "2025-05-11",
+          "close": 7273.0
+        },
+        {
+          "date": "2025-05-18",
+          "close": 6815.0
+        },
+        {
+          "date": "2025-05-25",
+          "close": 7367.0
+        },
+        {
+          "date": "2025-06-01",
+          "close": 7929.0
+        },
+        {
+          "date": "2025-06-08",
+          "close": 8504.0
+        },
+        {
+          "date": "2025-06-15",
+          "close": 9831.0
+        },
+        {
+          "date": "2025-06-22",
+          "close": 10585.0
+        },
+        {
+          "date": "2025-06-29",
+          "close": 10675.0
+        },
+        {
+          "date": "2025-07-06",
+          "close": 11325.0
+        },
+        {
+          "date": "2025-07-13",
+          "close": 11185.0
+        },
+        {
+          "date": "2025-07-20",
+          "close": 11495.0
+        },
+        {
+          "date": "2025-07-27",
+          "close": 10215.0
+        },
+        {
+          "date": "2025-08-03",
+          "close": 10485.0
+        },
+        {
+          "date": "2025-08-10",
+          "close": 11295.0
+        },
+        {
+          "date": "2025-08-17",
+          "close": 10765.0
+        },
+        {
+          "date": "2025-08-24",
+          "close": 11675.0
+        },
+        {
+          "date": "2025-08-31",
+          "close": 11440.0
+        },
+        {
+          "date": "2025-09-07",
+          "close": 13950.0
+        },
+        {
+          "date": "2025-09-14",
+          "close": 15020.0
+        },
+        {
+          "date": "2025-09-21",
+          "close": 14470.0
+        },
+        {
+          "date": "2025-09-28",
+          "close": 15690.0
+        },
+        {
+          "date": "2025-10-05",
+          "close": 17835.0
+        },
+        {
+          "date": "2025-10-12",
+          "close": 16870.0
+        },
+        {
+          "date": "2025-10-19",
+          "close": 17080.0
+        },
+        {
+          "date": "2025-10-26",
+          "close": 23135.0
+        },
+        {
+          "date": "2025-11-02",
+          "close": 19960.0
+        },
+        {
+          "date": "2025-11-09",
+          "close": 19530.0
+        },
+        {
+          "date": "2025-11-16",
+          "close": 18315.0
+        },
+        {
+          "date": "2025-11-23",
+          "close": 20575.0
+        },
+        {
+          "date": "2025-11-30",
+          "close": 20200.0
+        },
+        {
+          "date": "2025-12-07",
+          "close": 20785.0
+        },
+        {
+          "date": "2025-12-14",
+          "close": 19195.0
+        },
+        {
+          "date": "2025-12-21",
+          "close": 20245.0
+        },
+        {
+          "date": "2025-12-28",
+          "close": 19635.0
+        },
+        {
+          "date": "2026-01-04",
+          "close": 20255.0
+        },
+        {
+          "date": "2026-01-11",
+          "close": 22800.0
+        },
+        {
+          "date": "2026-01-18",
+          "close": 23530.0
+        },
+        {
+          "date": "2026-01-25",
+          "close": 25505.0
+        },
+        {
+          "date": "2026-02-01",
+          "close": 24530.0
+        },
+        {
+          "date": "2026-02-08",
+          "close": 27130.0
+        },
+        {
+          "date": "2026-02-15",
+          "close": 25475.0
+        },
+        {
+          "date": "2026-02-22",
+          "close": 26850.0
+        },
+        {
+          "date": "2026-03-01",
+          "close": 25710.0
+        },
+        {
+          "date": "2026-03-08",
+          "close": 23650.0
+        },
+        {
+          "date": "2026-03-15",
+          "close": 23980.0
+        },
+        {
+          "date": "2026-03-22",
+          "close": 22070.0
+        },
+        {
+          "date": "2026-03-29",
+          "close": 21555.0
+        },
+        {
+          "date": "2026-04-05",
+          "close": 24990.0
+        },
+        {
+          "date": "2026-04-12",
+          "close": 27870.0
+        },
+        {
+          "date": "2026-04-19",
+          "close": 29440.0
+        },
+        {
+          "date": "2026-04-26",
+          "close": 27815.0
+        },
+        {
+          "date": "2026-05-03",
+          "close": 29885.0
+        },
+        {
+          "date": "2026-05-10",
+          "close": 26360.0
+        },
+        {
+          "date": "2026-05-15",
+          "close": 26360.0
+        }
+      ]
+    },
+    {
+      "ticker": "6920.T",
+      "name": "Lasertec",
+      "market": "TSE",
+      "price": 38410.0,
+      "currency": "JPY",
+      "pct1y": 159.2,
+      "fwdPe": 35.0,
+      "revGrowth": 20.0,
+      "aiExposure": "◎",
+      "lgRelevance": "△",
+      "note": "EUV 마스크 검사 세계 유일, 고변동성",
+      "priceHistory": [
+        {
+          "date": "2025-05-11",
+          "close": 14820.0
+        },
+        {
+          "date": "2025-05-18",
+          "close": 14160.0
+        },
+        {
+          "date": "2025-05-25",
+          "close": 14605.0
+        },
+        {
+          "date": "2025-06-01",
+          "close": 14525.0
+        },
+        {
+          "date": "2025-06-08",
+          "close": 14595.0
+        },
+        {
+          "date": "2025-06-15",
+          "close": 16470.0
+        },
+        {
+          "date": "2025-06-22",
+          "close": 19545.0
+        },
+        {
+          "date": "2025-06-29",
+          "close": 18655.0
+        },
+        {
+          "date": "2025-07-06",
+          "close": 19265.0
+        },
+        {
+          "date": "2025-07-13",
+          "close": 17475.0
+        },
+        {
+          "date": "2025-07-20",
+          "close": 16450.0
+        },
+        {
+          "date": "2025-07-27",
+          "close": 14620.0
+        },
+        {
+          "date": "2025-08-03",
+          "close": 14455.0
+        },
+        {
+          "date": "2025-08-10",
+          "close": 17405.0
+        },
+        {
+          "date": "2025-08-17",
+          "close": 16045.0
+        },
+        {
+          "date": "2025-08-24",
+          "close": 15655.0
+        },
+        {
+          "date": "2025-08-31",
+          "close": 15645.0
+        },
+        {
+          "date": "2025-09-07",
+          "close": 16685.0
+        },
+        {
+          "date": "2025-09-14",
+          "close": 19185.0
+        },
+        {
+          "date": "2025-09-21",
+          "close": 19730.0
+        },
+        {
+          "date": "2025-09-28",
+          "close": 20010.0
+        },
+        {
+          "date": "2025-10-05",
+          "close": 20225.0
+        },
+        {
+          "date": "2025-10-12",
+          "close": 20520.0
+        },
+        {
+          "date": "2025-10-19",
+          "close": 21680.0
+        },
+        {
+          "date": "2025-10-26",
+          "close": 28410.0
+        },
+        {
+          "date": "2025-11-02",
+          "close": 29100.0
+        },
+        {
+          "date": "2025-11-09",
+          "close": 28095.0
+        },
+        {
+          "date": "2025-11-16",
+          "close": 26515.0
+        },
+        {
+          "date": "2025-11-23",
+          "close": 28080.0
+        },
+        {
+          "date": "2025-11-30",
+          "close": 32600.0
+        },
+        {
+          "date": "2025-12-07",
+          "close": 31080.0
+        },
+        {
+          "date": "2025-12-14",
+          "close": 28520.0
+        },
+        {
+          "date": "2025-12-21",
+          "close": 30000.0
+        },
+        {
+          "date": "2025-12-28",
+          "close": 29645.0
+        },
+        {
+          "date": "2026-01-04",
+          "close": 30380.0
+        },
+        {
+          "date": "2026-01-11",
+          "close": 36590.0
+        },
+        {
+          "date": "2026-01-18",
+          "close": 36490.0
+        },
+        {
+          "date": "2026-01-25",
+          "close": 36390.0
+        },
+        {
+          "date": "2026-02-01",
+          "close": 30190.0
+        },
+        {
+          "date": "2026-02-08",
+          "close": 30860.0
+        },
+        {
+          "date": "2026-02-15",
+          "close": 30640.0
+        },
+        {
+          "date": "2026-02-22",
+          "close": 33660.0
+        },
+        {
+          "date": "2026-03-01",
+          "close": 33310.0
+        },
+        {
+          "date": "2026-03-08",
+          "close": 37550.0
+        },
+        {
+          "date": "2026-03-15",
+          "close": 35090.0
+        },
+        {
+          "date": "2026-03-22",
+          "close": 34970.0
+        },
+        {
+          "date": "2026-03-29",
+          "close": 35860.0
+        },
+        {
+          "date": "2026-04-05",
+          "close": 41580.0
+        },
+        {
+          "date": "2026-04-12",
+          "close": 39950.0
+        },
+        {
+          "date": "2026-04-19",
+          "close": 45060.0
+        },
+        {
+          "date": "2026-04-26",
+          "close": 42930.0
+        },
+        {
+          "date": "2026-05-03",
+          "close": 43770.0
+        },
+        {
+          "date": "2026-05-10",
+          "close": 38410.0
+        },
+        {
+          "date": "2026-05-15",
+          "close": 38410.0
+        }
+      ]
+    },
+    {
+      "ticker": "4063.T",
+      "name": "Shin-Etsu Chemical",
+      "market": "TSE",
+      "price": 7105.0,
+      "currency": "JPY",
+      "pct1y": 51.5,
+      "fwdPe": 15.0,
+      "revGrowth": 5.0,
+      "aiExposure": "○",
+      "lgRelevance": "△",
+      "note": "실리콘 웨이퍼·포토레지스트 글로벌 1위, 안정배당",
+      "priceHistory": [
+        {
+          "date": "2025-05-11",
+          "close": 4689.0
+        },
+        {
+          "date": "2025-05-18",
+          "close": 4540.0
+        },
+        {
+          "date": "2025-05-25",
+          "close": 4641.0
+        },
+        {
+          "date": "2025-06-01",
+          "close": 4525.0
+        },
+        {
+          "date": "2025-06-08",
+          "close": 4434.0
+        },
+        {
+          "date": "2025-06-15",
+          "close": 4408.0
+        },
+        {
+          "date": "2025-06-22",
+          "close": 4738.0
+        },
+        {
+          "date": "2025-06-29",
+          "close": 4874.0
+        },
+        {
+          "date": "2025-07-06",
+          "close": 4695.0
+        },
+        {
+          "date": "2025-07-13",
+          "close": 4681.0
+        },
+        {
+          "date": "2025-07-20",
+          "close": 4530.0
+        },
+        {
+          "date": "2025-07-27",
+          "close": 4365.0
+        },
+        {
+          "date": "2025-08-03",
+          "close": 4439.0
+        },
+        {
+          "date": "2025-08-10",
+          "close": 4628.0
+        },
+        {
+          "date": "2025-08-17",
+          "close": 4509.0
+        },
+        {
+          "date": "2025-08-24",
+          "close": 4557.0
+        },
+        {
+          "date": "2025-08-31",
+          "close": 4403.0
+        },
+        {
+          "date": "2025-09-07",
+          "close": 4416.0
+        },
+        {
+          "date": "2025-09-14",
+          "close": 4632.0
+        },
+        {
+          "date": "2025-09-21",
+          "close": 4802.0
+        },
+        {
+          "date": "2025-09-28",
+          "close": 5031.0
+        },
+        {
+          "date": "2025-10-05",
+          "close": 5020.0
+        },
+        {
+          "date": "2025-10-12",
+          "close": 4897.0
+        },
+        {
+          "date": "2025-10-19",
+          "close": 4905.0
+        },
+        {
+          "date": "2025-10-26",
+          "close": 4655.0
+        },
+        {
+          "date": "2025-11-02",
+          "close": 4529.0
+        },
+        {
+          "date": "2025-11-09",
+          "close": 4641.0
+        },
+        {
+          "date": "2025-11-16",
+          "close": 4500.0
+        },
+        {
+          "date": "2025-11-23",
+          "close": 4702.0
+        },
+        {
+          "date": "2025-11-30",
+          "close": 4808.0
+        },
+        {
+          "date": "2025-12-07",
+          "close": 4836.0
+        },
+        {
+          "date": "2025-12-14",
+          "close": 4788.0
+        },
+        {
+          "date": "2025-12-21",
+          "close": 4894.0
+        },
+        {
+          "date": "2025-12-28",
+          "close": 4873.0
+        },
+        {
+          "date": "2026-01-04",
+          "close": 5114.0
+        },
+        {
+          "date": "2026-01-11",
+          "close": 5690.0
+        },
+        {
+          "date": "2026-01-18",
+          "close": 5631.0
+        },
+        {
+          "date": "2026-01-25",
+          "close": 5129.0
+        },
+        {
+          "date": "2026-02-01",
+          "close": 5104.0
+        },
+        {
+          "date": "2026-02-08",
+          "close": 5499.0
+        },
+        {
+          "date": "2026-02-15",
+          "close": 5750.0
+        },
+        {
+          "date": "2026-02-22",
+          "close": 6168.0
+        },
+        {
+          "date": "2026-03-01",
+          "close": 6247.0
+        },
+        {
+          "date": "2026-03-08",
+          "close": 6531.0
+        },
+        {
+          "date": "2026-03-15",
+          "close": 6373.0
+        },
+        {
+          "date": "2026-03-22",
+          "close": 6140.0
+        },
+        {
+          "date": "2026-03-29",
+          "close": 6450.0
+        },
+        {
+          "date": "2026-04-05",
+          "close": 6556.0
+        },
+        {
+          "date": "2026-04-12",
+          "close": 6907.0
+        },
+        {
+          "date": "2026-04-19",
+          "close": 6768.0
+        },
+        {
+          "date": "2026-04-26",
+          "close": 7104.0
+        },
+        {
+          "date": "2026-05-03",
+          "close": 7480.0
+        },
+        {
+          "date": "2026-05-10",
+          "close": 7105.0
+        },
+        {
+          "date": "2026-05-15",
+          "close": 7105.0
+        }
+      ]
+    },
+    {
+      "ticker": "3436.T",
+      "name": "SUMCO",
+      "market": "TSE",
+      "price": 3090.0,
+      "currency": "JPY",
+      "pct1y": 210.2,
+      "fwdPe": 20.0,
+      "revGrowth": 30.0,
+      "aiExposure": "○",
+      "lgRelevance": "△",
+      "note": "실리콘 웨이퍼 2위, AI 팹 증설 수혜 회복",
+      "priceHistory": [
+        {
+          "date": "2025-05-11",
+          "close": 996.2
+        },
+        {
+          "date": "2025-05-18",
+          "close": 958.4
+        },
+        {
+          "date": "2025-05-25",
+          "close": 982.7
+        },
+        {
+          "date": "2025-06-01",
+          "close": 974.0
+        },
+        {
+          "date": "2025-06-08",
+          "close": 1009.5
+        },
+        {
+          "date": "2025-06-15",
+          "close": 1023.5
+        },
+        {
+          "date": "2025-06-22",
+          "close": 1140.0
+        },
+        {
+          "date": "2025-06-29",
+          "close": 1118.5
+        },
+        {
+          "date": "2025-07-06",
+          "close": 1218.0
+        },
+        {
+          "date": "2025-07-13",
+          "close": 1197.0
+        },
+        {
+          "date": "2025-07-20",
+          "close": 1234.0
+        },
+        {
+          "date": "2025-07-27",
+          "close": 1164.0
+        },
+        {
+          "date": "2025-08-03",
+          "close": 1218.0
+        },
+        {
+          "date": "2025-08-10",
+          "close": 1201.0
+        },
+        {
+          "date": "2025-08-17",
+          "close": 1240.5
+        },
+        {
+          "date": "2025-08-24",
+          "close": 1246.5
+        },
+        {
+          "date": "2025-08-31",
+          "close": 1270.5
+        },
+        {
+          "date": "2025-09-07",
+          "close": 1325.0
+        },
+        {
+          "date": "2025-09-14",
+          "close": 1467.0
+        },
+        {
+          "date": "2025-09-21",
+          "close": 1427.5
+        },
+        {
+          "date": "2025-09-28",
+          "close": 1694.0
+        },
+        {
+          "date": "2025-10-05",
+          "close": 1657.5
+        },
+        {
+          "date": "2025-10-12",
+          "close": 1658.5
+        },
+        {
+          "date": "2025-10-19",
+          "close": 1704.0
+        },
+        {
+          "date": "2025-10-26",
+          "close": 1577.5
+        },
+        {
+          "date": "2025-11-02",
+          "close": 1445.0
+        },
+        {
+          "date": "2025-11-09",
+          "close": 1304.5
+        },
+        {
+          "date": "2025-11-16",
+          "close": 1174.5
+        },
+        {
+          "date": "2025-11-23",
+          "close": 1233.0
+        },
+        {
+          "date": "2025-11-30",
+          "close": 1379.5
+        },
+        {
+          "date": "2025-12-07",
+          "close": 1353.5
+        },
+        {
+          "date": "2025-12-14",
+          "close": 1264.5
+        },
+        {
+          "date": "2025-12-21",
+          "close": 1435.0
+        },
+        {
+          "date": "2025-12-28",
+          "close": 1435.0
+        },
+        {
+          "date": "2026-01-04",
+          "close": 1489.0
+        },
+        {
+          "date": "2026-01-11",
+          "close": 1609.0
+        },
+        {
+          "date": "2026-01-18",
+          "close": 1666.0
+        },
+        {
+          "date": "2026-01-25",
+          "close": 1614.0
+        },
+        {
+          "date": "2026-02-01",
+          "close": 1624.5
+        },
+        {
+          "date": "2026-02-08",
+          "close": 1526.0
+        },
+        {
+          "date": "2026-02-15",
+          "close": 1614.0
+        },
+        {
+          "date": "2026-02-22",
+          "close": 1827.5
+        },
+        {
+          "date": "2026-03-01",
+          "close": 1700.0
+        },
+        {
+          "date": "2026-03-08",
+          "close": 1567.0
+        },
+        {
+          "date": "2026-03-15",
+          "close": 1682.5
+        },
+        {
+          "date": "2026-03-22",
+          "close": 1850.5
+        },
+        {
+          "date": "2026-03-29",
+          "close": 1738.0
+        },
+        {
+          "date": "2026-04-05",
+          "close": 2033.5
+        },
+        {
+          "date": "2026-04-12",
+          "close": 2095.0
+        },
+        {
+          "date": "2026-04-19",
+          "close": 2242.0
+        },
+        {
+          "date": "2026-04-26",
+          "close": 2533.0
+        },
+        {
+          "date": "2026-05-03",
+          "close": 3578.0
+        },
+        {
+          "date": "2026-05-10",
+          "close": 3090.0
+        },
+        {
+          "date": "2026-05-15",
+          "close": 3090.0
+        }
+      ]
+    }
+  ],
+  "topPicks": [
+    {
+      "rank": 1,
+      "ticker": "KLAC",
+      "name": "KLA Corporation",
+      "market": "NASDAQ",
+      "price": 1804.32,
+      "currency": "USD",
+      "buyPrice": 1700.0,
+      "target1": 2050.0,
+      "target1pct": 20.6,
+      "stopLoss": 1530.0,
+      "stopLossPct": -10.0,
+      "summary": "공정 제어 검사 장비 독과점. AI 칩 복잡도 증가로 WFE 내 검사 비중 구조적 상승. 어드밴스드 패키징 매출 $635M→$1B 가시성. 순이익률 33.4%로 그룹 최고 마진 — 프리미엄 밸류에이션 정당화.",
+      "risks": [
+        "Forward PE 40x 부담 — 금리 충격 취약",
+        "중국 WFE 비중 축소로 단기 매출 변동 가능"
+      ]
+    },
+    {
+      "rank": 2,
+      "ticker": "6857.T",
+      "name": "Advantest",
+      "market": "TSE",
+      "price": 26360.0,
+      "currency": "JPY",
+      "buyPrice": 24000.0,
+      "target1": 31000.0,
+      "target1pct": 29.2,
+      "stopLoss": 21600.0,
+      "stopLossPct": -10.0,
+      "summary": "AI SoC 테스터 시장 점유율 60%+ 독점. FY2026 가이던스 +26% — 반도체 장비주 중 최고 성장률. 생산능력 70%+ 확장 진행 중. NVIDIA·삼성전자 HBM·AI 칩 테스트 직공급 구조.",
+      "risks": [
+        "테스터 사이클 피크아웃 우려 — 1년 +262% 과열",
+        "고객 집중도 高 — NVIDIA 발주 지연 시 취약"
+      ]
+    },
+    {
+      "rank": 3,
+      "ticker": "LRCX",
+      "name": "Lam Research",
+      "market": "NASDAQ",
+      "price": 284.72,
+      "currency": "USD",
+      "buyPrice": 260.0,
+      "target1": 315.0,
+      "target1pct": 21.2,
+      "stopLoss": 234.0,
+      "stopLossPct": -10.2,
+      "summary": "Etch·Deposition 글로벌 1위. HBM 적층 증가(HBM4)로 식각 장비 수요 구조적 상승. Q1 FY2026 +23.8% YoY, Q2 가이던스 $6.6B. 애널리스트 컨센서스 목표가 $315.",
+      "risks": [
+        "1년 +237% 급등 후 단기 조정 리스크",
+        "NAND 회복 속도 둔화 시 가이던스 하향 가능"
+      ]
+    }
+  ],
+  "watchlist": [
+    {
+      "ticker": "AMAT",
+      "name": "Applied Materials",
+      "trigger": "FY2026 Q4 결과 발표(11월) — $35B 연매출 달성 여부 확인. ICAPS·패키징 비중 공시"
+    },
+    {
+      "ticker": "8035.T",
+      "name": "Tokyo Electron (TEL)",
+      "trigger": "MATCH Act 통과 여부 — DUV 대중국 추가 규제 시 매출 15~20% 타격, 진입가 재조정 필요"
+    },
+    {
+      "ticker": "6920.T",
+      "name": "Lasertec",
+      "trigger": "Q4 FY2026 주문 잔고 공시(6월) — 반도체 검사 수주 잔고 YoY 증감으로 EUV 수요 선행 확인"
+    },
+    {
+      "ticker": "ENTG",
+      "name": "Entegris",
+      "trigger": "Q2 2026 실적(7월) — 가이던스 상단($845M) 달성 및 마진 개선 추세 확인 후 매수 검토"
+    },
+    {
+      "ticker": "3436.T",
+      "name": "SUMCO",
+      "trigger": "실리콘 웨이퍼 ASP 반등 확인(Q3 가이던스) — AI 팹 증설 수혜 실적 반영 타이밍"
+    }
+  ],
+  "lgImplications": [
+    "AIDC 파주 신축·DBO 3개 거점 발주에서 반도체 장비 업사이클이 간접 참고 지표. GPU 서버 출하↑ → 메모리/로직 칩 수요↑ → 장비·소재 수주↑ → AIDC 인프라 투자 확대로 이어지는 인과 사슬을 확인하면 U+ AIDC CapEx 타이밍 정당화 논거 강화 가능.",
+    "KLAC·AMAT 한국 고객(삼성·SK하이닉스) 매출 비중 40%+ — 이들 기업 IR에서 한국 고객 WFE 투자 계획을 파악하면 삼성·SK와의 AICC/AX 수주 전망 선행 지표로 활용 가능. B2B 영업 인텔리전스 소스.",
+    "Advantest AI SoC 테스터 수요 급증 = 국내 팹리스·AI 칩 설계사 성장 시그널. AI에이전트 슈퍼스쿨, EXAONE 온디바이스 사업의 고객군(AI 반도체 스타트업·팹리스)과 교차 — 신규 AX 사업화 고객 발굴 타이밍.",
+    "MATCH Act(DUV 대중국 추가 제재) 시행 시 일본 장비사 타격 → 한국·대만·인도 파운드리 추가 투자 가속 → 국내 AI 팹 수요 증가 → U+ AIDC 코로케이션 고객 파이프라인 직접 확대 시나리오. 규제 동향 모니터링 권장.",
+    "Entegris·Shin-Etsu 초순수 소재 공급망은 국내 반도체 클린룸 운영사와 동일한 서플라이 체인. U+ AIDC 운영 파트너(삼성·SK) 납품 구조 파악 시 DBO NOC 협상 레버리지로 활용 가능한 업종 지식."
+  ],
+  "sources": [
+    {
+      "url": "https://korea.counterpointresearch.com/ai-driven-semiconductor-equipment-market-2026-outlook/",
+      "title": "Counterpoint Research — 반도체 장비 시장 2026 전망 +12%",
+      "note": "장비 시장 1,430억달러, 12% 성장"
+    },
+    {
+      "url": "https://www.semi.org/ko/node/168261",
+      "title": "SEMI — 글로벌 반도체 장비 시장 2027 1,560억달러 전망",
+      "note": "TAM 전망"
+    },
+    {
+      "url": "https://ir.kla.com/news-events/press-releases/detail/514/kla-corporation-reports-fiscal-2026-third-quarter-results",
+      "title": "KLA Q3 FY2026 실적 — 매출 $3.42B, +11.5% YoY",
+      "note": "KLAC 실적"
+    },
+    {
+      "url": "https://www.indexbox.io/blog/kla-corporation-reports-strong-march-quarter-2026-results-with-revenue-of-3415-billion/",
+      "title": "KLA March Quarter 2026 — Revenue Up 11% YoY",
+      "note": "KLAC 실적 요약"
+    },
+    {
+      "url": "https://www.tradingview.com/news/zacks:27f67df35094b:0-lrcx-s-gross-margin-near-50-more-upside-ahead-amid-ai-led-demand/",
+      "title": "Lam Research LRCX 총이익률 50% 근접, AI 수요 모멘텀",
+      "note": "LRCX 분석"
+    },
+    {
+      "url": "https://www.indexbox.io/blog/entegris-q1-2026-results-beat-revenue-expectations-eps-surges-154-above-estimates/",
+      "title": "Entegris Q1 2026 — Revenue $811.9M, EPS Beat",
+      "note": "ENTG 실적"
+    },
+    {
+      "url": "https://ninescrolls.com/news/mks-q1-2026-hits-1-08-billion-as-plasma-vacuum-and-rf-power-for-deposition-and-etch-surge/",
+      "title": "MKS Q1 2026 $1.08B — 플라즈마·진공·RF 파워 서지",
+      "note": "MKSI 실적"
+    },
+    {
+      "url": "https://simplywall.st/stocks/jp/semiconductors/tse-6857/advantest-shares/news/assessing-advantest-tse6857-valuation-after-strong-fy-2026-r",
+      "title": "Advantest FY2026 실적 평가 — AI HPC 드라이버",
+      "note": "6857.T 실적"
+    },
+    {
+      "url": "https://www.digitimes.com/news/a20260501VL206/advantest-earnings-outlook-revenue-testing.html",
+      "title": "Advantest beats on AI chip testing — FY2026 +26% 가이던스",
+      "note": "6857.T FY2026 가이던스"
+    },
+    {
+      "url": "https://oplexa.com/us-china-chip-war-2026-semiconductor/",
+      "title": "US-China Chip War 2026 — 수출 통제 영향",
+      "note": "규제 리스크 분석"
+    },
+    {
+      "url": "https://www.fortunebusinessinsights.com/semiconductor-material-market-110088",
+      "title": "Fortune Business Insights — 반도체 소재 시장 $72B→$104B",
+      "note": "소재 TAM"
+    },
+    {
+      "url": "https://www.smartkarma.com/home/newswire/earnings-alerts/tokyo-electron-8035-earnings-fy-operating-income-forecast-boosted-but-estimates-missed/",
+      "title": "Tokyo Electron FY2026 영업이익 가이던스 상향",
+      "note": "TEL 실적"
+    }
+  ]
+};
+
+// ── Helpers ──────────────────────────────────────────────────────────────
+function fmtPct(v) {
+  if (v == null) return '—';
+  const sign = v >= 0 ? '+' : '';
+  return `${sign}${v.toFixed(1)}%`;
+}
+function pctClass(v) { return v >= 0 ? 'pct-up' : 'pct-down'; }
+function fmtPrice(p, cur) {
+  if (cur === 'JPY') return `¥${p.toLocaleString()}`;
+  return `$${p.toFixed(2)}`;
+}
+
+// ── Header ───────────────────────────────────────────────────────────────
+document.getElementById('header-theme').textContent = THEME_DATA.theme;
+document.getElementById('meta-category').textContent = THEME_DATA.category === 'upstream' ? '후방 (Upstream)' : '전방 (Downstream)';
+document.getElementById('meta-week').textContent = THEME_DATA.isoWeek;
+document.getElementById('meta-date').textContent = THEME_DATA.date;
+document.getElementById('meta-stocks').textContent = `종목 ${THEME_DATA.stocks.length}개 분석`;
+document.getElementById('footer-date').textContent = THEME_DATA.date;
+document.title = `Sector Theme Intel — ${THEME_DATA.theme} | ${THEME_DATA.date}`;
+
+// ── Macro ─────────────────────────────────────────────────────────────────
+const mg = document.getElementById('macro-grid');
+const macroCards = [
+  { label: '반도체 장비 TAM', value: THEME_DATA.macro.tam.current, sub: `→ ${THEME_DATA.macro.tam.target} (${THEME_DATA.macro.tam.year})` },
+  { label: '반도체 소재 시장', value: THEME_DATA.macro.cpo_tam.current, sub: `→ ${THEME_DATA.macro.cpo_tam.target} (${THEME_DATA.macro.cpo_tam.year})` },
+  { label: '장비 시장 CAGR', value: THEME_DATA.macro.cagr, sub: 'SEMI·Counterpoint 2026' },
+  { label: '소재 시장 CAGR', value: THEME_DATA.macro.cpo_tam.cagr, sub: 'Fortune Business Insights' },
+];
+mg.innerHTML = macroCards.map(c => `
+  <div class="macro-card">
+    <div class="macro-label">${c.label}</div>
+    <div class="macro-value">${c.value}</div>
+    <div class="macro-sub">${c.sub}</div>
+  </div>`).join('');
+
+const tg = document.getElementById('trigger-grid');
+tg.innerHTML = THEME_DATA.macro.triggers.map(t => `
+  <div class="trigger-card">
+    <div class="trigger-title">⚡ ${t.title}</div>
+    <div class="trigger-desc">${t.desc}</div>
+  </div>`).join('');
+
+const bl = document.getElementById('bottleneck-list');
+bl.innerHTML = THEME_DATA.macro.bottlenecks.map(b => `<span class="bottleneck-tag">⚠ ${b}</span>`).join('');
+
+// ── Performance Chart ─────────────────────────────────────────────────────
+const topTickers = THEME_DATA.topPicks.map(p => p.ticker);
+const perfCtx = document.getElementById('perfChart').getContext('2d');
+const colorMap = {
+  'KLAC': '#FFD700', 'LRCX': '#3FB950', 'AMAT': '#56D4DD',
+  'ENTG': '#58A6FF', 'MKSI': '#79C0FF',
+  '8035.T': '#BC8CFF', '6857.T': '#F7AC59', '6920.T': '#FF6B9D',
+  '4063.T': '#8B949E', '3436.T': '#F47067'
+};
+
+// Normalize to 100 at start
+const perfDatasets = THEME_DATA.stocks.map(s => {
+  const hist = s.priceHistory;
+  if (!hist || hist.length === 0) return null;
+  const base = hist[0].close;
+  return {
+    label: s.ticker,
+    data: hist.map(h => ({ x: h.date, y: parseFloat(((h.close / base) * 100).toFixed(2)) })),
+    borderColor: colorMap[s.ticker] || '#888',
+    backgroundColor: 'transparent',
+    borderWidth: topTickers.includes(s.ticker) ? 2.5 : 1.2,
+    borderDash: topTickers.includes(s.ticker) ? [] : [4, 3],
+    pointRadius: 0,
+    tension: 0.3,
+  };
+}).filter(Boolean);
+
+new Chart(perfCtx, {
+  type: 'line',
+  data: { datasets: perfDatasets },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: true, position: 'top', labels: { color: '#8B949E', font: { size: 11 }, usePointStyle: true, boxWidth: 10 } },
+      tooltip: { backgroundColor: '#1C2128', borderColor: '#30363D', borderWidth: 1, titleColor: '#E6EDF3', bodyColor: '#8B949E', callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}` } }
+    },
+    scales: {
+      x: { type: 'time', time: { unit: 'month', displayFormats: { month: 'YY/MM' } }, grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', maxTicksLimit: 12 } },
+      y: { grid: { color: 'rgba(48,54,61,0.5)' }, ticks: { color: '#6E7681', callback: v => `${v}` }, title: { display: true, text: '상대 수익률 (기준=100)', color: '#6E7681', font: { size: 11 } } }
+    }
+  }
+});
+
+// ── Matrix Table ──────────────────────────────────────────────────────────
+document.getElementById('stock-count').textContent = THEME_DATA.stocks.length;
+const mt = document.getElementById('matrix-table');
+const pickRanks = {};
+THEME_DATA.topPicks.forEach((p, i) => { pickRanks[p.ticker] = i + 1; });
+
+mt.innerHTML = `
+  <thead><tr>
+    <th>티커</th><th>종목명</th><th>시장</th>
+    <th>현재가</th><th>1년 수익률</th><th>Forward PE</th>
+    <th>매출 성장률</th><th>AI 익스포저</th><th>LG U+ 관련성</th><th>특징</th>
+  </tr></thead>
+  <tbody>${THEME_DATA.stocks.map(s => {
+    const rank = pickRanks[s.ticker];
+    const badge = rank ? `<span class="top-pick-badge badge-${rank}">TOP${rank}</span>` : '';
+    const mktClass = ['NYSE','NASDAQ'].includes(s.market) ? 'us' : 'jp';
+    return `<tr>
+      <td class="ticker-cell ${mktClass}">${s.ticker}${badge}</td>
+      <td>${s.name}</td>
+      <td><span class="meta-tag">${s.market}</span></td>
+      <td>${fmtPrice(s.price, s.currency)}</td>
+      <td class="${pctClass(s.pct1y)}">${fmtPct(s.pct1y)}</td>
+      <td>${s.fwdPe ? s.fwdPe + 'x' : '—'}</td>
+      <td class="${pctClass(s.revGrowth)}">${fmtPct(s.revGrowth)}</td>
+      <td class="exposure-tag">${s.aiExposure}</td>
+      <td class="exposure-tag">${s.lgRelevance}</td>
+      <td style="color:#8B949E;font-size:12px">${s.note}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── Top Picks ─────────────────────────────────────────────────────────────
+const pg = document.getElementById('picks-grid');
+pg.innerHTML = THEME_DATA.topPicks.map(p => `
+  <div class="pick-card rank-${p.rank}">
+    <div class="pick-rank">PICK ${p.rank}</div>
+    <div class="pick-header">
+      <div>
+        <div class="pick-name">${p.name}</div>
+        <div class="pick-ticker">${p.ticker} · ${p.market}</div>
+      </div>
+      <div>
+        <div class="pick-price">${fmtPrice(p.price, p.currency)}</div>
+        <div class="pick-1y pct-up">${fmtPct(THEME_DATA.stocks.find(s=>s.ticker===p.ticker)?.pct1y)} (1Y)</div>
+      </div>
+    </div>
+    <div class="pick-summary">${p.summary}</div>
+    <div class="pick-targets">
+      <div class="pick-target buy-t">
+        <div class="pick-target-label">매수가</div>
+        <div class="pick-target-val">${fmtPrice(p.buyPrice, p.currency)}</div>
+      </div>
+      <div class="pick-target t1">
+        <div class="pick-target-label">1차 목표가</div>
+        <div class="pick-target-val">${fmtPrice(p.target1, p.currency)} <small>(${fmtPct(p.target1pct)})</small></div>
+      </div>
+      <div class="pick-target sl">
+        <div class="pick-target-label">손절가</div>
+        <div class="pick-target-val">${fmtPrice(p.stopLoss, p.currency)} <small>(${fmtPct(p.stopLossPct)})</small></div>
+      </div>
+    </div>
+    <div class="pick-risks"><span>⚠ 리스크:</span> ${p.risks.join(' / ')}</div>
+  </div>`).join('');
+
+// ── Watchlist ─────────────────────────────────────────────────────────────
+const wt = document.getElementById('watchlist-table');
+wt.innerHTML = `
+  <thead><tr><th>#</th><th>티커</th><th>종목명</th><th>현재가</th><th>1Y</th><th>다음 분기 트리거</th></tr></thead>
+  <tbody>${THEME_DATA.watchlist.map((w, i) => {
+    const s = THEME_DATA.stocks.find(x => x.ticker === w.ticker);
+    return `<tr>
+      <td style="color:#6E7681">${i+1}</td>
+      <td class="ticker-cell ${['NYSE','NASDAQ'].includes(s?.market) ? 'us' : 'jp'}">${w.ticker}</td>
+      <td>${w.name}</td>
+      <td>${s ? fmtPrice(s.price, s.currency) : '—'}</td>
+      <td class="${pctClass(s?.pct1y || 0)}">${fmtPct(s?.pct1y)}</td>
+      <td style="font-size:12px;color:#8B949E">${w.trigger}</td>
+    </tr>`;
+  }).join('')}</tbody>`;
+
+// ── LG Implications ───────────────────────────────────────────────────────
+const li = document.getElementById('lg-items');
+li.innerHTML = THEME_DATA.lgImplications.map((t, i) => `
+  <div class="lg-item">
+    <div class="lg-num">${i+1}</div>
+    <div class="lg-text">${t}</div>
+  </div>`).join('');
+
+// ── Sources ───────────────────────────────────────────────────────────────
+if (THEME_DATA.sources) {
+  const sl = document.getElementById('source-list');
+  sl.innerHTML = THEME_DATA.sources.map((s, i) => `
+    <li>${i+1}. <a href="${s.url}" target="_blank">${s.title}</a> — ${s.note}</li>`).join('');
+}
+</script>
+</body>
+</html>
